@@ -2,36 +2,25 @@ import SwiftUI
 import SwiftData
 
 struct SettingsView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
 
     var body: some View {
         Text("Select a conversation")
     }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
-            }
-        }
-    }
 }
 
 struct SettingsNav: View {
+  @EnvironmentObject var userManager: UserManager
+  
   var body: some View {
     List {
-      NavigationLink {
-        Text("Item 1")
-      } label: {
-        Text("Item 1")
+      Section {
+        NavigationLink {
+          
+        } label: {
+          if let activeUser = userManager.activeUser {
+            Avatar(avatar: activeUser.avatar)
+          }
+        }
       }
     }
   }
@@ -57,5 +46,5 @@ struct SettingsToolbar: ToolbarContent {
 
 #Preview {
     SettingsView()
-        .modelContainer(for: Item.self, inMemory: true)
+      .modelContainer(for: User.self, inMemory: true)
 }

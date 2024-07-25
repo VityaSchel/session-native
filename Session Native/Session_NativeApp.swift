@@ -4,9 +4,7 @@ import SwiftData
 @main
 struct Session_NativeApp: App {
     var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
+        let schema = Schema(storageSchema)
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
         do {
@@ -19,6 +17,8 @@ struct Session_NativeApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+              .environmentObject(UserManager(container: sharedModelContainer))
+              .environmentObject(ViewManager())
         }
         .modelContainer(sharedModelContainer)
     }

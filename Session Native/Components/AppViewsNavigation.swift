@@ -4,19 +4,16 @@ import SwiftUI
 let buttonSize: CGFloat = 24.0
 
 struct AppViewsNavigation: View {
-  @Binding var appView: AppView
+  @EnvironmentObject var appViewManager: ViewManager
   
   var body: some View {
-    HStack {
-      Spacer()
-      NavButton(appView: $appView, view: .contacts, icon: "person.crop.circle.fill")
-      Spacer()
-      Spacer()
-      NavButton(appView: $appView, view: .conversations, icon: "bubble.left.and.bubble.right.fill")
-      Spacer()
-      Spacer()
-      NavButton(appView: $appView, view: .settings, icon: "gear")
-      Spacer()
+    HStack(spacing: 0) {
+      NavButton(view: .contacts, icon: "person.crop.circle.fill")
+        .layoutPriority(1)
+      NavButton(view: .conversations, icon: "bubble.left.and.bubble.right.fill")
+        .layoutPriority(1)
+      NavButton(view: .settings, icon: "gear")
+        .layoutPriority(1)
     }
     .padding(.vertical, 12.5)
     .border(width: 1, edges: [.top], color: Color("Separator"))
@@ -24,25 +21,27 @@ struct AppViewsNavigation: View {
   }
   
   private struct NavButton: View {
-    @Binding var appView: AppView
+    @EnvironmentObject var appViewManager: ViewManager
     var view: AppView
     var icon: String
     
     var body: some View {
       Button(action: {
-        appView = view
+        appViewManager.setActiveView(view)
       }) {
         Image(systemName: icon)
           .resizable()
           .frame(width: buttonSize, height: buttonSize)
-          
+          .frame(maxWidth: .infinity)
+          .contentShape(Rectangle())
       }
-      .foregroundColor(appView == view ? Color.accentColor : Color.gray)
+      .foregroundColor(appViewManager.appView == view ? Color.accentColor : Color.gray)
       .buttonStyle(PlainButtonStyle())
     }
   }
 }
 
 #Preview {
-  AppViewsNavigation(appView: .constant(.conversations))
+  AppViewsNavigation()
+    .environmentObject(ViewManager())
 }
