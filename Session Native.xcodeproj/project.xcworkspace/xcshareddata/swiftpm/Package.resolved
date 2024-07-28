@@ -1,0 +1,15 @@
+{
+  "originHash" : "04ab09cdefcb684b9c28ceb69de9477a29b8116a0b27da31e9608b08c3a06d04",
+  "pins" : [
+    {
+      "identity" : "messagepack.swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/a2/MessagePack.swift.git",
+      "state" : {
+        "revision" : "27b35fd49e92fcae395bf8ccb233499d89cc7890",
+        "version" : "4.0.0"
+      }
+    }
+  ],
+  "version" : 3
+}

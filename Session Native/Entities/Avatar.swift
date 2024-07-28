@@ -3,6 +3,8 @@ import SwiftUI
 
 struct Avatar: View {
   var avatar: Data?
+  var width: CGFloat? = 40
+  var height: CGFloat? = 40
   
   var body: some View {
     ZStack {
@@ -13,9 +15,9 @@ struct Avatar: View {
       Image(systemName: "person.fill")
         .resizable()
         .scaledToFit()
-        .padding(12)
+        .padding((width ?? 40)*0.3)
     }
-    .frame(width: 40, height: 40)
+    .frame(width: width, height: height)
     .background(Color.gray.gradient)
     .cornerRadius(.infinity)
   }

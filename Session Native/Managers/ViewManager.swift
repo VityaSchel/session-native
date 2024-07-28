@@ -4,10 +4,10 @@ import SwiftUI
 
 @MainActor
 class ViewManager: ObservableObject {
-  @Published var appView: AppView = .auth
+  @Published var appView: AppView
   
-  init() {
-    // todo: check whether the user is logged in with saved credentials
+  init(_ defaultAppView: AppView? = nil) {
+    appView = defaultAppView ?? .auth
   }
   
   func setActiveView(_ view: AppView) {

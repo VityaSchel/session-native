@@ -12,54 +12,62 @@ enum AppView {
 
 struct ContentView: View {
   @EnvironmentObject var appViewManager: ViewManager
+  @EnvironmentObject var userManager: UserManager
   @State private var searchText = ""
     
   var body: some View {
-    switch appViewManager.appView {
-    case .contacts, .conversations, .settings:
-      NavigationSplitView {
-        VStack {
-          switch appViewManager.appView {
-          case .contacts:
-            ContactsNav()
-          case .conversations:
-            ConversationsNav()
-          case .settings:
-            SettingsNav()
+    Group {
+      switch appViewManager.appView {
+      case .contacts, .conversations, .settings:
+        NavigationSplitView {
+          VStack {
+            switch appViewManager.appView {
+            case .contacts:
+              ContactsNav()
+            case .conversations:
+              ConversationsNav()
+            case .settings:
+              SettingsNav()
+            default:
+              EmptyView()
+            }
+            AppViewsNavigation()
+          }
+          .toolbar {
+            switch appViewManager.appView {
+            case .contacts:
+              ContactsToolbar()
+            case .conversations:
+              ConversationsToolbar()
+            case .settings:
+              SettingsToolbar()
+            default:
+              ToolbarItem{}
+            }
+          }
+          .frame(minWidth: 200)
+          .toolbar(removing: .sidebarToggle)
+          .navigationSplitViewColumnWidth(min: 200, ideal: 300, max: 400)
+        } detail: {
+        }
+      case .auth, .login, .signup:
+        NavigationStack {
+          switch(appViewManager.appView) {
+          case .auth:
+            AuthView()
+          case .login:
+            LoginView()
+          case .signup:
+            SignupView()
           default:
             EmptyView()
           }
-          AppViewsNavigation()
         }
-        .toolbar {
-          switch appViewManager.appView {
-          case .contacts:
-            ContactsToolbar()
-          case .conversations:
-            ConversationsToolbar()
-          case .settings:
-            SettingsToolbar()
-          default:
-            ToolbarItem{}
-          }
-        }
-        .frame(minWidth: 200)
-        .toolbar(removing: .sidebarToggle)
-        .navigationSplitViewColumnWidth(min: 200, ideal: 300, max: 400)
-      } detail: {
       }
-    case .auth, .login, .signup:
-      NavigationStack {
-        switch(appViewManager.appView) {
-        case .auth:
-          AuthView()
-        case .login:
-          LoginView()
-        case .signup:
-          SignupView()
-        default:
-          EmptyView()
-        }
+    }
+    .onAppear() {
+      if userManager.activeUser != nil {
+        appViewManager.setActiveView(.conversations)
       }
     }
   }

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A7037D112C55562C00B53FBD /* BackendManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7037D102C55562C00B53FBD /* BackendManager.swift */; };
+		A7037D142C5578C500B53FBD /* MessagePack in Frameworks */ = {isa = PBXBuildFile; productRef = A7037D132C5578C500B53FBD /* MessagePack */; };
 		A719F74B2C51C23100E9487A /* Session_NativeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A719F74A2C51C23100E9487A /* Session_NativeApp.swift */; };
 		A719F74D2C51C23100E9487A /* ConversationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A719F74C2C51C23100E9487A /* ConversationsView.swift */; };
 		A719F74F2C51C23100E9487A /* Conversation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A719F74E2C51C23100E9487A /* Conversation.swift */; };
@@ -34,9 +36,12 @@
 		A76FE57A2C52C8D1009B1D19 /* SignupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A76FE5792C52C8D1009B1D19 /* SignupView.swift */; };
 		A76FE57C2C52C977009B1D19 /* ViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A76FE57B2C52C977009B1D19 /* ViewManager.swift */; };
 		A76FE57E2C52DA89009B1D19 /* SessionIdAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A76FE57D2C52DA89009B1D19 /* SessionIdAnimation.swift */; };
+		A7E68C5A2C55B4B4005D8819 /* KeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E68C592C55B4B4005D8819 /* KeychainManager.swift */; };
+		A7EB5E6E2C53B46800A887B3 /* ToolbarStyleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7EB5E6D2C53B46800A887B3 /* ToolbarStyleButton.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		A7037D102C55562C00B53FBD /* BackendManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackendManager.swift; sourceTree = "<group>"; };
 		A719F7472C51C23100E9487A /* Session Native.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Session Native.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A719F74A2C51C23100E9487A /* Session_NativeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session_NativeApp.swift; sourceTree = "<group>"; };
 		A719F74C2C51C23100E9487A /* ConversationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationsView.swift; sourceTree = "<group>"; };
@@ -66,6 +71,8 @@
 		A76FE5792C52C8D1009B1D19 /* SignupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignupView.swift; sourceTree = "<group>"; };
 		A76FE57B2C52C977009B1D19 /* ViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewManager.swift; sourceTree = "<group>"; };
 		A76FE57D2C52DA89009B1D19 /* SessionIdAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionIdAnimation.swift; sourceTree = "<group>"; };
+		A7E68C592C55B4B4005D8819 /* KeychainManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainManager.swift; sourceTree = "<group>"; };
+		A7EB5E6D2C53B46800A887B3 /* ToolbarStyleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarStyleButton.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +80,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A7037D142C5578C500B53FBD /* MessagePack in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -188,7 +196,9 @@
 			isa = PBXGroup;
 			children = (
 				A76FE57B2C52C977009B1D19 /* ViewManager.swift */,
+				A7E68C592C55B4B4005D8819 /* KeychainManager.swift */,
 				A76FE56A2C52B483009B1D19 /* UserManager.swift */,
+				A7037D102C55562C00B53FBD /* BackendManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -205,6 +215,7 @@
 			isa = PBXGroup;
 			children = (
 				A76FE5752C52C698009B1D19 /* SecondaryButton.swift */,
+				A7EB5E6D2C53B46800A887B3 /* ToolbarStyleButton.swift */,
 				A76FE5722C52C0EF009B1D19 /* PrimaryButton.swift */,
 			);
 			path = UI;
@@ -226,6 +237,9 @@
 			dependencies = (
 			);
 			name = "Session Native";
+			packageProductDependencies = (
+				A7037D132C5578C500B53FBD /* MessagePack */,
+			);
 			productName = "Session Native";
 			productReference = A719F7472C51C23100E9487A /* Session Native.app */;
 			productType = "com.apple.product-type.application";
@@ -254,6 +268,9 @@
 				Base,
 			);
 			mainGroup = A719F73E2C51C23100E9487A;
+			packageReferences = (
+				A7037D122C5578C500B53FBD /* XCRemoteSwiftPackageReference "MessagePack.swift" */,
+			);
 			productRefGroup = A719F7482C51C23100E9487A /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -293,9 +310,12 @@
 				A76FE55B2C527FE6009B1D19 /* Message.swift in Sources */,
 				A76FE55F2C52A280009B1D19 /* Avatar.swift in Sources */,
 				A76FE5502C51DA93009B1D19 /* AppViewsNavigation.swift in Sources */,
+				A7EB5E6E2C53B46800A887B3 /* ToolbarStyleButton.swift in Sources */,
+				A7E68C5A2C55B4B4005D8819 /* KeychainManager.swift in Sources */,
 				A76FE57E2C52DA89009B1D19 /* SessionIdAnimation.swift in Sources */,
 				A76FE5652C52A5D4009B1D19 /* SessionId.swift in Sources */,
 				A719F74B2C51C23100E9487A /* Session_NativeApp.swift in Sources */,
+				A7037D112C55562C00B53FBD /* BackendManager.swift in Sources */,
 				A76FE5762C52C698009B1D19 /* SecondaryButton.swift in Sources */,
 				A76FE5782C52C8B7009B1D19 /* LoginView.swift in Sources */,
 				A76FE5532C5250B1009B1D19 /* EdgeBorder.swift in Sources */,
@@ -509,6 +529,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A7037D122C5578C500B53FBD /* XCRemoteSwiftPackageReference "MessagePack.swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/a2/MessagePack.swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A7037D132C5578C500B53FBD /* MessagePack */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A7037D122C5578C500B53FBD /* XCRemoteSwiftPackageReference "MessagePack.swift" */;
+			productName = MessagePack;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A719F73F2C51C23100E9487A /* Project object */;
 }
