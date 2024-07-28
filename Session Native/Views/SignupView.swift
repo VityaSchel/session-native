@@ -124,7 +124,7 @@ struct SignupView: View {
   private func signup() {
     let result = saveToKeychain(account: sessionId, service: "mnemonic", data: mnemonic.data(using: .utf8)!)
     if(result == errSecSuccess) {
-      let user = User(id: UUID(), sessionId: sessionId, displayName: displayName, avatar: avatar)
+      let user = User(id: UUID(), sessionId: sessionId, displayName: displayName.count == 0 ? nil : displayName, avatar: avatar)
       userManager.addUser(user)
       userManager.setActiveUser(user)
       userManager.saveUsers()

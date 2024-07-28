@@ -8,8 +8,9 @@ final class Conversation {
   var archived: Bool
   var lastMessage: Message?
   var typingIndicator: Bool
+  var notifications: Notification
   
-  init(id: UUID, recipient: Recipient, archived: Bool, lastMessage: Message? = nil, typingIndicator: Bool) {
+  init(id: UUID, recipient: Recipient, archived: Bool, lastMessage: Message? = nil, typingIndicator: Bool, notifications: Notification = Notification(enabled: true)) {
     self.id = id
     self.recipient = recipient
     self.archived = archived
@@ -17,5 +18,15 @@ final class Conversation {
       self.lastMessage = lastMessageUnwrapped
     }
     self.typingIndicator = typingIndicator
+    self.notifications = notifications
+  }
+}
+
+@Model
+final class Notification {
+  var enabled: Bool
+  
+  init(enabled: Bool) {
+    self.enabled = enabled
   }
 }

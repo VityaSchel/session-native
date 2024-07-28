@@ -2,22 +2,22 @@ import SwiftUI
 import SwiftData
 
 struct SettingsView: View {
-
     var body: some View {
-        Text("Select a conversation")
+        Text("Select a setting")
     }
 }
 
 struct SettingsNav: View {
   @EnvironmentObject var userManager: UserManager
+  @EnvironmentObject var viewManager: ViewManager
   
   var body: some View {
-    List {
+    List(selection: $viewManager.navigationSelection) {
       Section {
         if let activeUser = userManager.activeUser {
-          NavigationLink {
-            Text(activeUser.sessionId)
-          } label: {
+          NavigationLink(
+            value: "profile"
+          ) {
             Avatar(avatar: activeUser.avatar, width: 64, height: 64)
             VStack(alignment: .leading, spacing: 6) {
               Text(activeUser.displayName ?? getSessionIdPlaceholder(sessionId: activeUser.sessionId))
@@ -113,8 +113,7 @@ struct SettingsNav: View {
             Text("Help")
           }
           NavigationLink {
-            Text("great")
-            //https://github.com/VityaSchel/session-native
+            Text("https://github.com/VityaSchel/session-native")
           } label: {
             Image(systemName: "ladybug.fill")
               .frame(width: 24, height: 24)
@@ -137,20 +136,20 @@ struct SettingsNav: View {
 }
 
 struct SettingsToolbar: ToolbarContent {
+  @EnvironmentObject var viewManager: ViewManager
+  
   var body: some ToolbarContent {
     ToolbarItem {
       Spacer()
     }
     ToolbarItem {
-      Button(action: addItem) {
+      Button(action: {
+        viewManager.setActiveNavigationSelection("profile")
+      }) {
         Text("Edit")
       }
       .buttonStyle(.link)
     }
-  }
-  
-  private func addItem() {
-    
   }
 }
 
@@ -159,14 +158,12 @@ struct SettingsView_Preview: PreviewProvider {
     let inMemoryModelContainer: ModelContainer = {
       do {
         let container = try ModelContainer(for: Schema(storageSchema), configurations: [.init(isStoredInMemoryOnly: true)])
-        let user = User(id: UUID(), sessionId: "051230e39d16adf1f07ca8c7ac46ec7b2f4c000069d9abc00d06ee53b48aa1bc0c", displayName: "hloth")
-        container.mainContext.insert(user)
-        let user2 = User(id: UUID(), sessionId: "05123c7bf529754d0540db25a78e69c73c45b614a6e7a7b8b47004db7452ae616f", displayName: "username picky picka beba biba boba 123 456")
-        container.mainContext.insert(user2)
-        let user3 = User(id: UUID(), sessionId: "05123acfd235ce2513eb20cb5bd6695dd4de365dd91e4914e3054edefe558bd251")
-        container.mainContext.insert(user3)
+        let users = getUsersPreviewMocks()
+        container.mainContext.insert(users[0])
+        container.mainContext.insert(users[1])
+        container.mainContext.insert(users[2])
         try container.mainContext.save()
-        UserDefaults.standard.set(user.id.uuidString, forKey: "activeUser")
+        UserDefaults.standard.set(users[0].id.uuidString, forKey: "activeUser")
         return container
       } catch {
         fatalError("Could not create ModelContainer: \(error)")
@@ -189,7 +186,7 @@ struct SettingsView_Preview: PreviewProvider {
         SettingsView()
       }
     }
-    .modelContainer(for: User.self, inMemory: true)
+    .modelContainer(inMemoryModelContainer)
     .environmentObject(UserManager(container: inMemoryModelContainer))
     .environmentObject(ViewManager(.settings))
   }

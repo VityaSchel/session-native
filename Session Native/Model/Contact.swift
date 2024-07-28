@@ -10,8 +10,6 @@ final class Contact {
   init(id: UUID, recipient: Recipient, name: String? = nil) {
     self.id = id
     self.recipient = recipient
-    if let nameUnwrapped = name {
-      self.name = nameUnwrapped
-    }
+    self.name = name
   }
 }

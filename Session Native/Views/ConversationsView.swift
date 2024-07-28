@@ -13,45 +13,57 @@ struct ConversationsView: View {
 struct ConversationsNav: View {
   @Environment(\.modelContext) private var modelContext
   @Query private var items: [Conversation]
+  @State var deleteAlert: Bool = false
+  @State var deleteAlertLocalOnly: Bool = false
   
   var body: some View {
-    List {
-      Section {
-        ForEach(items) { conversation in
-          ConversationPreviewItem(item: conversation)
-            .swipeActions(edge: .leading) {
-              Button {
-                print("Read conversation")
-              } label: {
-                Label("Read", systemImage: "message.badge.filled.fill")
-              }
-              .tint(.blue)
-            }
-            .swipeActions(edge: .trailing) {
-              Button {
-                print("Muting conversation")
-              } label: {
-                Label("Mute", systemImage: "bell.slash.fill")
-              }
-              .tint(.indigo)
-              
-              
-              Button {
-                print("Move to archive")
-              } label: {
-                Label("Move to archive", systemImage: "archivebox.fill")
-              }
-              
-              Button(role: .destructive) {
-                print("Deleting conversation")
-              } label: {
-                Label("Delete", systemImage: "trash.fill")
-              }
-            }
+    List(items, id: \.id) { conversation in
+      ConversationPreviewItem(item: conversation)
+        .swipeActions(edge: .leading) {
+          Button {
+            print("Read conversation")
+          } label: {
+            Label("Read", systemImage: "message.badge.filled.fill")
+          }
+          .tint(.blue)
         }
-        .onDelete(perform: deleteItems)
-      }
+        .swipeActions(edge: .trailing) {
+          Button {
+            print("Muting conversation")
+          } label: {
+            Label("Mute", systemImage: "bell.slash.fill")
+          }
+          .tint(.indigo)
+          Button {
+            print("Move to archive")
+            
+          } label: {
+            Label("Move to archive", systemImage: "archivebox.fill")
+          }
+          
+          Button(role: .destructive) {
+            print("Deleting conversation")
+            deleteAlert = true
+            deleteAlertLocalOnly = true
+          } label: {
+            Label("Delete", systemImage: "trash.fill")
+          }
+        }
+        .alert("Delete this conversation?", isPresented: $deleteAlert) {
+          Button("Delete everywhere", role: .destructive) {
+            
+          }
+          Button("Delete locally", role: .destructive) {
+            
+          }
+          Button("Cancel", role: .cancel) {
+            deleteAlert = false
+          }
+        }
     }
+    .onDeleteCommand(perform: {
+      
+    })
   }
   
   private func deleteItems(offsets: IndexSet) {
@@ -65,6 +77,7 @@ struct ConversationsNav: View {
 
 struct ConversationPreviewItem: View {
   var item: Conversation
+  @EnvironmentObject var userManager: UserManager
   
   var body: some View {
     NavigationLink {
@@ -72,11 +85,35 @@ struct ConversationPreviewItem: View {
     } label: {
       Avatar(avatar: item.recipient.avatar)
       VStack(alignment: .leading) {
-        Text(item.recipient.displayName ?? getSessionIdPlaceholder(sessionId: item.recipient.sessionId))
-          .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
+        HStack(alignment: .center, spacing: 4) {
+          Text(item.recipient.displayName ?? getSessionIdPlaceholder(sessionId: item.recipient.sessionId))
+            .fontWeight(.bold)
+          if !item.notifications.enabled {
+            Image(systemName: "speaker.slash.fill")
+              .resizable()
+              .scaledToFit()
+              .frame(height: 12)
+              .padding(.top, 4)
+              .opacity(0.45)
+          }
+        }
         if let lastMessage = item.lastMessage {
-          Text(lastMessage.body)
-            .lineLimit(2)
+          if lastMessage.from.sessionId == userManager.activeUser?.sessionId {
+            (Text("You: ")
+              .foregroundStyle(.opacity(0.6))
+            + Text(lastMessage.body)
+              .foregroundColor(.primary)
+             )
+              .lineLimit(2)
+          } else {
+            Text(lastMessage.body)
+              .foregroundColor(.primary)
+              .lineLimit(2)
+              .fixedSize(horizontal: false, vertical: true)
+          }
+        } else {
+          Text("Empty chat")
+            .foregroundStyle(.opacity(0.6))
         }
       }
     }
@@ -97,36 +134,50 @@ struct ConversationsToolbar: ToolbarContent {
     }
   }
   
-  private func addItem() {
-    modelContext.insert(
-      Conversation(
-        id: UUID(),
-        recipient: Recipient(
-          id: UUID(),
-          sessionId: "057aeb66e45660c3bdfb7c62706f6440226af43ec13f3b6f899c1dd4db1b8fce5b",
-          displayName: "hloth"
-        ),
-        archived: false,
-        lastMessage: Message(
-          id: UUID(),
-          hash: "asjdasdkas",
-          timestamp: Date(),
-          from: Recipient(
-            id: UUID(),
-            sessionId: "05123d0edc7681aab3c6ab0895853cde71ee13536028de01ba3caa9522a1edbd19",
-            displayName: "biba"
-          ),
-          body: "Hello worldnnbbnbnnbnbnbHello worldnnbbnbnnbnbnbHello worldnnbbnbnnbnbnbHello worldnnbbnbnnbnbnbHello worldnnbbnbnnbnbnbHello worldnnbbnbnnbnbnbHello worldnnbbnbnnbnbnbHello worldnnbbnbnnbnbnbHello worldnnbbnbnnbnbnbHello worldnnbbnbnnbnbnb",
-          read: false
-          
-        ),
-        typingIndicator: false
-      )
-    )
+  @MainActor private func addItem() {
+    let conversations = getConversationsPreviewMocks()
+    modelContext.container.mainContext.insert(conversations[0])
+    try! modelContext.container.mainContext.save()
   }
 }
 
-#Preview {
-    ConversationsView()
-        .modelContainer(for: Conversation.self, inMemory: true)
+struct ConversationsView_Preview: PreviewProvider {
+  static var previews: some View {
+    let inMemoryModelContainer: ModelContainer = {
+      do {
+        let container = try ModelContainer(for: Schema(storageSchema), configurations: [.init(isStoredInMemoryOnly: true)])
+        let convos = getConversationsPreviewMocks()
+        container.mainContext.insert(convos[0])
+        container.mainContext.insert(convos[1])
+        container.mainContext.insert(convos[2])
+        let users = getUsersPreviewMocks()
+        container.mainContext.insert(users[0])
+        try container.mainContext.save()
+        UserDefaults.standard.set(users[0].id.uuidString, forKey: "activeUser")
+        return container
+      } catch {
+        fatalError("Could not create ModelContainer: \(error)")
+      }
+    }()
+    
+    return Group {
+      NavigationSplitView {
+        VStack {
+          ConversationsNav()
+          AppViewsNavigation()
+        }
+        .toolbar {
+          ConversationsToolbar()
+        }
+        .frame(minWidth: 200)
+        .toolbar(removing: .sidebarToggle)
+        .navigationSplitViewColumnWidth(min: 200, ideal: 300, max: 400)
+      } detail: {
+        ConversationsView()
+      }
+    }
+    .modelContainer(inMemoryModelContainer)
+    .environmentObject(UserManager(container: inMemoryModelContainer))
+    .environmentObject(ViewManager(.conversations))
+  }
 }

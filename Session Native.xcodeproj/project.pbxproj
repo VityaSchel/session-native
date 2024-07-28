@@ -37,6 +37,10 @@
 		A76FE57C2C52C977009B1D19 /* ViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A76FE57B2C52C977009B1D19 /* ViewManager.swift */; };
 		A76FE57E2C52DA89009B1D19 /* SessionIdAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A76FE57D2C52DA89009B1D19 /* SessionIdAnimation.swift */; };
 		A7E68C5A2C55B4B4005D8819 /* KeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E68C592C55B4B4005D8819 /* KeychainManager.swift */; };
+		A7E68C5C2C566B08005D8819 /* Conversations.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E68C5B2C566B08005D8819 /* Conversations.swift */; };
+		A7E68C5F2C566BEF005D8819 /* Users.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E68C5E2C566BEF005D8819 /* Users.swift */; };
+		A7E68C612C567478005D8819 /* Recipients.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E68C602C567478005D8819 /* Recipients.swift */; };
+		A7E68C652C56913B005D8819 /* NotBinding.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E68C642C56913B005D8819 /* NotBinding.swift */; };
 		A7EB5E6E2C53B46800A887B3 /* ToolbarStyleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7EB5E6D2C53B46800A887B3 /* ToolbarStyleButton.swift */; };
 /* End PBXBuildFile section */
 
@@ -72,6 +76,10 @@
 		A76FE57B2C52C977009B1D19 /* ViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewManager.swift; sourceTree = "<group>"; };
 		A76FE57D2C52DA89009B1D19 /* SessionIdAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionIdAnimation.swift; sourceTree = "<group>"; };
 		A7E68C592C55B4B4005D8819 /* KeychainManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainManager.swift; sourceTree = "<group>"; };
+		A7E68C5B2C566B08005D8819 /* Conversations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Conversations.swift; sourceTree = "<group>"; };
+		A7E68C5E2C566BEF005D8819 /* Users.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Users.swift; sourceTree = "<group>"; };
+		A7E68C602C567478005D8819 /* Recipients.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recipients.swift; sourceTree = "<group>"; };
+		A7E68C642C56913B005D8819 /* NotBinding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotBinding.swift; sourceTree = "<group>"; };
 		A7EB5E6D2C53B46800A887B3 /* ToolbarStyleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarStyleButton.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -120,6 +128,7 @@
 				A719F7502C51C23200E9487A /* Assets.xcassets */,
 				A719F7552C51C23200E9487A /* Session_Native.entitlements */,
 				A719F7522C51C23200E9487A /* Preview Content */,
+				A7E68C5D2C566B1C005D8819 /* PreviewMocks */,
 			);
 			path = "Session Native";
 			sourceTree = "<group>";
@@ -158,6 +167,7 @@
 			isa = PBXGroup;
 			children = (
 				A76FE5522C5250B1009B1D19 /* EdgeBorder.swift */,
+				A7E68C642C56913B005D8819 /* NotBinding.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -219,6 +229,16 @@
 				A76FE5722C52C0EF009B1D19 /* PrimaryButton.swift */,
 			);
 			path = UI;
+			sourceTree = "<group>";
+		};
+		A7E68C5D2C566B1C005D8819 /* PreviewMocks */ = {
+			isa = PBXGroup;
+			children = (
+				A7E68C5B2C566B08005D8819 /* Conversations.swift */,
+				A7E68C602C567478005D8819 /* Recipients.swift */,
+				A7E68C5E2C566BEF005D8819 /* Users.swift */,
+			);
+			path = PreviewMocks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -299,6 +319,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A76FE55D2C5290CD009B1D19 /* Contact.swift in Sources */,
+				A7E68C652C56913B005D8819 /* NotBinding.swift in Sources */,
 				A76FE5562C527553009B1D19 /* SearchField.swift in Sources */,
 				A719F74D2C51C23100E9487A /* ConversationsView.swift in Sources */,
 				A719F74F2C51C23100E9487A /* Conversation.swift in Sources */,
@@ -319,9 +340,12 @@
 				A76FE5762C52C698009B1D19 /* SecondaryButton.swift in Sources */,
 				A76FE5782C52C8B7009B1D19 /* LoginView.swift in Sources */,
 				A76FE5532C5250B1009B1D19 /* EdgeBorder.swift in Sources */,
+				A7E68C612C567478005D8819 /* Recipients.swift in Sources */,
 				A76FE5672C52ACAE009B1D19 /* SwiftDataSchema.swift in Sources */,
+				A7E68C5F2C566BEF005D8819 /* Users.swift in Sources */,
 				A76FE57A2C52C8D1009B1D19 /* SignupView.swift in Sources */,
 				A76FE57C2C52C977009B1D19 /* ViewManager.swift in Sources */,
+				A7E68C5C2C566B08005D8819 /* Conversations.swift in Sources */,
 				A76FE5732C52C0EF009B1D19 /* PrimaryButton.swift in Sources */,
 				A76FE5492C51D842009B1D19 /* ContactsView.swift in Sources */,
 				A76FE56B2C52B483009B1D19 /* UserManager.swift in Sources */,
