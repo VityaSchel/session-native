@@ -2,22 +2,31 @@ import SwiftUI
 import SwiftData
 
 struct ConversationsView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Conversation]
+  @Environment(\.modelContext) private var modelContext
+  @EnvironmentObject private var viewManager: ViewManager
+  @Query private var items: [Conversation]
 
-    var body: some View {
-        Text("Select a conversation")
+  var body: some View {
+    switch(viewManager.navigationSelection) {
+    case "new":
+      NewConversationView()
+    case nil:
+      TipsView()
+    default:
+      ConversationView()
     }
+  }
 }
 
 struct ConversationsNav: View {
   @Environment(\.modelContext) private var modelContext
+  @EnvironmentObject var viewManager: ViewManager
   @Query private var items: [Conversation]
   @State var deleteAlert: Bool = false
   @State var deleteAlertLocalOnly: Bool = false
   
   var body: some View {
-    List(items, id: \.id) { conversation in
+    List(items, id: \.id, selection: $viewManager.navigationSelection) { conversation in
       ConversationPreviewItem(item: conversation)
         .swipeActions(edge: .leading) {
           Button {
@@ -80,57 +89,68 @@ struct ConversationPreviewItem: View {
   @EnvironmentObject var userManager: UserManager
   
   var body: some View {
-    NavigationLink {
-      
-    } label: {
-      Avatar(avatar: item.recipient.avatar)
-      VStack(alignment: .leading) {
-        HStack(alignment: .center, spacing: 4) {
-          Text(item.recipient.displayName ?? getSessionIdPlaceholder(sessionId: item.recipient.sessionId))
-            .fontWeight(.bold)
-          if !item.notifications.enabled {
-            Image(systemName: "speaker.slash.fill")
-              .resizable()
-              .scaledToFit()
-              .frame(height: 12)
-              .padding(.top, 4)
-              .opacity(0.45)
+    NavigationLink(
+      value: item.id.uuidString,
+      label: {
+        Avatar(avatar: item.recipient.avatar)
+        VStack(alignment: .leading) {
+          HStack(alignment: .center, spacing: 4) {
+            Text(item.recipient.displayName ?? getSessionIdPlaceholder(sessionId: item.recipient.sessionId))
+              .fontWeight(.bold)
+            if !item.notifications.enabled {
+              Image(systemName: "speaker.slash.fill")
+                .resizable()
+                .scaledToFit()
+                .frame(height: 12)
+                .padding(.top, 4)
+                .opacity(0.45)
+            }
           }
-        }
-        if let lastMessage = item.lastMessage {
-          if lastMessage.from.sessionId == userManager.activeUser?.sessionId {
-            (Text("You: ")
-              .foregroundStyle(.opacity(0.6))
-            + Text(lastMessage.body)
-              .foregroundColor(.primary)
-             )
-              .lineLimit(2)
+          if let lastMessage = item.lastMessage {
+            if lastMessage.from.sessionId == userManager.activeUser?.sessionId {
+              (Text("You: ")
+                .foregroundStyle(.opacity(0.6))
+              + Text(lastMessage.body)
+                .foregroundColor(.primary)
+               )
+                .lineLimit(2)
+            } else {
+              Text(lastMessage.body)
+                .foregroundColor(.primary)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+            }
           } else {
-            Text(lastMessage.body)
-              .foregroundColor(.primary)
-              .lineLimit(2)
-              .fixedSize(horizontal: false, vertical: true)
+            Text("Empty chat")
+              .foregroundStyle(.opacity(0.6))
           }
-        } else {
-          Text("Empty chat")
-            .foregroundStyle(.opacity(0.6))
         }
       }
-    }
+    )
   }
 }
 
 struct ConversationsToolbar: ToolbarContent {
   @Environment(\.modelContext) private var modelContext
+  @EnvironmentObject var viewManager: ViewManager
   
   var body: some ToolbarContent {
     ToolbarItem {
       Spacer()
     }
     ToolbarItem {
-      Button(action: addItem) {
+      Button(
+        action: {
+          viewManager.setActiveNavigationSelection("new")
+        }
+      ) {
         Label("New conversation", systemImage: "square.and.pencil")
       }
+      .if(viewManager.navigationSelection == "new", { view in
+        view
+          .background(Color.accentColor)
+          .cornerRadius(5)
+      })
     }
   }
   
@@ -171,7 +191,6 @@ struct ConversationsView_Preview: PreviewProvider {
         }
         .frame(minWidth: 200)
         .toolbar(removing: .sidebarToggle)
-        .navigationSplitViewColumnWidth(min: 200, ideal: 300, max: 400)
       } detail: {
         ConversationsView()
       }

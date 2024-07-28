@@ -49,6 +49,16 @@ struct ContentView: View {
           .toolbar(removing: .sidebarToggle)
           .navigationSplitViewColumnWidth(min: 200, ideal: 300, max: 400)
         } detail: {
+          switch appViewManager.appView {
+          case .contacts:
+            ContactsView()
+          case .conversations:
+            ConversationsView()
+          case .settings:
+            SettingsView()
+          default:
+            EmptyView()
+          }
         }
       case .auth, .login, .signup:
         NavigationStack {

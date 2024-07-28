@@ -56,7 +56,7 @@ struct SettingsNav: View {
             .frame(width: 24, height: 24)
             .background(Color.gray.gradient)
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-          Text("Add account")
+          Text("Add Session")
         }
         Section {
           NavigationLink {
