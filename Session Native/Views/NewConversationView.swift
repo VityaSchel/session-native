@@ -85,7 +85,7 @@ struct NewConversationView: View {
       let conversations = try modelContext.fetch(fetchDescriptor)
       
       if(!conversations.isEmpty) {
-        viewManager.setActiveNavigationSelection(conversations[0].recipient.sessionId)
+        viewManager.setActiveNavigationSelection(conversations[0].id.uuidString)
       } else {
         Task { @MainActor in
           let recipient = Recipient(

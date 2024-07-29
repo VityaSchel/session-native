@@ -2,9 +2,11 @@ import SwiftUI
 import SwiftData
 
 struct SettingsView: View {
-    var body: some View {
-        Text("Select a setting")
-    }
+  @EnvironmentObject var viewManager: ViewManager
+  
+  var body: some View {
+    Text("Select a setting")
+  }
 }
 
 struct SettingsNav: View {
@@ -34,9 +36,7 @@ struct SettingsNav: View {
         }
         ForEach(userManager.users) { user in
           if(user.id != userManager.activeUser?.id) {
-            NavigationLink {
-              Text(user.sessionId)
-            } label: {
+            NavigationLink {} label: {
               Avatar(avatar: user.avatar, width: 24, height: 24)
               VStack(alignment: .leading) {
                 Text(user.displayName ?? getSessionIdPlaceholder(sessionId: user.sessionId))

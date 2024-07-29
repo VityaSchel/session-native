@@ -22,8 +22,8 @@ struct ConversationsNav: View {
   @Environment(\.modelContext) private var modelContext
   @EnvironmentObject var viewManager: ViewManager
   @Query private var items: [Conversation]
-  @State var deleteAlert: Bool = false
-  @State var deleteAlertLocalOnly: Bool = false
+  @State var deleteAlertConversation: Conversation? = nil
+  @State var deleteAlertVisible: Bool = false
   
   var body: some View {
     List(items, id: \.id, selection: $viewManager.navigationSelection) { conversation in
@@ -38,9 +38,13 @@ struct ConversationsNav: View {
         }
         .swipeActions(edge: .trailing) {
           Button {
-            print("Muting conversation")
+            conversation.notifications.enabled = !conversation.notifications.enabled
           } label: {
-            Label("Mute", systemImage: "bell.slash.fill")
+            if conversation.notifications.enabled {
+              Label("Mute", systemImage: "bell.slash.fill")
+            } else {
+              Label("Unmute", systemImage: "bell.fill")
+            }
           }
           .tint(.indigo)
           Button {
@@ -51,24 +55,25 @@ struct ConversationsNav: View {
           }
           
           Button(role: .destructive) {
-            print("Deleting conversation")
-            deleteAlert = true
-            deleteAlertLocalOnly = true
+            deleteAlertVisible = true
+            deleteAlertConversation = conversation
           } label: {
             Label("Delete", systemImage: "trash.fill")
           }
         }
-        .alert("Delete this conversation?", isPresented: $deleteAlert) {
-          Button("Delete everywhere", role: .destructive) {
-            
-          }
-          Button("Delete locally", role: .destructive) {
-            
-          }
-          Button("Cancel", role: .cancel) {
-            deleteAlert = false
-          }
+    }
+    .alert("Delete this conversation?", isPresented: $deleteAlertVisible) {
+      Button("Delete everywhere", role: .destructive) {
+        
+      }
+      Button("Delete locally", role: .destructive) {
+        if let conversation = deleteAlertConversation {
+          modelContext.delete(conversation)
         }
+      }
+      Button("Cancel", role: .cancel) {
+        deleteAlertVisible = false
+      }
     }
     .onDeleteCommand(perform: {
       

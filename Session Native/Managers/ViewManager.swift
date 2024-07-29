@@ -7,8 +7,9 @@ class ViewManager: ObservableObject {
   @Published var appView: AppView
   @Published var navigationSelection: String? = nil
   
-  init(_ defaultAppView: AppView? = nil) {
+  init(_ defaultAppView: AppView? = nil, _ defaultNavigationSelection: String? = nil) {
     appView = defaultAppView ?? .auth
+    navigationSelection = defaultNavigationSelection
   }
   
   func setActiveView(_ view: AppView) {

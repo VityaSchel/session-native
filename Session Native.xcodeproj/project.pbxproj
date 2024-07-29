@@ -46,6 +46,7 @@
 		A7E68C6B2C56CB88005D8819 /* NewConversationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E68C6A2C56CB88005D8819 /* NewConversationView.swift */; };
 		A7E68C6D2C56CB8E005D8819 /* TipsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E68C6C2C56CB8E005D8819 /* TipsView.swift */; };
 		A7E68C6F2C56CB94005D8819 /* ConversationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E68C6E2C56CB94005D8819 /* ConversationView.swift */; };
+		A7E68C712C57D6F1005D8819 /* MessageBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E68C702C57D6F1005D8819 /* MessageBubble.swift */; };
 		A7EB5E6E2C53B46800A887B3 /* ToolbarStyleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7EB5E6D2C53B46800A887B3 /* ToolbarStyleButton.swift */; };
 /* End PBXBuildFile section */
 
@@ -90,6 +91,7 @@
 		A7E68C6A2C56CB88005D8819 /* NewConversationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewConversationView.swift; sourceTree = "<group>"; };
 		A7E68C6C2C56CB8E005D8819 /* TipsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TipsView.swift; sourceTree = "<group>"; };
 		A7E68C6E2C56CB94005D8819 /* ConversationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationView.swift; sourceTree = "<group>"; };
+		A7E68C702C57D6F1005D8819 /* MessageBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageBubble.swift; sourceTree = "<group>"; };
 		A7EB5E6D2C53B46800A887B3 /* ToolbarStyleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarStyleButton.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -138,7 +140,7 @@
 				A719F7502C51C23200E9487A /* Assets.xcassets */,
 				A719F7552C51C23200E9487A /* Session_Native.entitlements */,
 				A719F7522C51C23200E9487A /* Preview Content */,
-				A7E68C5D2C566B1C005D8819 /* PreviewMocks */,
+				A7E68C5D2C566B1C005D8819 /* Preview Mocks */,
 			);
 			path = "Session Native";
 			sourceTree = "<group>";
@@ -204,6 +206,7 @@
 			isa = PBXGroup;
 			children = (
 				A76FE55E2C52A280009B1D19 /* Avatar.swift */,
+				A7E68C702C57D6F1005D8819 /* MessageBubble.swift */,
 				A76FE57D2C52DA89009B1D19 /* SessionIdAnimation.swift */,
 			);
 			path = Entities;
@@ -246,14 +249,14 @@
 			path = UI;
 			sourceTree = "<group>";
 		};
-		A7E68C5D2C566B1C005D8819 /* PreviewMocks */ = {
+		A7E68C5D2C566B1C005D8819 /* Preview Mocks */ = {
 			isa = PBXGroup;
 			children = (
 				A7E68C5B2C566B08005D8819 /* Conversations.swift */,
 				A7E68C602C567478005D8819 /* Recipients.swift */,
 				A7E68C5E2C566BEF005D8819 /* Users.swift */,
 			);
-			path = PreviewMocks;
+			path = "Preview Mocks";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -342,6 +345,7 @@
 				A76FE5692C52B2B2009B1D19 /* User.swift in Sources */,
 				A76FE54D2C51D882009B1D19 /* ContentView.swift in Sources */,
 				A76FE54B2C51D84D009B1D19 /* SettingsView.swift in Sources */,
+				A7E68C712C57D6F1005D8819 /* MessageBubble.swift in Sources */,
 				A7E68C672C56C2C5005D8819 /* IfConditionalModifier.swift in Sources */,
 				A76FE5592C527B5E009B1D19 /* Recipient.swift in Sources */,
 				A76FE56E2C52BA14009B1D19 /* AuthView.swift in Sources */,
