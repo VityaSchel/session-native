@@ -112,7 +112,7 @@ struct ConversationPreviewItem: View {
             }
           }
           if let lastMessage = item.lastMessage {
-            if lastMessage.from.sessionId == userManager.activeUser?.sessionId {
+            if lastMessage.from == nil {
               (Text("You: ")
                 .foregroundStyle(.opacity(0.6))
               + Text(lastMessage.body)

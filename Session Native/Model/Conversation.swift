@@ -9,6 +9,11 @@ final class Conversation {
   var lastMessage: Message?
   var typingIndicator: Bool
   var notifications: Notification
+  @Relationship(
+    deleteRule: .cascade,
+    inverse: \Message.conversation
+  )
+  var messages: [Message] = []
   
   init(id: UUID, recipient: Recipient, archived: Bool, lastMessage: Message? = nil, typingIndicator: Bool, notifications: Notification = Notification(enabled: true)) {
     self.id = id

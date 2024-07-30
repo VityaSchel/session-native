@@ -24,6 +24,7 @@ struct MessageBubble<Content>: View where Content: View {
         Spacer()
       }
     }
+    .frame(width: .infinity)
 //    .padding([(direction == .left) ? .leading : .trailing, .top, .bottom], 20)
 //      .padding((direction == .right) ? .leading : .trailing, 50)
   }

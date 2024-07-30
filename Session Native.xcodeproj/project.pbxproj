@@ -47,6 +47,7 @@
 		A7E68C6D2C56CB8E005D8819 /* TipsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E68C6C2C56CB8E005D8819 /* TipsView.swift */; };
 		A7E68C6F2C56CB94005D8819 /* ConversationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E68C6E2C56CB94005D8819 /* ConversationView.swift */; };
 		A7E68C712C57D6F1005D8819 /* MessageBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E68C702C57D6F1005D8819 /* MessageBubble.swift */; };
+		A7E68C732C5903CD005D8819 /* Messages.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E68C722C5903CD005D8819 /* Messages.swift */; };
 		A7EB5E6E2C53B46800A887B3 /* ToolbarStyleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7EB5E6D2C53B46800A887B3 /* ToolbarStyleButton.swift */; };
 /* End PBXBuildFile section */
 
@@ -92,6 +93,7 @@
 		A7E68C6C2C56CB8E005D8819 /* TipsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TipsView.swift; sourceTree = "<group>"; };
 		A7E68C6E2C56CB94005D8819 /* ConversationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationView.swift; sourceTree = "<group>"; };
 		A7E68C702C57D6F1005D8819 /* MessageBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageBubble.swift; sourceTree = "<group>"; };
+		A7E68C722C5903CD005D8819 /* Messages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Messages.swift; sourceTree = "<group>"; };
 		A7EB5E6D2C53B46800A887B3 /* ToolbarStyleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarStyleButton.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -253,6 +255,7 @@
 			isa = PBXGroup;
 			children = (
 				A7E68C5B2C566B08005D8819 /* Conversations.swift */,
+				A7E68C722C5903CD005D8819 /* Messages.swift */,
 				A7E68C602C567478005D8819 /* Recipients.swift */,
 				A7E68C5E2C566BEF005D8819 /* Users.swift */,
 			);
@@ -343,6 +346,7 @@
 				A719F74D2C51C23100E9487A /* ConversationsView.swift in Sources */,
 				A719F74F2C51C23100E9487A /* Conversation.swift in Sources */,
 				A76FE5692C52B2B2009B1D19 /* User.swift in Sources */,
+				A7E68C732C5903CD005D8819 /* Messages.swift in Sources */,
 				A76FE54D2C51D882009B1D19 /* ContentView.swift in Sources */,
 				A76FE54B2C51D84D009B1D19 /* SettingsView.swift in Sources */,
 				A7E68C712C57D6F1005D8819 /* MessageBubble.swift in Sources */,
