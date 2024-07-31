@@ -58,6 +58,13 @@ class MessageViewModel: ObservableObject {
     fetchItems()
   }
   
+  func updateConversation(_ newConversation: Conversation) {
+    self.conversation = newConversation
+    self.items.removeAll()
+    self.currentPage = 0
+    fetchItems()
+  }
+  
   func fetchItems() {
     guard !isLoading else { return }
     isLoading = true
@@ -122,6 +129,9 @@ struct Messages: View {
           }
         }
         .padding(.horizontal, 10)
+        .onChange(of: conversation) { newConversation in
+          viewModel.updateConversation(newConversation)
+        }
         .onChange(of: viewModel.items, {
           DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             withAnimation(.linear(duration: 10)) {
@@ -147,7 +157,7 @@ struct Messages: View {
         withAnimation {
           if let deletedMessage = viewModel.deleteConfirmationMessage {
             modelContext.delete(deletedMessage)
-          
+          }
         }
         viewModel.deleteConfirmationMessage = nil
       }
@@ -274,7 +284,8 @@ struct NewMessageInput: View {
       HStack {
         TextField("Message...", text: $messageText, axis: .vertical)
           .textFieldStyle(.plain)
-          .padding(.vertical, 12)
+          .padding(.top, 17)
+          .padding(.bottom, 16)
           .padding(.leading, 16)
           .lineLimit(1...5)
           .onSubmit {
@@ -293,6 +304,7 @@ struct NewMessageInput: View {
       }
       .padding(.trailing, 12)
     }
+    .border(width: 1, edges: [.top], color: Color.separator)
     .background(.windowBackground)
   }
   
@@ -326,18 +338,19 @@ struct NewMessageInput: View {
 
 struct ConversationView_Preview: PreviewProvider {
   static var previews: some View {
-    let convos = getConversationsPreviewMocks()
+    let users = getUsersPreviewMocks()
+    
+    let convos = getConversationsPreviewMocks(user: users[0])
     
     let inMemoryModelContainer: ModelContainer = {
       do {
         let container = try ModelContainer(for: Schema(storageSchema), configurations: [.init(isStoredInMemoryOnly: true)])
         container.mainContext.insert(convos[0])
-        let users = getUsersPreviewMocks()
-        container.mainContext.insert(users[0])
         let messages = getMessagePreviewMocks(conversation: convos[0])
         for message in messages {
           container.mainContext.insert(message)
         }
+        container.mainContext.insert(users[0])
         try container.mainContext.save()
         UserDefaults.standard.set(users[0].id.uuidString, forKey: "activeUser")
         return container

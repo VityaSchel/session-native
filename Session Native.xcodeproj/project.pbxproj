@@ -167,15 +167,15 @@
 		A76FE54E2C51D886009B1D19 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				A719F74C2C51C23100E9487A /* ConversationsView.swift */,
-				A7E68C6E2C56CB94005D8819 /* ConversationView.swift */,
-				A7E68C6C2C56CB8E005D8819 /* TipsView.swift */,
-				A7E68C6A2C56CB88005D8819 /* NewConversationView.swift */,
-				A76FE5482C51D842009B1D19 /* ContactsView.swift */,
-				A76FE54A2C51D84D009B1D19 /* SettingsView.swift */,
 				A76FE56D2C52BA14009B1D19 /* AuthView.swift */,
 				A76FE5792C52C8D1009B1D19 /* SignupView.swift */,
 				A76FE5772C52C8B7009B1D19 /* LoginView.swift */,
+				A76FE5482C51D842009B1D19 /* ContactsView.swift */,
+				A719F74C2C51C23100E9487A /* ConversationsView.swift */,
+				A7E68C6C2C56CB8E005D8819 /* TipsView.swift */,
+				A7E68C6A2C56CB88005D8819 /* NewConversationView.swift */,
+				A7E68C6E2C56CB94005D8819 /* ConversationView.swift */,
+				A76FE54A2C51D84D009B1D19 /* SettingsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";

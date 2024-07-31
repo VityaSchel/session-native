@@ -18,7 +18,7 @@ class UserManager: ObservableObject {
   func loadUsers() {
     do {
       let fetchRequest = FetchDescriptor<User>()
-      users = try container.mainContext.fetch(fetchRequest)
+      self.users = try container.mainContext.fetch(fetchRequest)
       if let activeUserID = UserDefaults.standard.string(forKey: "activeUser"),
          let user = users.first(where: { $0.id.uuidString == activeUserID }) {
         self.activeUser = user

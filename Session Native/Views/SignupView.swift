@@ -12,17 +12,6 @@ struct SignupView: View {
   @State private var mnemonic: String = ""
   
   var body: some View {
-    HStack {
-      Button(action: {
-        appViewManager.setActiveView(.auth)
-      }) {
-        Image(systemName: "chevron.backward")
-      }
-      .buttonStyle(ToolbarButtonStyle())
-      Spacer()
-    }
-    .padding(.top, 7)
-    .padding(.horizontal, 12)
     VStack(spacing: 0) {
       VStack {
         Text("Create Session")

@@ -7,6 +7,11 @@ final class User {
   var sessionId: String
   var displayName: String?
   @Attribute(.externalStorage) var avatar: Data?
+  @Relationship(
+    deleteRule: .cascade,
+    inverse: \Conversation.user
+  )
+  var conversations: [Conversation] = []
   
   init(id: UUID, sessionId: String, displayName: String? = nil, avatar: Data? = nil) {
     self.id = id

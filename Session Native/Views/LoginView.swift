@@ -10,17 +10,6 @@ struct LoginView: View {
   @State var errorMessage: String? = nil
   
   var body: some View {
-    HStack {
-      Button(action: {
-        appViewManager.setActiveView(.auth)
-      }) {
-        Image(systemName: "chevron.backward")
-      }
-      .buttonStyle(ToolbarButtonStyle())
-      Spacer()
-    }
-    .padding(.top, 7)
-    .padding(.horizontal, 12)
     VStack(spacing: 24) {
       VStack {
         Text("Login")

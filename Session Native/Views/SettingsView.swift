@@ -36,7 +36,9 @@ struct SettingsNav: View {
         }
         ForEach(userManager.users) { user in
           if(user.id != userManager.activeUser?.id) {
-            NavigationLink {} label: {
+            NavigationLink(
+              value: user.id.uuidString
+            ) {
               Avatar(avatar: user.avatar, width: 24, height: 24)
               VStack(alignment: .leading) {
                 Text(user.displayName ?? getSessionIdPlaceholder(sessionId: user.sessionId))
@@ -49,9 +51,9 @@ struct SettingsNav: View {
             }
           }
         }
-        NavigationLink {
-          Text("great")
-        } label: {
+        NavigationLink(
+          value: "add-session"
+        ) {
           Image(systemName: "person.badge.plus")
             .frame(width: 24, height: 24)
             .background(Color.gray.gradient)
@@ -59,36 +61,36 @@ struct SettingsNav: View {
           Text("Add Session")
         }
         Section {
-          NavigationLink {
-            Text("great")
-          } label: {
+          NavigationLink(
+            value: "general"
+          ) {
             Image(systemName: "gear")
               .frame(width: 24, height: 24)
               .background(Color.gray.gradient)
               .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             Text("General")
           }
-          NavigationLink {
-            Text("great")
-          } label: {
+          NavigationLink(
+            value: "notifications"
+          ) {
             Image(systemName: "app.badge")
               .frame(width: 24, height: 24)
               .background(Color.red.gradient)
               .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             Text("Notifications & sound")
           }
-          NavigationLink {
-            Text("great")
-          } label: {
+          NavigationLink(
+            value: "privacy"
+          ) {
             Image(systemName: "lock")
               .frame(width: 24, height: 24)
               .background(Color.blue.gradient)
               .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             Text("Privacy")
           }
-          NavigationLink {
-            Text("great")
-          } label: {
+          NavigationLink(
+            value: "appearance"
+          ) {
             Image(systemName: "bubble.left.and.bubble.right")
               .resizable()
               .scaledToFit()
@@ -100,9 +102,9 @@ struct SettingsNav: View {
           }
         }
         Section {
-          NavigationLink {
-            Text("great")
-          } label: {
+          NavigationLink(
+            value: "help"
+          ) {
             Image(systemName: "questionmark.circle.fill")
               .resizable()
               .scaledToFit()
@@ -112,9 +114,9 @@ struct SettingsNav: View {
               .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             Text("Help")
           }
-          NavigationLink {
-            Text("https://github.com/VityaSchel/session-native")
-          } label: {
+          NavigationLink(
+            value: "bug-report"
+          ) {
             Image(systemName: "ladybug.fill")
               .frame(width: 24, height: 24)
               .background(Color.purple.gradient.secondary)
@@ -130,6 +132,24 @@ struct SettingsNav: View {
               .foregroundStyle(Color.white.opacity(0.5))
           }
         }
+      }
+    }
+    .onChange(of: viewManager.navigationSelection) {
+      switch(viewManager.navigationSelection) {
+      case "profile", "general", "notifications", "privacy", "appearance", "help":
+        break
+      case "add-session":
+        viewManager.setActiveView(.auth)
+        break
+      case "bug-report":
+        let url = URL(string: "https://github.com/VityaSchel/session-native/issues")!
+        NSWorkspace.shared.open(url)
+        break
+      default:
+        if let user = userManager.users.first(where: { $0.id.uuidString == viewManager.navigationSelection }) {
+          userManager.setActiveUser(user)
+        }
+        break
       }
     }
   }

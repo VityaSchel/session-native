@@ -5,6 +5,7 @@ import SwiftData
 struct NewConversationView: View {
   @Environment(\.modelContext) var modelContext
   @EnvironmentObject var viewManager: ViewManager
+  @EnvironmentObject var userManager: UserManager
   @State private var text: String = ""
   @State private var error: String = ""
   @State private var submitting: Bool = false
@@ -95,6 +96,7 @@ struct NewConversationView: View {
           modelContext.insert(recipient)
           let conversation = Conversation(
             id: UUID(),
+            user: userManager.activeUser!,
             recipient: recipient,
             archived: false,
             lastMessage: nil,
@@ -116,12 +118,12 @@ struct NewConversationView_Preview: PreviewProvider {
     let inMemoryModelContainer: ModelContainer = {
       do {
         let container = try ModelContainer(for: Schema(storageSchema), configurations: [.init(isStoredInMemoryOnly: true)])
-        let convos = getConversationsPreviewMocks()
+        let users = getUsersPreviewMocks()
+        container.mainContext.insert(users[0])
+        let convos = getConversationsPreviewMocks(user: users[0])
         container.mainContext.insert(convos[0])
         container.mainContext.insert(convos[1])
         container.mainContext.insert(convos[2])
-        let users = getUsersPreviewMocks()
-        container.mainContext.insert(users[0])
         try container.mainContext.save()
         UserDefaults.standard.set(users[0].id.uuidString, forKey: "activeUser")
         return container

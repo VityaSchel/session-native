@@ -14,10 +14,8 @@ class ViewManager: ObservableObject {
   
   func setActiveView(_ view: AppView) {
     if(appView != view) {
-      navigationSelection = nil
-      withAnimation {
-        appView = view
-      }
+      appView = view
+      self.navigationSelection = nil
     }
   }
   

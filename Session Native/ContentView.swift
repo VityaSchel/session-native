@@ -19,6 +19,7 @@ struct ContentView: View {
     Group {
       switch appViewManager.appView {
       case .contacts, .conversations, .settings:
+        EmptyView()
         NavigationSplitView {
           VStack {
             switch appViewManager.appView {
@@ -61,6 +62,24 @@ struct ContentView: View {
           }
         }
       case .auth, .login, .signup:
+        if(appViewManager.appView == .login || appViewManager.appView == .signup || (appViewManager.appView == .auth && userManager.activeUser != nil)) {
+          HStack {
+            Button(action: {
+              if(appViewManager.appView == .login || appViewManager.appView == .signup) {
+                appViewManager.setActiveView(.auth)
+              } else if(appViewManager.appView == .auth) {
+                appViewManager.setActiveView(.settings)
+              }
+            }) {
+              Image(systemName: "chevron.backward")
+            }
+            .buttonStyle(ToolbarButtonStyle())
+            Spacer()
+          }
+          .padding(.top, 7)
+          .padding(.horizontal, 12)
+        }
+        Spacer()
         NavigationStack {
           switch(appViewManager.appView) {
           case .auth:
@@ -73,6 +92,7 @@ struct ContentView: View {
             EmptyView()
           }
         }
+        Spacer()
       }
     }
     .onAppear() {
