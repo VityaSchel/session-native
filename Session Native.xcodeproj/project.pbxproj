@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A70072612C5A8C7B00C5370D /* AvatarSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A70072602C5A8C7B00C5370D /* AvatarSelector.swift */; };
+		A70072652C5ACA9000C5370D /* ObjectNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = A70072642C5ACA9000C5370D /* ObjectNotification.swift */; };
 		A7037D112C55562C00B53FBD /* BackendManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7037D102C55562C00B53FBD /* BackendManager.swift */; };
 		A7037D142C5578C500B53FBD /* MessagePack in Frameworks */ = {isa = PBXBuildFile; productRef = A7037D132C5578C500B53FBD /* MessagePack */; };
 		A719F74B2C51C23100E9487A /* Session_NativeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A719F74A2C51C23100E9487A /* Session_NativeApp.swift */; };
@@ -52,6 +54,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		A70072602C5A8C7B00C5370D /* AvatarSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarSelector.swift; sourceTree = "<group>"; };
+		A70072642C5ACA9000C5370D /* ObjectNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectNotification.swift; sourceTree = "<group>"; };
 		A7037D102C55562C00B53FBD /* BackendManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackendManager.swift; sourceTree = "<group>"; };
 		A719F7472C51C23100E9487A /* Session Native.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Session Native.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A719F74A2C51C23100E9487A /* Session_NativeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session_NativeApp.swift; sourceTree = "<group>"; };
@@ -159,6 +163,7 @@
 			isa = PBXGroup;
 			children = (
 				A76FE54F2C51DA93009B1D19 /* AppViewsNavigation.swift */,
+				A70072602C5A8C7B00C5370D /* AvatarSelector.swift */,
 				A76FE5552C527553009B1D19 /* SearchField.swift */,
 			);
 			path = Components;
@@ -184,6 +189,7 @@
 			isa = PBXGroup;
 			children = (
 				A76FE5522C5250B1009B1D19 /* EdgeBorder.swift */,
+				A70072642C5ACA9000C5370D /* ObjectNotification.swift */,
 				A7E68C682C56C8C5005D8819 /* Color.swift */,
 				A7E68C642C56913B005D8819 /* NotBinding.swift */,
 				A7E68C662C56C2C5005D8819 /* IfConditionalModifier.swift */,
@@ -340,6 +346,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A76FE55D2C5290CD009B1D19 /* Contact.swift in Sources */,
+				A70072652C5ACA9000C5370D /* ObjectNotification.swift in Sources */,
 				A7E68C652C56913B005D8819 /* NotBinding.swift in Sources */,
 				A7E68C692C56C8C5005D8819 /* Color.swift in Sources */,
 				A76FE5562C527553009B1D19 /* SearchField.swift in Sources */,
@@ -372,6 +379,7 @@
 				A7E68C5F2C566BEF005D8819 /* Users.swift in Sources */,
 				A76FE57A2C52C8D1009B1D19 /* SignupView.swift in Sources */,
 				A76FE57C2C52C977009B1D19 /* ViewManager.swift in Sources */,
+				A70072612C5A8C7B00C5370D /* AvatarSelector.swift in Sources */,
 				A7E68C5C2C566B08005D8819 /* Conversations.swift in Sources */,
 				A76FE5732C52C0EF009B1D19 /* PrimaryButton.swift in Sources */,
 				A76FE5492C51D842009B1D19 /* ContactsView.swift in Sources */,

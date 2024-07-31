@@ -29,6 +29,7 @@ class ConversationsViewModel: ObservableObject {
   init(context: ModelContext, activeUser: User) {
     self.dbContext = context
     fetchItems(activeUser: activeUser)
+    subscribeToNotifications(activeUser: activeUser)
   }
   
   func fetchItems(activeUser: User) {
@@ -42,16 +43,27 @@ class ConversationsViewModel: ObservableObject {
       })
       fetchDescriptor.sortBy = [SortDescriptor(\Conversation.updatedAt, order: .reverse)]
       
-      let fetchedItems = try dbContext.fetch(fetchDescriptor).reversed()
+      let fetchedItems = try dbContext.fetch(fetchDescriptor)
       
       DispatchQueue.main.async {
-        self.items.insert(contentsOf: fetchedItems, at: 0)
+        print("upading with", fetchedItems.count)
+        self.items = fetchedItems
         self.isLoading = false
       }
     } catch {
       print("Failed to fetch items: \(error)")
       self.isLoading = false
     }
+  }
+  
+  private func subscribeToNotifications(activeUser: User) {
+    NotificationCenter.default.publisher(for: .newConversationAdded)
+      .receive(on: DispatchQueue.main)
+      .sink { [weak self] _ in
+        print("received notification")
+        self?.fetchItems(activeUser: activeUser)
+      }
+      .store(in: &cancellables)
   }
 }
 

@@ -77,38 +77,42 @@ struct NewConversationView: View {
   }
   
   private func openConversation(_ sessionId: String) {
-    do {
-      var fetchDescriptor = FetchDescriptor<Conversation>(predicate: #Predicate { conversation in
-        conversation.recipient.sessionId == sessionId
-      })
-      fetchDescriptor.fetchLimit = 1
-      
-      let conversations = try modelContext.fetch(fetchDescriptor)
-      
-      if(!conversations.isEmpty) {
-        viewManager.setActiveNavigationSelection(conversations[0].id.uuidString)
-      } else {
-        Task { @MainActor in
-          let recipient = Recipient(
-            id: UUID(),
-            sessionId: sessionId
-          )
-          modelContext.insert(recipient)
-          let conversation = Conversation(
-            id: UUID(),
-            user: userManager.activeUser!,
-            recipient: recipient,
-            archived: false,
-            lastMessage: nil,
-            typingIndicator: false
-          )
-          modelContext.insert(conversation)
-          try modelContext.save()
-          viewManager.setActiveNavigationSelection(conversation.id.uuidString)
+    if let activeUser = userManager.activeUser {
+      do {
+        var fetchDescriptor = FetchDescriptor<Conversation>(predicate: #Predicate { conversation in
+          conversation.recipient.sessionId == sessionId
+          && conversation.user.persistentModelID == activeUser.persistentModelID
+        })
+        fetchDescriptor.fetchLimit = 1
+        
+        let conversations = try modelContext.fetch(fetchDescriptor)
+        
+        if(!conversations.isEmpty) {
+          viewManager.setActiveNavigationSelection(conversations[0].id.uuidString)
+        } else {
+          Task { @MainActor in
+            let recipient = Recipient(
+              id: UUID(),
+              sessionId: sessionId
+            )
+            modelContext.insert(recipient)
+            let conversation = Conversation(
+              id: UUID(),
+              user: userManager.activeUser!,
+              recipient: recipient,
+              archived: false,
+              lastMessage: nil,
+              typingIndicator: false
+            )
+            modelContext.insert(conversation)
+            try modelContext.save()
+            NotificationCenter.default.post(name: .newConversationAdded, object: nil)
+            viewManager.setActiveNavigationSelection(conversation.id.uuidString)
+          }
         }
+      } catch {
+        print("Failed to load Movie model.")
       }
-    } catch {
-      print("Failed to load Movie model.")
     }
   }
 }

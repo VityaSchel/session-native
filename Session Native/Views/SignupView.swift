@@ -23,31 +23,7 @@ struct SignupView: View {
         .font(.title2)
       SessionIdAnimation(finalString: sessionId)
       HStack(spacing: 24) {
-        Button(action: {
-          avatarFilePath = nil
-          openAvatarPicker()
-        }) {
-          ZStack {
-            if let avatarData = avatar, let nsImage = NSImage(data: avatarData) {
-              Image(nsImage: nsImage)
-                .resizable()
-                .scaledToFill()
-                .aspectRatio(contentMode: .fill)
-            } else {
-              Image(systemName: "photo")
-                .resizable()
-                .scaledToFit()
-                .padding(18)
-            }
-          }
-          .frame(width: 64, height: 64)
-          .background(Color.gray.gradient)
-          .cornerRadius(.infinity)
-        }
-        .contentShape(Circle())
-        .buttonStyle(.borderless)
-        .clipShape(Circle())
-        .cornerRadius(.infinity)
+        AvatarSelector(avatar: $avatar)
         TextField("Profile name (optional)", text: $displayName)
           .textFieldStyle(.plain)
           .onReceive(Just(displayName)) { _ in limitText(64) }
@@ -81,32 +57,6 @@ struct SignupView: View {
   func limitText(_ upper: Int) {
     if displayName.count > upper {
       displayName = String(displayName.prefix(upper))
-    }
-  }
-  
-  private func openAvatarPicker() {
-    let openPanel = NSOpenPanel()
-    openPanel.canChooseFiles = true
-    openPanel.canChooseDirectories = false
-    openPanel.allowsMultipleSelection = false
-    openPanel.allowedContentTypes = [.image]
-    
-    if openPanel.runModal() == .OK, let url = openPanel.url {
-      avatarFilePath = url.path
-      loadImageData(from: url)
-    }
-  }
-  
-  private func loadImageData(from url: URL) {
-    DispatchQueue.global(qos: .userInitiated).async {
-      do {
-        let data = try Data(contentsOf: url)
-        DispatchQueue.main.async {
-          avatar = data
-        }
-      } catch {
-        print("Error loading image data: \(error)")
-      }
     }
   }
   

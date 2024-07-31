@@ -19,9 +19,12 @@ class UserManager: ObservableObject {
     do {
       let fetchRequest = FetchDescriptor<User>()
       self.users = try container.mainContext.fetch(fetchRequest)
-      if let activeUserID = UserDefaults.standard.string(forKey: "activeUser"),
-         let user = users.first(where: { $0.id.uuidString == activeUserID }) {
-        self.activeUser = user
+      if let activeUserID = UserDefaults.standard.string(forKey: "activeUser") {
+        if let user = users.first(where: { $0.id.uuidString == activeUserID }) {
+          self.activeUser = user
+        }
+      } else {
+        self.activeUser = users[0]
       }
     } catch {
       print("Failed to fetch users: \(error.localizedDescription)")
@@ -56,7 +59,7 @@ class UserManager: ObservableObject {
     loadUsers()
   }
   
-  func setActiveUser(_ user: User) {
+  func setActiveUser(_ user: User?) {
     activeUser = user
     saveUsers()
   }
