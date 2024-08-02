@@ -117,7 +117,7 @@ struct ConversationsNav: View {
       ConversationPreviewItem(item: conversation)
         .swipeActions(edge: .leading) {
           Button {
-            print("Read conversation") // TODO
+            print("Read conversation") // TODO: set unread to 0
           } label: {
             Label("Read", systemImage: "message.badge.filled.fill")
           }
@@ -136,7 +136,7 @@ struct ConversationsNav: View {
           .tint(.indigo)
           if(conversation.archived) {
             Button {
-              // TODO
+              // TODO: conversations archive
               conversation.archived = false
             } label: {
               Label("Move from archive", systemImage: "square.and.arrow.up.fill")
@@ -167,7 +167,7 @@ struct ConversationsNav: View {
           }
           if(conversation.notifications.enabled) {
             Button("􀋝 Mute") {
-              // TODO
+              // TODO: notifications
               conversation.notifications.enabled = false
               try? modelContext.save()
             }
@@ -178,12 +178,11 @@ struct ConversationsNav: View {
             }
           }
           Button("􀌤 Mark as read") {
-            // TODO
+            // TODO: unread counter
           }
           Divider()
           if(conversation.archived) {
             Button("􀈭 Archive") {
-              // TODO
               conversation.archived = true
             }
           } else {
@@ -193,7 +192,7 @@ struct ConversationsNav: View {
           }
           Divider()
           Button("􀁠 Clear history") {
-            // TODO
+            // TODO: clear history of messages without deleting conversation (with confirmation dialog)
           }
           Button {
             deleteAlertVisible = true
@@ -206,7 +205,7 @@ struct ConversationsNav: View {
     }
     .alert("Delete this conversation?", isPresented: $deleteAlertVisible) {
       Button("Delete everywhere", role: .destructive) {
-        // TODO: delete request
+        // TODO: delete messages request to backend
       }
       Button("Delete locally", role: .destructive) {
         if let conversation = deleteAlertConversation {
@@ -218,7 +217,7 @@ struct ConversationsNav: View {
       }
     }
     .onDeleteCommand(perform: {
-      // TODO
+      // TODO: find conversation by selection and delete it on esc press
     })
     .listStyle(.sidebar)
     .background(.clear)

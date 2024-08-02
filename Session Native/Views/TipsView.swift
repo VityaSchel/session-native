@@ -4,7 +4,8 @@ import SwiftUI
 let tips = [
   "You can switch between multiple Sessions in 􀍟",
   "Swipe conversation to the left and click 􀈮 to archive it",
-  "Add contacts via 􀉮 for easy access"
+  "Add contacts via 􀉮 to change their display name locally",
+  "Click 􀊫 to show search bar in contacts or conversations tab"
 ]
 
 struct TipsView: View {

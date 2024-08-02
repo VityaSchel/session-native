@@ -9,7 +9,17 @@ struct ContactsView: View {
     if(viewManager.navigationSelection == "add_contact") {
       NewContact()
     } else {
-      Text("TODO: There will be a tip for contacts")
+      VStack(spacing: 16) {
+        Image(systemName: "person.crop.circle")
+          .resizable()
+          .scaledToFit()
+          .frame(width: 64, height: 64)
+        Text("Contacts is a list of recipients that you frequently communicate with. You can change their display names locally: right click on a contact and select «􀈊 Edit name».")
+          .font(.caption)
+          .multilineTextAlignment(.center)
+      }
+      .frame(width: 300)
+      .padding()
     }
   }
 }
@@ -25,8 +35,8 @@ struct NewContact: View {
   
   var body: some View {
     VStack(spacing: 4) {
-      Text("Contacts are list of recipients that you frequently communicate with. You can change their display names locally.")
-        .font(.caption2)
+      Text("Add contact")
+        .font(.title)
         .multilineTextAlignment(.center)
         .frame(maxWidth: .infinity, alignment: .leading)
       TextField("Session ID", text: $contactSessionId)

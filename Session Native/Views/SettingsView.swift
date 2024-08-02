@@ -6,7 +6,7 @@ struct SettingsView: View {
   
   var body: some View {
     ScrollView {
-      switch("profile") {
+      switch(viewManager.navigationSelection) {
       case "profile":
         ProfileSettingsView()
       case "general":
@@ -16,13 +16,16 @@ struct SettingsView: View {
       case "privacy":
         PrivacySettingsView()
       case "appearance":
-        AppearanceView()
+        AppearanceSettingsView()
       case "help":
         HelpView()
       default:
         EmptyView()
       }
       Spacer()
+    }
+    .onAppear {
+      viewManager.setActiveNavigationSelection("profile")
     }
   }
 }
@@ -182,7 +185,13 @@ struct ProfileSettingsView: View {
       .toolbar {
         ToolbarItem {
           Button(action: {
-            print("Save")
+            do {
+              user.displayName = displayName
+              user.avatar = avatar
+              try modelContext.save()
+            } catch {
+              print("Failed to save user")
+            }
           }) {
             Text("Save")
           }
@@ -191,6 +200,8 @@ struct ProfileSettingsView: View {
       }
       .onAppear(perform: {
         mnemonicPlaceholder = getRandomHiddenMnemonic()
+        displayName = user.displayName ?? ""
+        avatar = user.avatar
       })
     }
   }
@@ -209,7 +220,7 @@ struct ProfileSettingsView: View {
 struct GeneralSettingsView: View {
   var body: some View {
     VStack {
-      
+      // TODO: general settings
     }
   }
 }
@@ -217,7 +228,7 @@ struct GeneralSettingsView: View {
 struct NotificationsSettingsView: View {
   var body: some View {
     VStack {
-      
+      // TODO: notifications settings
     }
   }
 }
@@ -225,15 +236,16 @@ struct NotificationsSettingsView: View {
 struct PrivacySettingsView: View {
   var body: some View {
     VStack {
-      
+      // TODO: privacy settings
     }
   }
 }
 
-struct AppearanceView: View {
+struct AppearanceSettingsView: View {
   var body: some View {
     VStack {
-      
+      // TODO: appearance settings
+      // TODO: check light theme
     }
   }
 }
@@ -241,7 +253,7 @@ struct AppearanceView: View {
 struct HelpView: View {
   var body: some View {
     VStack {
-      
+      // TODO: help section in settings
     }
   }
 }
