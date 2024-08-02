@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import Combine
 
 struct ContactsView: View {
   @EnvironmentObject private var viewManager: ViewManager
@@ -128,23 +129,30 @@ struct ContactsNav: View {
   }
   
   var body: some View {
-    SearchField(searchText: $searchText)
-    Divider()
-    List(items, selection: $navigationManager.navigationSelection) { item in
-      NavigationLink(
-        value: item.id.uuidString
-      ) {
-        Avatar(avatar: item.recipient.avatar)
-        VStack {
-          Text(item.name ?? item.recipient.displayName ?? getSessionIdPlaceholder(sessionId: item.recipient.sessionId))
-        }
+    if navigationManager.searchVisible {
+      SearchField(searchText: $searchText)
+        .padding(.horizontal, 12)
+      Divider()
+    }
+    List(items.filter { contact in
+      guard !searchText.isEmpty else {
+        return true
       }
+      let query = searchText.lowercased()
+      if let name = contact.name {
+        return name.lowercased().contains(query)
+      } else if let displayName = contact.recipient.displayName {
+        return displayName.lowercased().contains(query)
+      } else {
+        return contact.recipient.sessionId.contains(query)
+      }
+    }, selection: $navigationManager.navigationSelection) { item in
+      ContactItem(contact: item)
     }
     .onChange(of: navigationManager.navigationSelection) {
       if (navigationManager.navigationSelection != "add_contact" && navigationManager.navigationSelection != nil) {
         do {
-          if let contactIdString = navigationManager.navigationSelection,
-             let activeUserId = userManager.activeUser?.persistentModelID {
+          if let contactIdString = navigationManager.navigationSelection {
             if(navigationManager.appView == .contacts) {
               if let contactId = UUID(uuidString: contactIdString) {
                 var contactsFetchDescriptor = FetchDescriptor<Contact>(predicate: #Predicate { contact in
@@ -174,11 +182,66 @@ struct ContactsNav: View {
       }
     }
   }
+}
+
+struct ContactItem: View {
+  @Environment (\.modelContext) private var context
+  var contact: Contact
+  @State private var isEditing = false
+  @State private var name = ""
   
-  private func deleteItems(offsets: IndexSet) {
+  var body: some View {
+    NavigationLink(
+      value: contact.id.uuidString
+    ) {
+      Avatar(avatar: contact.recipient.avatar)
+      VStack {
+        Text(contact.name ?? contact.recipient.displayName ?? getSessionIdPlaceholder(sessionId: contact.recipient.sessionId))
+      }
+    }
+    .contextMenu(ContextMenu(menuItems: {
+      Button("􀈊 Edit name") {
+        isEditing = true
+      }
+      Divider()
+      Button("􀁠 Remove from contacts") {
+        context.delete(contact)
+      }
+    }))
+    .popover(isPresented: $isEditing, arrowEdge: .trailing) {
+      HStack(spacing: 6) {
+        TextField("Display name (optional)", text: $name)
+          .onSubmit {
+            handleSubmit()
+          }
+          .textFieldStyle(.roundedBorder)
+          .onReceive(Just(name)) { _ in limitText(64) }
+          .frame(width: 200)
+        Button("OK") {
+          handleSubmit()
+        }
+      }
+      .padding(.all, 8)
+    }
+    .onAppear {
+      name = contact.name ?? ""
+    }
+  }
+  
+  func limitText(_ upper: Int) {
+    if name.count > upper {
+      name = String(name.prefix(upper))
+    }
+  }
+  
+  func handleSubmit() {
+    isEditing = false
     withAnimation {
-      for index in offsets {
-        modelContext.delete(items[index])
+      do {
+        contact.name = name
+        try context.save()
+      } catch {
+        print("Failed to save contact name.")
       }
     }
   }
@@ -192,6 +255,20 @@ struct ContactsToolbar: ToolbarContent {
   var body: some ToolbarContent {
     ToolbarItem {
       Spacer()
+    }
+    ToolbarItem {
+      Button {
+        withAnimation {
+          viewManager.searchVisible.toggle()
+        }
+      } label: {
+        Label("Search", systemImage: "magnifyingglass")
+      }
+      .if(viewManager.searchVisible, { view in
+        view
+          .background(Color.accentColor)
+          .cornerRadius(5)
+      })
     }
     ToolbarItem {
       Button {

@@ -7,6 +7,7 @@ class ViewManager: ObservableObject {
   @Published var appView: AppView
   @Published var navigationSelection: String? = nil
   @Published var navigationSelectionData: [String: String]? = nil
+  @Published var searchVisible = false
   
   init(_ defaultAppView: AppView? = nil, _ defaultNavigationSelection: String? = nil) {
     appView = defaultAppView ?? .auth
@@ -17,6 +18,7 @@ class ViewManager: ObservableObject {
     if(appView != view) {
       appView = view
       self.navigationSelection = nil
+      self.searchVisible = false
     }
   }
   

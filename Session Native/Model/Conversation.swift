@@ -25,7 +25,7 @@ final class Conversation {
   var user: User
   var blocked: Bool = false
   @Relationship(
-    deleteRule: .cascade,
+    deleteRule: .nullify,
     inverse: \Contact.conversation
   )
   var contact: Contact?

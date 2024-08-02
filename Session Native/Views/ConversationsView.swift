@@ -88,12 +88,32 @@ struct ConversationsNav: View {
   }
     
   var body: some View {
-    List(items.sorted { (lhs, rhs) -> Bool in
-      if lhs.pinned == rhs.pinned {
-        return false
+    if viewManager.searchVisible {
+      SearchField(searchText: $searchText)
+        .padding(.horizontal, 12)
+      Divider()
+    }
+    List(items
+      .filter { conversation in
+        guard !searchText.isEmpty else {
+          return true
+        }
+        let query = searchText.lowercased()
+        if let name = conversation.contact?.name {
+          return name.lowercased().contains(query)
+        } else if let displayName = conversation.recipient.displayName {
+          return displayName.lowercased().contains(query)
+        } else {
+          return conversation.recipient.sessionId.contains(query)
+        }
       }
-      return lhs.pinned && !rhs.pinned
-    }) { conversation in
+      .sorted { (lhs, rhs) -> Bool in
+      if lhs.pinned == rhs.pinned {
+          return false
+        }
+        return lhs.pinned && !rhs.pinned
+      }
+    ) { conversation in
       ConversationPreviewItem(item: conversation)
         .swipeActions(edge: .leading) {
           Button {
@@ -326,6 +346,20 @@ struct ConversationsToolbar: ToolbarContent {
   var body: some ToolbarContent {
     ToolbarItem {
       Spacer()
+    }
+    ToolbarItem {
+      Button {
+        withAnimation {
+          viewManager.searchVisible.toggle()
+        }
+      } label: {
+        Label("Search", systemImage: "magnifyingglass")
+      }
+      .if(viewManager.searchVisible, { view in
+        view
+          .background(Color.accentColor)
+          .cornerRadius(5)
+      })
     }
     ToolbarItem {
       Button(

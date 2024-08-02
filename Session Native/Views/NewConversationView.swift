@@ -114,7 +114,6 @@ struct NewConversationView: View {
             viewManager.setActiveNavigationSelection(conversations[0].id.uuidString)
           }
         } else {
-          print(1)
           var recipientsFetchDescriptor = FetchDescriptor<Recipient>(predicate: #Predicate { recipient in
             recipient.sessionId == sessionId
           })
@@ -130,8 +129,6 @@ struct NewConversationView: View {
           } else {
             recipient = recipients[0]
           }
-          
-          print(2, recipient.sessionId)
           
           let conversation = Conversation(
             id: UUID(),
