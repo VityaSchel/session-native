@@ -10,6 +10,7 @@ struct NewConversationView: View {
   @State private var error: String = ""
   @State private var submitting: Bool = false
   @FocusState private var inputFocused: Bool
+  @Namespace private var namespace
   
   var body: some View {
     VStack(spacing: 12) {
@@ -22,6 +23,21 @@ struct NewConversationView: View {
           error = ""
         })
         .focused($inputFocused, equals: true)
+        .prefersDefaultFocus(in: self.namespace)
+        .onChange(of: viewManager.navigationSelectionData) {
+          if let data = viewManager.navigationSelectionData {
+            if let recipient = data["recipient"] {
+              text = recipient
+            }
+          }
+        }
+        .onAppear {
+          if let data = viewManager.navigationSelectionData {
+            if let recipient = data["recipient"] {
+              text = recipient
+            }
+          }
+        }
       if !error.isEmpty {
         Text(error)
           .fontWeight(.medium)
@@ -47,71 +63,102 @@ struct NewConversationView: View {
     }
     .frame(width: 300)
     .navigationTitle("New conversation")
+    .focusScope(self.namespace)
+    .defaultFocus($inputFocused, true)
   }
   
   private func handleSubmit() {
-    if(text.count == 66) {
+    if(text.count == 66 && isSessionID(text)) {
       openConversation(text)
     } else {
-      submitting = true
-      request([
-        "type": "resolve_ons",
-        "ons": .string(text)
-      ], { response in
-        submitting = false
-        if(response["ok"]?.boolValue == true) {
-          if(response["sessionId"]?.isNil == true) {
-            error = "ONS not found"
-            inputFocused = true
-          } else {
-            if let sessionId = response["sessionId"]?.stringValue {
-              openConversation(sessionId)
+      if(text.count <= 64) {
+        submitting = true
+        request([
+          "type": "resolve_ons",
+          "ons": .string(text)
+        ], { response in
+          submitting = false
+          if(response["ok"]?.boolValue == true) {
+            if(response["sessionId"]?.isNil == true) {
+              error = "ONS not found"
+              inputFocused = true
+            } else {
+              if let sessionId = response["sessionId"]?.stringValue {
+                openConversation(sessionId)
+              }
             }
+          } else {
+            error = response["error"]?.stringValue ?? "Error during ONS resolving"
+            inputFocused = true
           }
-        } else {
-          error = response["error"]?.stringValue ?? "Error during ONS resolving"
-          inputFocused = true
-        }
-      })
+        })
+      } else {
+        error = "Invalid ONS"
+        inputFocused = true
+      }
     }
   }
   
   private func openConversation(_ sessionId: String) {
-    if let activeUser = userManager.activeUser {
+    if let activeUserId = userManager.activeUser?.persistentModelID {
       do {
-        var fetchDescriptor = FetchDescriptor<Conversation>(predicate: #Predicate { conversation in
+        var conversationFetchDescriptor = FetchDescriptor<Conversation>(predicate: #Predicate { conversation in
           conversation.recipient.sessionId == sessionId
-          && conversation.user.persistentModelID == activeUser.persistentModelID
+          && conversation.user.persistentModelID == activeUserId
         })
-        fetchDescriptor.fetchLimit = 1
-        
-        let conversations = try modelContext.fetch(fetchDescriptor)
+        conversationFetchDescriptor.fetchLimit = 1
+        let conversations = try modelContext.fetch(conversationFetchDescriptor)
         
         if(!conversations.isEmpty) {
-          viewManager.setActiveNavigationSelection(conversations[0].id.uuidString)
+          DispatchQueue.main.async {
+            viewManager.setActiveNavigationSelection(conversations[0].id.uuidString)
+          }
         } else {
-          Task { @MainActor in
-            let recipient = Recipient(
+          print(1)
+          var recipientsFetchDescriptor = FetchDescriptor<Recipient>(predicate: #Predicate { recipient in
+            recipient.sessionId == sessionId
+          })
+          recipientsFetchDescriptor.fetchLimit = 1
+          let recipients = try modelContext.fetch(recipientsFetchDescriptor)
+          let recipient: Recipient
+          if(recipients.isEmpty) {
+            recipient = Recipient(
               id: UUID(),
               sessionId: sessionId
             )
             modelContext.insert(recipient)
-            let conversation = Conversation(
-              id: UUID(),
-              user: userManager.activeUser!,
-              recipient: recipient,
-              archived: false,
-              lastMessage: nil,
-              typingIndicator: false
-            )
-            modelContext.insert(conversation)
-            try modelContext.save()
-            NotificationCenter.default.post(name: .newConversationAdded, object: nil)
+          } else {
+            recipient = recipients[0]
+          }
+          
+          print(2, recipient.sessionId)
+          
+          let conversation = Conversation(
+            id: UUID(),
+            user: userManager.activeUser!,
+            recipient: recipient,
+            archived: false,
+            lastMessage: nil,
+            typingIndicator: false
+          )
+          
+          var contactsFetchDescriptor = FetchDescriptor<Contact>(predicate: #Predicate { contact in
+            contact.recipient.sessionId == sessionId
+            && contact.user.persistentModelID == activeUserId
+          })
+          contactsFetchDescriptor.fetchLimit = 1
+          let contacts = try modelContext.fetch(contactsFetchDescriptor)
+          if !contacts.isEmpty {
+            conversation.contact = contacts[0]
+          }
+          modelContext.insert(conversation)
+          try modelContext.save()
+          DispatchQueue.main.async {
             viewManager.setActiveNavigationSelection(conversation.id.uuidString)
           }
         }
       } catch {
-        print("Failed to load Movie model.")
+        print("Failed to save new conversation model.")
       }
     }
   }

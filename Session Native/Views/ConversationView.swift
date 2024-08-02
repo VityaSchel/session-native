@@ -6,35 +6,154 @@ struct ConversationView: View {
   @Environment(\.modelContext) var modelContext
   @EnvironmentObject var viewManager: ViewManager
   @EnvironmentObject var userManager: UserManager
+  @State var conversationModel: Conversation?
+  @State var showProfilePopover: Bool = false
   
-  private var conversationModel: Conversation? {
+  private func fetchConversation() {
     if let conversationId = viewManager.navigationSelection {
       if let conversationUuid = UUID(uuidString: conversationId) {
-        return try? modelContext.fetch(
+        let conversation = try? modelContext.fetch(
           FetchDescriptor(predicate: #Predicate<Conversation> { conversation in
             conversation.id == conversationUuid
           })
         ).first
+        conversationModel = conversation
       } else {
-        return nil
+        conversationModel = nil
       }
     } else {
-      return nil
+      conversationModel = nil
     }
   }
   
   var body: some View {
-    if let conversation = conversationModel {
-      Messages(
-        context: modelContext,
-        userManager: userManager,
-        conversation: conversation
-      )
-      .navigationTitle(conversation.recipient.sessionId)
-      .background(Color.conversationDefaultBackground)
-    } else {
-      Text("Conversation not found")
-        .foregroundStyle(Color.gray)
+    Group {
+      if let conversation = conversationModel {
+        Group {
+          Messages(
+            context: modelContext,
+            userManager: userManager,
+            conversation: conversation
+          )
+          .navigationTitle(conversation.recipient.displayName ?? getSessionIdPlaceholder(sessionId: conversation.recipient.sessionId))
+          .background(Color.conversationDefaultBackground)
+        }
+        .toolbar {
+          ToolbarItem(placement: .navigation) {
+            Button {
+              showProfilePopover = true
+            } label: {
+              Avatar(
+                avatar: conversationModel?.recipient.avatar,
+                width: 36,
+                height: 36
+              )
+                .contentShape(Circle())
+            }
+            .buttonStyle(.plain)
+            .popover(isPresented: $showProfilePopover, arrowEdge: .bottom) {
+              VStack(alignment: .center) {
+                Avatar(
+                  avatar: conversation.recipient.avatar,
+                  width: 148,
+                  height: 148
+                )
+                Text(conversation.recipient.displayName ?? getSessionIdPlaceholder(sessionId: conversation.recipient.sessionId))
+                  .font(.title)
+                HStack(spacing: 0) {
+                  ProfileButton(icon: "phone.fill", name: "Call")
+                  ProfileButton(icon: "person.crop.circle.fill.badge.plus", name: "Add as contact")
+                  ProfileButton(icon: conversation.notifications.enabled ? "speaker.slash.fill" : "speaker.wave.2.fill", name: conversation.notifications.enabled ? "Mute" : "Unmute") {
+                    conversation.notifications.enabled.toggle()
+                    do {
+                      try modelContext.save()
+                    } catch {
+                      print("Failed to save conversation: \(error)")
+                    }
+                  }
+                  ProfileButton(icon: conversation.blocked ? "hand.raised.slash.fill" : "hand.raised.fill", name: conversation.blocked ? "Unblock" : "Block") {
+                    conversation.blocked.toggle()
+                    do {
+                      try modelContext.save()
+                    } catch {
+                      print("Failed to save conversation: \(error)")
+                    }
+                  }
+                }
+                .frame(width: 256)
+                .padding(.top, 12)
+                VStack(alignment: .leading, spacing: 0) {
+                  Text("Session ID")
+                    .padding(.horizontal, 14)
+                    .padding(.top, 8)
+                    .padding(.bottom, 10)
+                  Divider()
+                  HStack {
+                    Text(conversation.recipient.sessionId)
+                      .font(.system(size: 11, design: .monospaced))
+                      .textSelection(.enabled)
+                  }
+                  .frame(maxWidth: .infinity, alignment: .leading)
+                  .padding(.horizontal, 10)
+                  .padding(.top, 10)
+                  .padding(.bottom, 7)
+                }
+                .background(Color.cardBackground)
+                .cornerRadius(8)
+              }
+              .padding()
+              .frame(width: 320)
+            }
+          }
+          ToolbarItem() {
+            Button {
+              
+            } label: {
+              Image(systemName: "phone")
+            }
+          }
+        }
+      } else {
+        Text("Conversation not found")
+          .foregroundStyle(Color.gray)
+      }
+    }
+    .onAppear {
+      fetchConversation()
+    }
+    .onChange(of: viewManager.navigationSelection) {
+      fetchConversation()
+    }
+  }
+  
+  struct ProfileButton: View {
+    var icon: String
+    var name: String
+    var action: () -> Void = {}
+    
+    var body: some View {
+      Button {
+        action()
+      } label: {
+        VStack {
+          VStack(spacing: 7) {
+            Image(systemName: icon)
+              .resizable()
+              .scaledToFit()
+              .frame(width: 15, height: 15)
+              .frame(width: 28, height: 28)
+              .background(Color.linkButton)
+              .cornerRadius(.infinity)
+            Text(name)
+              .foregroundStyle(Color.linkButton)
+          }
+          Spacer()
+        }
+        .frame(maxWidth: .infinity)
+        .contentShape(Rectangle())
+      }
+      .buttonStyle(.plain)
+//      .frame(maxWidth: .infinity)
     }
   }
 }
@@ -127,10 +246,12 @@ struct Messages: View {
             Spacer()
               .id("ConversationBottom")
           }
+          .padding(.horizontal, 10)
         }
-        .padding(.horizontal, 10)
-        .onChange(of: conversation) { newConversation in
-          viewModel.updateConversation(newConversation)
+        .onChange(of: conversation) { oldConversation, newConversation in
+          if(oldConversation.persistentModelID != newConversation.persistentModelID) {
+            viewModel.updateConversation(newConversation)
+          }
         }
         .onChange(of: viewModel.items, {
           DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
@@ -178,19 +299,26 @@ struct Messages: View {
     }
     
     var body: some View {
-      MessageBubble(direction: message.from == nil ? .right : .left) {
-        Text(message.body)
-          .textSelection(.enabled)
+      MessageBubble(
+        direction: message.from == nil ? .right : .left,
+        timestamp: getFormattedDate(date: message.timestamp),
+        status: message.status,
+        read: message.read
+      ) {
+        (Text(message.body)
+         /*.textSelection(.enabled)*/ + Text("\u{2066}" +	 String(repeating: "\u{2004}", count: message.from == nil ? 11 : 7) + "\u{2800}"))
           .foregroundStyle(message.from == nil ? Color.black : Color.messageBubbleText)
-          .contextMenu(menuItems: {
-            MessageContextMenu(message: message)
-              .environmentObject(viewModel)
-          })
       }
+      .contentShape(Rectangle())
       .contextMenu(menuItems: {
         MessageContextMenu(message: message)
           .environmentObject(viewModel)
       })
+      .onTapGesture(count: 2) {
+        withAnimation(.easeOut(duration: 0.1)) {
+          viewModel.replyTo = message
+        }
+      }
     }
     
     struct MessageContextMenu: View {
@@ -237,6 +365,12 @@ struct Messages: View {
   }
 }
 
+func getFormattedDate(date: Date) -> String {
+  let dateFormatter = DateFormatter()
+  dateFormatter.dateFormat = "HH:mm"
+  return dateFormatter.string(from: date)
+}
+
 struct NewMessageInput: View {
   @State private var messageText = ""
   var conversation: Conversation
@@ -254,58 +388,78 @@ struct NewMessageInput: View {
   }
   
   var body: some View {
-    VStack(spacing: 0) {
-      if let replyTo = messageModel.replyTo {
-        HStack {
-          VStack(alignment: .leading) {
-            Text("Reply to " + getReplyToText(replyTo: replyTo, userManager: userManager))
-              .fontWeight(.medium)
-              .foregroundStyle(Color.accentColor)
-            Text(replyTo.body)
-          }
-          .padding(.leading, 10)
-          .border(width: 2, edges: [.leading], color: Color.accentColor)
-          .cornerRadius(3.0)
-          Spacer()
-          Button(action: {
-            withAnimation(.easeOut(duration: 0.1)) {
-              messageModel.replyTo = nil
+    if conversation.blocked {
+      Button {
+        conversation.blocked = false
+        do {
+          try modelContext.save()
+        } catch {
+          print("Failed to save conversation: \(error)")
+        }
+      } label: {
+        Label("Unblock", systemImage: "hand.raised.slash.fill")
+          .frame(height: 48)
+          .frame(maxWidth: .infinity)
+          .background(.windowBackground)
+          .foregroundColor(Color.linkButton)
+          .contentShape(Rectangle())
+      }
+      .buttonStyle(.plain)
+      .border(width: 1, edges: [.top], color: Color.separator)
+    } else {
+      VStack(spacing: 0) {
+        if let replyTo = messageModel.replyTo {
+          HStack {
+            VStack(alignment: .leading) {
+              Text("Reply to " + getReplyToText(replyTo: replyTo, userManager: userManager))
+                .fontWeight(.medium)
+                .foregroundStyle(Color.accentColor)
+              Text(replyTo.body)
             }
-          }) {
-            Image(systemName: "xmark.circle")
-              .resizable()
-              .frame(width: 18, height: 18)
+            .padding(.leading, 10)
+            .border(width: 2, edges: [.leading], color: Color.accentColor)
+            .cornerRadius(3.0)
+            Spacer()
+            Button(action: {
+              withAnimation(.easeOut(duration: 0.1)) {
+                messageModel.replyTo = nil
+              }
+            }) {
+              Image(systemName: "xmark.circle")
+                .resizable()
+                .frame(width: 18, height: 18)
+            }
+            .buttonStyle(.plain)
           }
+          .padding(.horizontal, 12)
+          .padding(.top, 6)
+        }
+        HStack {
+          TextField("Message...", text: $messageText, axis: .vertical)
+            .textFieldStyle(.plain)
+            .padding(.top, 17)
+            .padding(.bottom, 16)
+            .padding(.leading, 16)
+            .lineLimit(1...5)
+            .onSubmit {
+              handleSubmit()
+            }
+          Button(
+            action: {
+              handleSubmit()
+            },
+            label: {
+              Image(systemName: "paperplane.fill")
+                .foregroundColor(.accentColor)
+            }
+          )
           .buttonStyle(.plain)
         }
-        .padding(.horizontal, 12)
-        .padding(.top, 6)
+        .padding(.trailing, 12)
       }
-      HStack {
-        TextField("Message...", text: $messageText, axis: .vertical)
-          .textFieldStyle(.plain)
-          .padding(.top, 17)
-          .padding(.bottom, 16)
-          .padding(.leading, 16)
-          .lineLimit(1...5)
-          .onSubmit {
-            handleSubmit()
-          }
-        Button(
-          action: {
-            handleSubmit()
-          },
-          label: {
-            Image(systemName: "paperplane.fill")
-              .foregroundColor(.accentColor)
-          }
-        )
-        .buttonStyle(.plain)
-      }
-      .padding(.trailing, 12)
+      .border(width: 1, edges: [.top], color: Color.separator)
+      .background(.windowBackground)
     }
-    .border(width: 1, edges: [.top], color: Color.separator)
-    .background(.windowBackground)
   }
   
   private func handleSubmit() {
@@ -321,10 +475,13 @@ struct NewMessageInput: View {
       hash: "aasnda",
       timestamp: Date(),
       body: body,
-      read: false
+      read: false,
+      status: .sending
     )
-    
     modelContext.insert(message)
+    
+    conversation.lastMessage = message
+    conversation.updatedAt = Date()
     
     do {
       try modelContext.save()
@@ -338,19 +495,19 @@ struct NewMessageInput: View {
 
 struct ConversationView_Preview: PreviewProvider {
   static var previews: some View {
-    let users = getUsersPreviewMocks()
-    
-    let convos = getConversationsPreviewMocks(user: users[0])
+    var convo = ""
     
     let inMemoryModelContainer: ModelContainer = {
       do {
+        let users = getUsersPreviewMocks()
+        let convos = getConversationsPreviewMocks(user: users[0])
+        convo = convos[0].id.uuidString
         let container = try ModelContainer(for: Schema(storageSchema), configurations: [.init(isStoredInMemoryOnly: true)])
         container.mainContext.insert(convos[0])
         let messages = getMessagePreviewMocks(conversation: convos[0])
         for message in messages {
           container.mainContext.insert(message)
         }
-        container.mainContext.insert(users[0])
         try container.mainContext.save()
         UserDefaults.standard.set(users[0].id.uuidString, forKey: "activeUser")
         return container
@@ -361,7 +518,7 @@ struct ConversationView_Preview: PreviewProvider {
     
     ConversationView()
       .modelContainer(inMemoryModelContainer)
-      .environmentObject(ViewManager(.conversations, convos[0].id.uuidString))
+      .environmentObject(ViewManager(.conversations, convo))
       .environmentObject(UserManager(container: inMemoryModelContainer))
       .frame(width: 500, height: 300)
   }

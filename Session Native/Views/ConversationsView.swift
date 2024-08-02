@@ -38,18 +38,16 @@ class ConversationsViewModel: ObservableObject {
     
     do {
       let activeUserId = activeUser.persistentModelID
-      var fetchDescriptor = FetchDescriptor(predicate: #Predicate<Conversation> { conversation in
-        conversation.user.persistentModelID == activeUserId
-      })
-      fetchDescriptor.sortBy = [SortDescriptor(\Conversation.updatedAt, order: .reverse)]
+//      var fetchDescriptor = FetchDescriptor(predicate: )
+//      fetchDescriptor.sortBy =
       
-      let fetchedItems = try dbContext.fetch(fetchDescriptor)
+//      let fetchedItems = try dbContext.fetch(fetchDescriptor)
       
-      DispatchQueue.main.async {
-        print("upading with", fetchedItems.count)
-        self.items = fetchedItems
-        self.isLoading = false
-      }
+//      DispatchQueue.main.async {
+//        print("upading with", fetchedItems.count)
+//        self.items = fetchedItems
+//        self.isLoading = false
+//      }
     } catch {
       print("Failed to fetch items: \(error)")
       self.isLoading = false
@@ -69,146 +67,147 @@ class ConversationsViewModel: ObservableObject {
 
 struct ConversationsNav: View {
   @Environment(\.modelContext) var modelContext
-  @EnvironmentObject var viewManager: ViewManager
   @EnvironmentObject var userManager: UserManager
+  @EnvironmentObject var viewManager: ViewManager
+  @State private var deleteAlertConversation: Conversation? = nil
+  @State private var deleteAlertVisible: Bool = false
+  @State private var searchText = ""
+  @Query private var items: [Conversation] = []
+  @Binding private var selected: String?
   
-  var body: some View {
-    ConversationsList(context: modelContext, modelContext: modelContext, userManager: userManager, viewManager: viewManager)
+  init(userManager: UserManager) {
+    let activeUserId = userManager.activeUser!.persistentModelID
+    let predicate = #Predicate<Conversation> {
+      $0.user.persistentModelID == activeUserId
+    }
+    _items = Query(
+      filter: predicate,
+      sort: [SortDescriptor(\Conversation.updatedAt, order: .reverse)]
+    )
+    _selected = .constant("")
   }
-  
-  struct ConversationsList: View {
-    @Environment(\.modelContext) var modelContext
-    var userManager: UserManager
-    @State var viewManager: ViewManager
-    @State private var deleteAlertConversation: Conversation? = nil
-    @State private var deleteAlertVisible: Bool = false
-    @StateObject private var viewModel: ConversationsViewModel
-    @State private var searchText = ""
     
-    init(context: ModelContext, modelContext: ModelContext, userManager: UserManager, viewManager: ViewManager) {
-      self.viewManager = viewManager
-      self.userManager = userManager
-      self.deleteAlertConversation = nil
-      self.deleteAlertVisible = false
-      _viewModel = StateObject(
-        wrappedValue: ConversationsViewModel(
-          context: modelContext,
-          activeUser: userManager.activeUser!
-        )
-      )
-    }
-    
-    var body: some View {
-      List(viewModel.items, id: \.id, selection: $viewManager.navigationSelection) { conversation in
-        ConversationPreviewItem(item: conversation)
-          .swipeActions(edge: .leading) {
-            Button {
-              print("Read conversation")
-            } label: {
-              Label("Read", systemImage: "message.badge.filled.fill")
-            }
-            .tint(.blue)
-          }
-          .swipeActions(edge: .trailing) {
-            Button {
-              conversation.notifications.enabled = !conversation.notifications.enabled
-            } label: {
-              if conversation.notifications.enabled {
-                Label("Mute", systemImage: "bell.slash.fill")
-              } else {
-                Label("Unmute", systemImage: "bell.fill")
-              }
-            }
-            .tint(.indigo)
-            if(conversation.archived) {
-              Button {
-                conversation.archived = false
-              } label: {
-                Label("Move from archive", systemImage: "square.and.arrow.up.fill")
-              }
-            } else {
-              Button {
-                conversation.archived = true
-              } label: {
-                Label("Move to archive", systemImage: "archivebox.fill")
-              }
-            }
-            Button(role: .destructive) {
-              deleteAlertVisible = true
-              deleteAlertConversation = conversation
-            } label: {
-              Label("Delete", systemImage: "trash.fill")
-            }
-          }
-          .contextMenu(ContextMenu(menuItems: {
-            if(conversation.pinned) {
-              Button("􀎨 Unpin") {
-                conversation.pinned = false
-              }
-            } else {
-              Button("􀎦 Pin") {
-                conversation.pinned = true
-              }
-            }
-            if(conversation.notifications.enabled) {
-              Button("􀋝 Mute") {
-                conversation.notifications.enabled = false
-                try? modelContext.save()
-              }
-            } else {
-              Button("􀋙 Unmute") {
-                conversation.notifications.enabled = true
-                try? modelContext.save()
-              }
-            }
-            Button("􀌤 Mark as read") {
-              
-            }
-            Divider()
-            if(conversation.archived) {
-              Button("􀈭 Archive") {
-                conversation.archived = true
-              }
-            } else {
-              Button("􀈂 Unarchive") {
-                conversation.archived = false
-              }
-            }
-            Divider()
-            Button("􀁠 Clear history") {
-              
-            }
-            Button {
-              
-            } label: {
-              Label("􀈑 Delete conversation", systemImage: "trash")
-                .foregroundStyle(Color.red)
-            }
-          }))
+  var body: some View {
+    List(items.sorted { (lhs, rhs) -> Bool in
+      if lhs.pinned == rhs.pinned {
+        return false
       }
-      .alert("Delete this conversation?", isPresented: $deleteAlertVisible) {
-        Button("Delete everywhere", role: .destructive) {
-          
+      return lhs.pinned && !rhs.pinned
+    }) { conversation in
+      ConversationPreviewItem(item: conversation)
+        .swipeActions(edge: .leading) {
+          Button {
+            print("Read conversation") // TODO
+          } label: {
+            Label("Read", systemImage: "message.badge.filled.fill")
+          }
+          .tint(.blue)
         }
-        Button("Delete locally", role: .destructive) {
-          if let conversation = deleteAlertConversation {
-            modelContext.delete(conversation)
+        .swipeActions(edge: .trailing) {
+          Button {
+            conversation.notifications.enabled = !conversation.notifications.enabled
+          } label: {
+            if conversation.notifications.enabled {
+              Label("Mute", systemImage: "bell.slash.fill")
+            } else {
+              Label("Unmute", systemImage: "bell.fill")
+            }
+          }
+          .tint(.indigo)
+          if(conversation.archived) {
+            Button {
+              // TODO
+              conversation.archived = false
+            } label: {
+              Label("Move from archive", systemImage: "square.and.arrow.up.fill")
+            }
+          } else {
+            Button {
+              conversation.archived = true
+            } label: {
+              Label("Move to archive", systemImage: "archivebox.fill")
+            }
+          }
+          Button(role: .destructive) {
+            deleteAlertVisible = true
+            deleteAlertConversation = conversation
+          } label: {
+            Label("Delete", systemImage: "trash.fill")
           }
         }
-        Button("Cancel", role: .cancel) {
-          deleteAlertVisible = false
+        .contextMenu(ContextMenu(menuItems: {
+          if(conversation.pinned) {
+            Button("􀎨 Unpin") {
+              conversation.pinned = false
+            }
+          } else {
+            Button("􀎦 Pin") {
+              conversation.pinned = true
+            }
+          }
+          if(conversation.notifications.enabled) {
+            Button("􀋝 Mute") {
+              // TODO
+              conversation.notifications.enabled = false
+              try? modelContext.save()
+            }
+          } else {
+            Button("􀋙 Unmute") {
+              conversation.notifications.enabled = true
+              try? modelContext.save()
+            }
+          }
+          Button("􀌤 Mark as read") {
+            // TODO
+          }
+          Divider()
+          if(conversation.archived) {
+            Button("􀈭 Archive") {
+              // TODO
+              conversation.archived = true
+            }
+          } else {
+            Button("􀈂 Unarchive") {
+              conversation.archived = false
+            }
+          }
+          Divider()
+          Button("􀁠 Clear history") {
+            // TODO
+          }
+          Button {
+            deleteAlertVisible = true
+            deleteAlertConversation = conversation
+          } label: {
+            Label("􀈑 Delete conversation", systemImage: "trash")
+              .foregroundStyle(Color.red)
+          }
+        }))
+    }
+    .alert("Delete this conversation?", isPresented: $deleteAlertVisible) {
+      Button("Delete everywhere", role: .destructive) {
+        // TODO: delete request
+      }
+      Button("Delete locally", role: .destructive) {
+        if let conversation = deleteAlertConversation {
+          modelContext.delete(conversation)
         }
       }
-      .onDeleteCommand(perform: {
-        
-      })
+      Button("Cancel", role: .cancel) {
+        deleteAlertVisible = false
+      }
     }
+    .onDeleteCommand(perform: {
+      // TODO
+    })
+    .listStyle(.sidebar)
+    .background(.clear)
+  }
     
-    private func deleteItems(offsets: IndexSet) {
-      withAnimation {
-        for index in offsets {
-          modelContext.delete(viewModel.items[index])
-        }
+  private func deleteItems(offsets: IndexSet) {
+    withAnimation {
+      for index in offsets {
+        modelContext.delete(items[index])
       }
     }
   }
@@ -217,62 +216,83 @@ struct ConversationsNav: View {
 struct ConversationPreviewItem: View {
   var item: Conversation
   @EnvironmentObject var userManager: UserManager
+  @EnvironmentObject var viewManager: ViewManager
+  @State var selected: Bool = false
   
   var body: some View {
-    NavigationLink(
-      value: item.id.uuidString,
-      label: {
-        HStack {
-          Avatar(avatar: item.recipient.avatar)
-          VStack(alignment: .leading) {
-            HStack(alignment: .center, spacing: 4) {
-              Text(item.recipient.displayName ?? getSessionIdPlaceholder(sessionId: item.recipient.sessionId))
-                .fontWeight(.bold)
-              if !item.notifications.enabled {
-                Image(systemName: "speaker.slash.fill")
-                  .resizable()
-                  .scaledToFit()
-                  .frame(height: 12)
-                  .padding(.top, 4)
-                  .opacity(0.45)
-              }
+    Button {
+      viewManager.setActiveNavigationSelection(item.id.uuidString)
+    } label: {
+      HStack {
+        Avatar(avatar: item.recipient.avatar)
+        VStack(alignment: .leading) {
+          HStack(alignment: .center, spacing: 4) {
+            Text(item.contact?.name ?? item.recipient.displayName ?? getSessionIdPlaceholder(sessionId: item.recipient.sessionId))
+              .fontWeight(.bold)
+              .foregroundStyle(selected ? Color.black.opacity(0.8) : Color.white)
+            if !item.notifications.enabled {
+              Image(systemName: "speaker.slash.fill")
+                .resizable()
+                .scaledToFit()
+                .frame(height: 12)
+                .padding(.top, 4)
+                .foregroundStyle(selected ? Color.black : Color.white)
+                .opacity(0.45)
             }
-            if let lastMessage = item.lastMessage {
-              if lastMessage.from == nil {
+          }
+          if let lastMessage = item.lastMessage {
+            if lastMessage.from == nil {
+              if selected {
+                (Text("You: ")
+                  .foregroundStyle(Color.black.opacity(0.3))
+                 + Text(lastMessage.body)
+                  .foregroundStyle(Color.black.opacity(0.6))
+                )
+                .lineLimit(2)
+              } else {
                 (Text("You: ")
                   .foregroundStyle(.opacity(0.4))
                  + Text(lastMessage.body)
                   .foregroundStyle(.opacity(0.6))
                 )
                 .lineLimit(2)
-              } else {
-                Text(lastMessage.body)
-                  .foregroundStyle(.opacity(0.6))
-                  .lineLimit(2)
-                  .fixedSize(horizontal: false, vertical: true)
               }
             } else {
-              Text("Empty chat")
-                .foregroundStyle(.opacity(0.4))
+              Text(lastMessage.body)
+                .foregroundStyle(selected ? Color.black.opacity(0.6) : Color.white.opacity(0.6))
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
             }
+          } else {
+            Text("Empty chat")
+              .foregroundStyle(selected ? Color.black.opacity(0.3) : Color.white.opacity(0.4))
           }
+        }
+        Spacer()
+        VStack(alignment: .trailing) {
+          Text(shortConversationUpdatedAt(item.updatedAt))
+            .foregroundStyle(selected ? Color.black.opacity(0.3) : Color.white.opacity(0.4))
           Spacer()
-          VStack(alignment: .trailing) {
-            Text(shortConversationUpdatedAt(item.updatedAt))
-              .foregroundStyle(.opacity(0.4))
-            Spacer()
-            if item.pinned {
-              Image(systemName: "pin.fill")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 12, height: 12)
-                .rotationEffect(.degrees(45))
-                .foregroundStyle(.opacity(0.4))
-            }
+          if item.pinned {
+            Image(systemName: "pin.fill")
+              .resizable()
+              .scaledToFit()
+              .frame(width: 12, height: 12)
+              .rotationEffect(.degrees(45))
+              .foregroundStyle(selected ? Color.black.opacity(0.3) : Color.white.opacity(0.4))
           }
         }
       }
-    )
+      .contentShape(Rectangle())
+      .padding(.vertical, 6)
+    }
+    .buttonStyle(.plain)
+    .onChange(of: viewManager.navigationSelection) {
+      selected = viewManager.navigationSelection == item.id.uuidString
+    }
+    .if(selected) { view in
+      view.listRowBackground(Color.accentColor)
+    }
   }
   
   private func shortConversationUpdatedAt(_ date: Date) -> String {
@@ -310,7 +330,11 @@ struct ConversationsToolbar: ToolbarContent {
     ToolbarItem {
       Button(
         action: {
-          viewManager.setActiveNavigationSelection("new")
+          if(viewManager.navigationSelection == "new") {
+            viewManager.setActiveNavigationSelection(nil)
+          } else {
+            viewManager.setActiveNavigationSelection("new")
+          }
         }
       ) {
         Label("New conversation", systemImage: "square.and.pencil")
@@ -343,10 +367,12 @@ struct ConversationsView_Preview: PreviewProvider {
       }
     }()
     
+    let userManager = UserManager(container: inMemoryModelContainer)
+    
     return Group {
       NavigationSplitView {
         VStack {
-          ConversationsNav()
+          ConversationsNav(userManager: userManager)
           AppViewsNavigation()
         }
         .toolbar {
@@ -359,7 +385,7 @@ struct ConversationsView_Preview: PreviewProvider {
       }
     }
     .modelContainer(inMemoryModelContainer)
-    .environmentObject(UserManager(container: inMemoryModelContainer))
+    .environmentObject(userManager)
     .environmentObject(ViewManager(.conversations))
   }
 }

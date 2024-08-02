@@ -16,6 +16,9 @@
 		A719F74F2C51C23100E9487A /* Conversation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A719F74E2C51C23100E9487A /* Conversation.swift */; };
 		A719F7512C51C23200E9487A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A719F7502C51C23200E9487A /* Assets.xcassets */; };
 		A719F7542C51C23200E9487A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A719F7532C51C23200E9487A /* Preview Assets.xcassets */; };
+		A71F42562C5C38E3006748A9 /* Spinner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A71F42552C5C38E3006748A9 /* Spinner.swift */; };
+		A71F42582C5D3871006748A9 /* Checkmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = A71F42572C5D3871006748A9 /* Checkmark.swift */; };
+		A71F425A2C5D5ADB006748A9 /* Contacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = A71F42592C5D5ADB006748A9 /* Contacts.swift */; };
 		A76FE5492C51D842009B1D19 /* ContactsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A76FE5482C51D842009B1D19 /* ContactsView.swift */; };
 		A76FE54B2C51D84D009B1D19 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A76FE54A2C51D84D009B1D19 /* SettingsView.swift */; };
 		A76FE54D2C51D882009B1D19 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A76FE54C2C51D882009B1D19 /* ContentView.swift */; };
@@ -64,6 +67,9 @@
 		A719F7502C51C23200E9487A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A719F7532C51C23200E9487A /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		A719F7552C51C23200E9487A /* Session_Native.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Session_Native.entitlements; sourceTree = "<group>"; };
+		A71F42552C5C38E3006748A9 /* Spinner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spinner.swift; sourceTree = "<group>"; };
+		A71F42572C5D3871006748A9 /* Checkmark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Checkmark.swift; sourceTree = "<group>"; };
+		A71F42592C5D5ADB006748A9 /* Contacts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Contacts.swift; sourceTree = "<group>"; };
 		A76FE5482C51D842009B1D19 /* ContactsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsView.swift; sourceTree = "<group>"; };
 		A76FE54A2C51D84D009B1D19 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		A76FE54C2C51D882009B1D19 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -214,6 +220,8 @@
 			isa = PBXGroup;
 			children = (
 				A76FE55E2C52A280009B1D19 /* Avatar.swift */,
+				A71F42552C5C38E3006748A9 /* Spinner.swift */,
+				A71F42572C5D3871006748A9 /* Checkmark.swift */,
 				A7E68C702C57D6F1005D8819 /* MessageBubble.swift */,
 				A76FE57D2C52DA89009B1D19 /* SessionIdAnimation.swift */,
 			);
@@ -262,6 +270,7 @@
 			children = (
 				A7E68C5B2C566B08005D8819 /* Conversations.swift */,
 				A7E68C722C5903CD005D8819 /* Messages.swift */,
+				A71F42592C5D5ADB006748A9 /* Contacts.swift */,
 				A7E68C602C567478005D8819 /* Recipients.swift */,
 				A7E68C5E2C566BEF005D8819 /* Users.swift */,
 			);
@@ -357,6 +366,7 @@
 				A76FE54D2C51D882009B1D19 /* ContentView.swift in Sources */,
 				A76FE54B2C51D84D009B1D19 /* SettingsView.swift in Sources */,
 				A7E68C712C57D6F1005D8819 /* MessageBubble.swift in Sources */,
+				A71F42562C5C38E3006748A9 /* Spinner.swift in Sources */,
 				A7E68C672C56C2C5005D8819 /* IfConditionalModifier.swift in Sources */,
 				A76FE5592C527B5E009B1D19 /* Recipient.swift in Sources */,
 				A76FE56E2C52BA14009B1D19 /* AuthView.swift in Sources */,
@@ -371,9 +381,11 @@
 				A7037D112C55562C00B53FBD /* BackendManager.swift in Sources */,
 				A76FE5762C52C698009B1D19 /* SecondaryButton.swift in Sources */,
 				A7E68C6B2C56CB88005D8819 /* NewConversationView.swift in Sources */,
+				A71F42582C5D3871006748A9 /* Checkmark.swift in Sources */,
 				A76FE5782C52C8B7009B1D19 /* LoginView.swift in Sources */,
 				A76FE5532C5250B1009B1D19 /* EdgeBorder.swift in Sources */,
 				A7E68C6D2C56CB8E005D8819 /* TipsView.swift in Sources */,
+				A71F425A2C5D5ADB006748A9 /* Contacts.swift in Sources */,
 				A7E68C612C567478005D8819 /* Recipients.swift in Sources */,
 				A76FE5672C52ACAE009B1D19 /* SwiftDataSchema.swift in Sources */,
 				A7E68C5F2C566BEF005D8819 /* Users.swift in Sources */,

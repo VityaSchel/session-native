@@ -90,6 +90,7 @@ struct ProfileSettingsView: View {
               .font(.system(size: 11, design: .monospaced))
               .if(mnemonic != nil) { view in
                 view.textSelection(.enabled)
+                  .privacySensitive()
               }
           }
           .frame(maxWidth: .infinity, alignment: .leading)

@@ -4,9 +4,18 @@ import SwiftUI
 struct MessageBubble<Content>: View where Content: View {
   let direction: ChatBubbleShape.Direction
   let content: () -> Content
-  init(direction: ChatBubbleShape.Direction, @ViewBuilder content: @escaping () -> Content) {
+  var timestamp: String
+  var status: MessageStatus
+  var read: Bool
+  @State var errorVisible: Bool = false
+  @State var errorReason: String = ""
+  
+  init(direction: ChatBubbleShape.Direction, timestamp: String, status: MessageStatus, read: Bool, @ViewBuilder content: @escaping () -> Content) {
     self.content = content
     self.direction = direction
+    self.timestamp = timestamp
+    self.status = status
+    self.read = read
   }
   
   var body: some View {
@@ -14,12 +23,58 @@ struct MessageBubble<Content>: View where Content: View {
       if direction == .right {
         Spacer()
       }
-      content()
-        .padding(.vertical, 6)
-        .padding(direction == .left ? .leading : .trailing, 11)
-        .padding(direction == .left ? .trailing : .leading, 8)
-        .background(direction == .left ? Color.messageBubble : Color.accentColor)
-        .clipShape(ChatBubbleShape(direction: direction))
+      ZStack {
+        content()
+          .padding(.vertical, 6)
+          .padding(direction == .left ? .leading : .trailing, 11)
+          .padding(direction == .left ? .trailing : .leading, 8)
+          .background(direction == .left ? Color.messageBubble : Color.accentColor)
+          .clipShape(ChatBubbleShape(direction: direction))
+          .overlay(
+            GeometryReader { geometry in
+              Text(timestamp)
+                .font(.system(size: 11))
+                .italic()
+                .padding(5)
+                .cornerRadius(5)
+                .foregroundStyle(direction == .left ? Color.gray : Color.black.opacity(0.8))
+                .position(x: geometry.size.width - (direction == .left ? 25 : 43), y: geometry.size.height - 13)
+              if(direction == .right) {
+                Group {
+                  switch(status) {
+                  case .sending:
+                    Spinner(style: .light, size: 8)
+                  case .sent:
+                    if read {
+                      Checkmark(style: .light, double: true, size: 16, thickness: 1)
+                        .offset(x: -1)
+                    } else {
+                      Checkmark(style: .light, size: 16, thickness: 1)
+                    }
+                  case .errored(let reason):
+                    Button() {
+                      errorVisible = true
+                      errorReason = reason
+                    } label: {
+                      ZStack {
+                        Circle()
+                          .foregroundStyle(Color.white)
+                          .frame(width: 12, height: 12)
+                        Image(systemName: "exclamationmark.circle.fill")
+                          .foregroundColor(Color(hex: "#f95252"))
+                      }
+                    }
+                    .buttonStyle(.plain)
+                    .alert(isPresented: $errorVisible) {
+                      Alert(title: Text("Error sending message"), message: Text(errorReason), dismissButton: .cancel())
+                    }
+                  }
+                }
+                .position(x: geometry.size.width - 17, y: geometry.size.height - 13)
+              }
+            }, alignment: .bottomTrailing
+          )
+      }
       if direction == .left {
         Spacer()
       }
@@ -111,10 +166,26 @@ struct ChatBubbleShape: Shape {
 }
 
 #Preview {
-  HStack {
-    MessageBubble(direction: .left) {
-      Text("Hello, World!")
+  VStack {
+    MessageBubble(direction: .left, timestamp: "12:00", status: .sent, read: false) {
+      Text("Hello, World!\u{2066}" + String(repeating: "\u{2004}", count: false ? 11 : 7) + "\u{2800}")
         .foregroundStyle(Color.white)
+    }
+    MessageBubble(direction: .right, timestamp: "12:00", status: .sent, read: true) {
+      Text("Hello, World!\u{2066}" + String(repeating: "\u{2004}", count: true ? 11 : 7) + "\u{2800}")
+        .foregroundStyle(Color.black)
+    }
+    MessageBubble(direction: .right, timestamp: "12:00", status: .sent, read: false) {
+      Text("Hello, World!\u{2066}" + String(repeating: "\u{2004}", count: true ? 11 : 7) + "\u{2800}")
+        .foregroundStyle(Color.black)
+    }
+    MessageBubble(direction: .right, timestamp: "00:00", status: .errored(reason: "Preview error"), read: false) {
+      Text("Hello, World!\u{2066}" + String(repeating: "\u{2004}", count: true ? 11 : 7) + "\u{2800}")
+        .foregroundStyle(Color.black)
+    }
+    MessageBubble(direction: .right, timestamp: "00:00", status: .sending, read: false) {
+      Text("Hello, World!\u{2066}" + String(repeating: "\u{2004}", count: true ? 11 : 7) + "\u{2800}")
+        .foregroundStyle(Color.black)
     }
   }
   .background(Color.conversationDefaultBackground)

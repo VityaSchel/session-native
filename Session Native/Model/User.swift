@@ -12,6 +12,11 @@ final class User {
     inverse: \Conversation.user
   )
   var conversations: [Conversation] = []
+  @Relationship(
+    deleteRule: .cascade,
+    inverse: \Contact.user
+  )
+  var contacts: [Contact] = []
   
   init(id: UUID, sessionId: String, displayName: String? = nil, avatar: Data? = nil) {
     self.id = id
