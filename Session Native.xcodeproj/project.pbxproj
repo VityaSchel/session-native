@@ -41,6 +41,25 @@
 		A76FE57A2C52C8D1009B1D19 /* SignupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A76FE5792C52C8D1009B1D19 /* SignupView.swift */; };
 		A76FE57C2C52C977009B1D19 /* ViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A76FE57B2C52C977009B1D19 /* ViewManager.swift */; };
 		A76FE57E2C52DA89009B1D19 /* SessionIdAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A76FE57D2C52DA89009B1D19 /* SessionIdAnimation.swift */; };
+		A77C0B252C5E213300343A5D /* NewContactView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77C0B242C5E213300343A5D /* NewContactView.swift */; };
+		A77C0B272C5E215000343A5D /* ContactsNav.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77C0B262C5E215000343A5D /* ContactsNav.swift */; };
+		A77C0B292C5E217D00343A5D /* ContactsToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77C0B282C5E217D00343A5D /* ContactsToolbar.swift */; };
+		A77C0B2C2C5E21F700343A5D /* ConversationsNav.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77C0B2B2C5E21F700343A5D /* ConversationsNav.swift */; };
+		A77C0B2E2C5E221500343A5D /* ConversationsToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77C0B2D2C5E221500343A5D /* ConversationsToolbar.swift */; };
+		A77C0B312C5E225400343A5D /* ConversationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77C0B302C5E225400343A5D /* ConversationViewModel.swift */; };
+		A77C0B332C5E227C00343A5D /* ConversationNewMessageInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77C0B322C5E227C00343A5D /* ConversationNewMessageInput.swift */; };
+		A77C0B362C5E22B200343A5D /* ProfileSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77C0B352C5E22B200343A5D /* ProfileSettingsView.swift */; };
+		A77C0B382C5E22C500343A5D /* GeneralSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77C0B372C5E22C500343A5D /* GeneralSettingsView.swift */; };
+		A77C0B3A2C5E22DF00343A5D /* NotificationsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77C0B392C5E22DF00343A5D /* NotificationsSettingsView.swift */; };
+		A77C0B3C2C5E22F200343A5D /* PrivacySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77C0B3B2C5E22F200343A5D /* PrivacySettingsView.swift */; };
+		A77C0B3E2C5E230700343A5D /* AppearanceSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77C0B3D2C5E230700343A5D /* AppearanceSettingsView.swift */; };
+		A77C0B402C5E231C00343A5D /* SettingsHelpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77C0B3F2C5E231C00343A5D /* SettingsHelpView.swift */; };
+		A77C0B422C5E233400343A5D /* SettingsNav.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77C0B412C5E233400343A5D /* SettingsNav.swift */; };
+		A77C0B442C5E234400343A5D /* SettingsToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77C0B432C5E234400343A5D /* SettingsToolbar.swift */; };
+		A77C0B462C5E23A600343A5D /* ChatMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77C0B452C5E23A600343A5D /* ChatMessageView.swift */; };
+		A77C0B482C5E23F100343A5D /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77C0B472C5E23F100343A5D /* ProfileView.swift */; };
+		A77C0B4A2C5E279000343A5D /* ContactsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77C0B492C5E279000343A5D /* ContactsManager.swift */; };
+		A77C0B4C2C5E37C000343A5D /* Accordion.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77C0B4B2C5E37C000343A5D /* Accordion.swift */; };
 		A7E68C5A2C55B4B4005D8819 /* KeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E68C592C55B4B4005D8819 /* KeychainManager.swift */; };
 		A7E68C5C2C566B08005D8819 /* Conversations.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E68C5B2C566B08005D8819 /* Conversations.swift */; };
 		A7E68C5F2C566BEF005D8819 /* Users.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E68C5E2C566BEF005D8819 /* Users.swift */; };
@@ -92,6 +111,25 @@
 		A76FE5792C52C8D1009B1D19 /* SignupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignupView.swift; sourceTree = "<group>"; };
 		A76FE57B2C52C977009B1D19 /* ViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewManager.swift; sourceTree = "<group>"; };
 		A76FE57D2C52DA89009B1D19 /* SessionIdAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionIdAnimation.swift; sourceTree = "<group>"; };
+		A77C0B242C5E213300343A5D /* NewContactView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewContactView.swift; sourceTree = "<group>"; };
+		A77C0B262C5E215000343A5D /* ContactsNav.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsNav.swift; sourceTree = "<group>"; };
+		A77C0B282C5E217D00343A5D /* ContactsToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsToolbar.swift; sourceTree = "<group>"; };
+		A77C0B2B2C5E21F700343A5D /* ConversationsNav.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationsNav.swift; sourceTree = "<group>"; };
+		A77C0B2D2C5E221500343A5D /* ConversationsToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationsToolbar.swift; sourceTree = "<group>"; };
+		A77C0B302C5E225400343A5D /* ConversationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationViewModel.swift; sourceTree = "<group>"; };
+		A77C0B322C5E227C00343A5D /* ConversationNewMessageInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationNewMessageInput.swift; sourceTree = "<group>"; };
+		A77C0B352C5E22B200343A5D /* ProfileSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSettingsView.swift; sourceTree = "<group>"; };
+		A77C0B372C5E22C500343A5D /* GeneralSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralSettingsView.swift; sourceTree = "<group>"; };
+		A77C0B392C5E22DF00343A5D /* NotificationsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsSettingsView.swift; sourceTree = "<group>"; };
+		A77C0B3B2C5E22F200343A5D /* PrivacySettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacySettingsView.swift; sourceTree = "<group>"; };
+		A77C0B3D2C5E230700343A5D /* AppearanceSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceSettingsView.swift; sourceTree = "<group>"; };
+		A77C0B3F2C5E231C00343A5D /* SettingsHelpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsHelpView.swift; sourceTree = "<group>"; };
+		A77C0B412C5E233400343A5D /* SettingsNav.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsNav.swift; sourceTree = "<group>"; };
+		A77C0B432C5E234400343A5D /* SettingsToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsToolbar.swift; sourceTree = "<group>"; };
+		A77C0B452C5E23A600343A5D /* ChatMessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessageView.swift; sourceTree = "<group>"; };
+		A77C0B472C5E23F100343A5D /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		A77C0B492C5E279000343A5D /* ContactsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsManager.swift; sourceTree = "<group>"; };
+		A77C0B4B2C5E37C000343A5D /* Accordion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Accordion.swift; sourceTree = "<group>"; };
 		A7E68C592C55B4B4005D8819 /* KeychainManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainManager.swift; sourceTree = "<group>"; };
 		A7E68C5B2C566B08005D8819 /* Conversations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Conversations.swift; sourceTree = "<group>"; };
 		A7E68C5E2C566BEF005D8819 /* Users.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Users.swift; sourceTree = "<group>"; };
@@ -181,12 +219,12 @@
 				A76FE56D2C52BA14009B1D19 /* AuthView.swift */,
 				A76FE5792C52C8D1009B1D19 /* SignupView.swift */,
 				A76FE5772C52C8B7009B1D19 /* LoginView.swift */,
-				A76FE5482C51D842009B1D19 /* ContactsView.swift */,
-				A719F74C2C51C23100E9487A /* ConversationsView.swift */,
+				A77C0B232C5E211C00343A5D /* Contacts */,
+				A77C0B2A2C5E21D700343A5D /* Conversations */,
 				A7E68C6C2C56CB8E005D8819 /* TipsView.swift */,
 				A7E68C6A2C56CB88005D8819 /* NewConversationView.swift */,
-				A7E68C6E2C56CB94005D8819 /* ConversationView.swift */,
-				A76FE54A2C51D84D009B1D19 /* SettingsView.swift */,
+				A77C0B2F2C5E224200343A5D /* Conversation */,
+				A77C0B342C5E229C00343A5D /* Settings */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -243,6 +281,7 @@
 				A7E68C592C55B4B4005D8819 /* KeychainManager.swift */,
 				A76FE56A2C52B483009B1D19 /* UserManager.swift */,
 				A7037D102C55562C00B53FBD /* BackendManager.swift */,
+				A77C0B492C5E279000343A5D /* ContactsManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -261,8 +300,58 @@
 				A76FE5752C52C698009B1D19 /* SecondaryButton.swift */,
 				A7EB5E6D2C53B46800A887B3 /* ToolbarStyleButton.swift */,
 				A76FE5722C52C0EF009B1D19 /* PrimaryButton.swift */,
+				A77C0B4B2C5E37C000343A5D /* Accordion.swift */,
 			);
 			path = UI;
+			sourceTree = "<group>";
+		};
+		A77C0B232C5E211C00343A5D /* Contacts */ = {
+			isa = PBXGroup;
+			children = (
+				A76FE5482C51D842009B1D19 /* ContactsView.swift */,
+				A77C0B282C5E217D00343A5D /* ContactsToolbar.swift */,
+				A77C0B262C5E215000343A5D /* ContactsNav.swift */,
+				A77C0B242C5E213300343A5D /* NewContactView.swift */,
+			);
+			path = Contacts;
+			sourceTree = "<group>";
+		};
+		A77C0B2A2C5E21D700343A5D /* Conversations */ = {
+			isa = PBXGroup;
+			children = (
+				A719F74C2C51C23100E9487A /* ConversationsView.swift */,
+				A77C0B2D2C5E221500343A5D /* ConversationsToolbar.swift */,
+				A77C0B2B2C5E21F700343A5D /* ConversationsNav.swift */,
+			);
+			path = Conversations;
+			sourceTree = "<group>";
+		};
+		A77C0B2F2C5E224200343A5D /* Conversation */ = {
+			isa = PBXGroup;
+			children = (
+				A7E68C6E2C56CB94005D8819 /* ConversationView.swift */,
+				A77C0B472C5E23F100343A5D /* ProfileView.swift */,
+				A77C0B452C5E23A600343A5D /* ChatMessageView.swift */,
+				A77C0B322C5E227C00343A5D /* ConversationNewMessageInput.swift */,
+				A77C0B302C5E225400343A5D /* ConversationViewModel.swift */,
+			);
+			path = Conversation;
+			sourceTree = "<group>";
+		};
+		A77C0B342C5E229C00343A5D /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				A76FE54A2C51D84D009B1D19 /* SettingsView.swift */,
+				A77C0B432C5E234400343A5D /* SettingsToolbar.swift */,
+				A77C0B412C5E233400343A5D /* SettingsNav.swift */,
+				A77C0B352C5E22B200343A5D /* ProfileSettingsView.swift */,
+				A77C0B372C5E22C500343A5D /* GeneralSettingsView.swift */,
+				A77C0B392C5E22DF00343A5D /* NotificationsSettingsView.swift */,
+				A77C0B3B2C5E22F200343A5D /* PrivacySettingsView.swift */,
+				A77C0B3D2C5E230700343A5D /* AppearanceSettingsView.swift */,
+				A77C0B3F2C5E231C00343A5D /* SettingsHelpView.swift */,
+			);
+			path = Settings;
 			sourceTree = "<group>";
 		};
 		A7E68C5D2C566B1C005D8819 /* Preview Mocks */ = {
@@ -368,29 +457,48 @@
 				A7E68C712C57D6F1005D8819 /* MessageBubble.swift in Sources */,
 				A71F42562C5C38E3006748A9 /* Spinner.swift in Sources */,
 				A7E68C672C56C2C5005D8819 /* IfConditionalModifier.swift in Sources */,
+				A77C0B402C5E231C00343A5D /* SettingsHelpView.swift in Sources */,
+				A77C0B3C2C5E22F200343A5D /* PrivacySettingsView.swift in Sources */,
 				A76FE5592C527B5E009B1D19 /* Recipient.swift in Sources */,
+				A77C0B3A2C5E22DF00343A5D /* NotificationsSettingsView.swift in Sources */,
 				A76FE56E2C52BA14009B1D19 /* AuthView.swift in Sources */,
+				A77C0B292C5E217D00343A5D /* ContactsToolbar.swift in Sources */,
+				A77C0B422C5E233400343A5D /* SettingsNav.swift in Sources */,
+				A77C0B252C5E213300343A5D /* NewContactView.swift in Sources */,
+				A77C0B442C5E234400343A5D /* SettingsToolbar.swift in Sources */,
 				A76FE55B2C527FE6009B1D19 /* Message.swift in Sources */,
 				A76FE55F2C52A280009B1D19 /* Avatar.swift in Sources */,
 				A76FE5502C51DA93009B1D19 /* AppViewsNavigation.swift in Sources */,
+				A77C0B312C5E225400343A5D /* ConversationViewModel.swift in Sources */,
+				A77C0B4A2C5E279000343A5D /* ContactsManager.swift in Sources */,
 				A7EB5E6E2C53B46800A887B3 /* ToolbarStyleButton.swift in Sources */,
+				A77C0B2E2C5E221500343A5D /* ConversationsToolbar.swift in Sources */,
 				A7E68C5A2C55B4B4005D8819 /* KeychainManager.swift in Sources */,
+				A77C0B462C5E23A600343A5D /* ChatMessageView.swift in Sources */,
 				A76FE57E2C52DA89009B1D19 /* SessionIdAnimation.swift in Sources */,
+				A77C0B382C5E22C500343A5D /* GeneralSettingsView.swift in Sources */,
 				A76FE5652C52A5D4009B1D19 /* SessionId.swift in Sources */,
 				A719F74B2C51C23100E9487A /* Session_NativeApp.swift in Sources */,
 				A7037D112C55562C00B53FBD /* BackendManager.swift in Sources */,
 				A76FE5762C52C698009B1D19 /* SecondaryButton.swift in Sources */,
+				A77C0B4C2C5E37C000343A5D /* Accordion.swift in Sources */,
 				A7E68C6B2C56CB88005D8819 /* NewConversationView.swift in Sources */,
 				A71F42582C5D3871006748A9 /* Checkmark.swift in Sources */,
+				A77C0B332C5E227C00343A5D /* ConversationNewMessageInput.swift in Sources */,
 				A76FE5782C52C8B7009B1D19 /* LoginView.swift in Sources */,
 				A76FE5532C5250B1009B1D19 /* EdgeBorder.swift in Sources */,
 				A7E68C6D2C56CB8E005D8819 /* TipsView.swift in Sources */,
+				A77C0B3E2C5E230700343A5D /* AppearanceSettingsView.swift in Sources */,
 				A71F425A2C5D5ADB006748A9 /* Contacts.swift in Sources */,
+				A77C0B272C5E215000343A5D /* ContactsNav.swift in Sources */,
 				A7E68C612C567478005D8819 /* Recipients.swift in Sources */,
+				A77C0B362C5E22B200343A5D /* ProfileSettingsView.swift in Sources */,
 				A76FE5672C52ACAE009B1D19 /* SwiftDataSchema.swift in Sources */,
 				A7E68C5F2C566BEF005D8819 /* Users.swift in Sources */,
 				A76FE57A2C52C8D1009B1D19 /* SignupView.swift in Sources */,
 				A76FE57C2C52C977009B1D19 /* ViewManager.swift in Sources */,
+				A77C0B482C5E23F100343A5D /* ProfileView.swift in Sources */,
+				A77C0B2C2C5E21F700343A5D /* ConversationsNav.swift in Sources */,
 				A70072612C5A8C7B00C5370D /* AvatarSelector.swift in Sources */,
 				A7E68C5C2C566B08005D8819 /* Conversations.swift in Sources */,
 				A76FE5732C52C0EF009B1D19 /* PrimaryButton.swift in Sources */,
