@@ -17,6 +17,7 @@ struct ConversationView: View {
           })
         ).first
         conversationModel = conversation
+        conversationModel?.unreadMessages = 0
       } else {
         conversationModel = nil
       }

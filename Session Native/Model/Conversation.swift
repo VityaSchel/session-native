@@ -16,12 +16,6 @@ final class Conversation {
   )
   var messages: [Message] = []
   var pinned: Bool = false
-  var unreadCount: Int {
-    messages.filter { !$0.read }.count
-  }
-  var hasUnread: Bool {
-    unreadCount > 0
-  }
   var user: User
   var blocked: Bool = false
   @Relationship(
@@ -29,6 +23,7 @@ final class Conversation {
     inverse: \Contact.conversation
   )
   var contact: Contact?
+  var unreadMessages: Int
   
   init(id: UUID, user: User, recipient: Recipient, archived: Bool, lastMessage: Message? = nil, typingIndicator: Bool, notifications: Notification = Notification(enabled: true), pinned: Bool = false, contact: Contact? = nil) {
     self.id = id
@@ -44,6 +39,7 @@ final class Conversation {
     self.updatedAt = Date()
     self.blocked = false
     self.contact = contact
+    self.unreadMessages = 0
   }
 }
 

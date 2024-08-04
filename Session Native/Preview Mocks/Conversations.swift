@@ -21,6 +21,7 @@ func getConversationsPreviewMocks(user: User) -> [Conversation] {
     body: "Hello hloth",
     read: false
   )
+  convo1.unreadMessages += 1
   
   let convo2 = Conversation(
     id: UUID(uuidString: "6e92da23-7f3c-4c0f-bb9c-73477b35983b")!,
