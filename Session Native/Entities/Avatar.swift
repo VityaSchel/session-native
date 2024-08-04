@@ -18,6 +18,7 @@ struct Avatar: View {
           .resizable()
           .scaledToFit()
           .padding((width ?? 40)*0.3)
+          .foregroundStyle(Color.white)
       }
     }
     .frame(width: width, height: height)

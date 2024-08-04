@@ -163,13 +163,13 @@ struct ConversationPreviewItem: View {
           HStack(alignment: .center, spacing: 4) {
             Text(conversation.contact?.name ?? conversation.recipient.displayName ?? getSessionIdPlaceholder(sessionId: conversation.recipient.sessionId))
               .fontWeight(.bold)
-              .foregroundStyle(selected ? Color.black.opacity(0.8) : Color.white)
+              .foregroundStyle(selected ? Color.black.opacity(0.8) : Color.text)
             if !conversation.notifications.enabled {
               Image(systemName: "speaker.slash.fill")
                 .resizable()
                 .scaledToFit()
                 .frame(height: 12)
-                .foregroundStyle(selected ? Color.black : Color.white)
+                .foregroundStyle(selected ? Color.black : Color.text)
                 .opacity(0.45)
             }
           }
@@ -199,24 +199,24 @@ struct ConversationPreviewItem: View {
               }
             } else {
               Text(lastMessage.body)
-                .foregroundStyle(selected ? Color.black.opacity(0.6) : Color.white.opacity(0.6))
+                .foregroundStyle(selected ? Color.black.opacity(0.6) : Color.text.opacity(0.6))
                 .lineLimit(2)
                 .fixedSize(horizontal: false, vertical: true)
             }
           } else {
             Text("Empty chat")
-              .foregroundStyle(selected ? Color.black.opacity(0.3) : Color.white.opacity(0.4))
+              .foregroundStyle(selected ? Color.black.opacity(0.3) : Color.text.opacity(0.4))
           }
         }
         Spacer()
         VStack(alignment: .trailing) {
-          HStack(spacing: 0) {
+          HStack(spacing: 2) {
             if let lastMessage = conversation.lastMessage,
                lastMessage.from == nil {
               Checkmark(style: .dark, double: lastMessage.read, size: 20)
             }
             Text(shortConversationUpdatedAt(conversation.updatedAt))
-              .foregroundStyle(selected ? Color.black.opacity(0.3) : Color.white.opacity(0.4))
+              .foregroundStyle(selected ? Color.black.opacity(0.3) : Color.text.opacity(0.4))
           }
           Spacer()
           HStack {
@@ -228,6 +228,7 @@ struct ConversationPreviewItem: View {
                     : String(conversation.unreadMessages)
                 )
                   .font(.system(size: 10))
+                  .foregroundStyle(Color.white)
               }
               .frame(width: conversation.unreadMessages > 99 ? 24 : 20, height: 20)
               .background(Color.linkButton)
@@ -239,7 +240,7 @@ struct ConversationPreviewItem: View {
                 .scaledToFit()
                 .frame(width: 12, height: 12)
                 .rotationEffect(.degrees(45))
-                .foregroundStyle(selected ? Color.black.opacity(0.3) : Color.white.opacity(0.4))
+                .foregroundStyle(selected ? Color.black.opacity(0.3) : Color.text.opacity(0.4))
             }
           }
         }

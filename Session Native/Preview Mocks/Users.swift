@@ -9,7 +9,7 @@ func getUsersPreviewMocks() -> [User] {
   let user2 = User(
     id: UUID(),
     sessionId: "05123c7bf529754d0540db25a78e69c73c45b614a6e7a7b8b47004db7452ae616f",
-    displayName: "username picky picka beba biba boba 123 456"
+    displayName: "one time session user throwaway I used to test some bots etc"
   )
   let user3 = User(
     id: UUID(),
