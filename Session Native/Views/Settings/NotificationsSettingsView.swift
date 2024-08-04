@@ -78,6 +78,7 @@ struct UserNotifications: View {
     } label: {
       Toggle(isOn: $notificationsEnabled.animation()) {
         HStack {
+          Avatar(avatar: user.avatar, width: 24, height: 24)
           Text(user.displayName ?? getSessionIdPlaceholder(sessionId: user.sessionId))
           Spacer()
         }
@@ -86,9 +87,9 @@ struct UserNotifications: View {
       .padding(.all, 10)
       .contentShape(Rectangle())
     }
-    .if(disabled) {
-      $0.disabled(true)
-    }
+//    .if(disabled) {
+//      $0.disabled(true)
+//    }
     .buttonStyle(.plain)
     .onChange(of: notificationsEnabled) {
       UserDefaults.standard.set(notificationsEnabled, forKey: "notificationsEnabled_" + user.id.uuidString)

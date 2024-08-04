@@ -24,6 +24,8 @@ final class Conversation {
   )
   var contact: Contact?
   var unreadMessages: Int
+  var showTypingIndicator: Bool?
+  var sendReadReceipts: Bool?
   
   init(id: UUID, user: User, recipient: Recipient, archived: Bool, lastMessage: Message? = nil, typingIndicator: Bool, notifications: Notification = Notification(enabled: true), pinned: Bool = false, contact: Contact? = nil) {
     self.id = id
@@ -40,6 +42,8 @@ final class Conversation {
     self.blocked = false
     self.contact = contact
     self.unreadMessages = 0
+    self.showTypingIndicator = nil
+    self.sendReadReceipts = nil
   }
 }
 

@@ -151,6 +151,8 @@ struct ProfileSettingsView: View {
       .onChange(of: user, {
         mnemonic = nil
         mnemonicPlaceholder = getRandomHiddenMnemonic()
+        displayName = user.displayName ?? ""
+        avatar = user.avatar
       })
       .padding(.all, 24)
       .toolbar {

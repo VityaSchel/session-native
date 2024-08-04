@@ -128,7 +128,7 @@ struct SettingsNav: View {
     }
     .onChange(of: viewManager.navigationSelection) {
       switch(viewManager.navigationSelection) {
-      case "profile", "general", "notifications", "privacy", "appearance", "help":
+      case "profile", "general", "notifications", "privacy", "appearance", "help", nil:
         break
       case "add-session":
         viewManager.setActiveView(.auth)
@@ -140,6 +140,7 @@ struct SettingsNav: View {
       default:
         if let user = userManager.users.first(where: { $0.id.uuidString == viewManager.navigationSelection }) {
           userManager.setActiveUser(user)
+          viewManager.setActiveNavigationSelection("profile")
         }
         break
       }

@@ -7,6 +7,7 @@ struct ConversationView: View {
   @EnvironmentObject var viewManager: ViewManager
   @EnvironmentObject var userManager: UserManager
   @State var conversationModel: Conversation?
+  @State var showProfilePopover: Bool = false
   
   private func fetchConversation() {
     if let conversationId = viewManager.navigationSelection {
@@ -40,7 +41,10 @@ struct ConversationView: View {
         }
         .toolbar {
           ToolbarItem(placement: .navigation) {
-            ProfileView(conversation: conversation)
+            ProfileView(
+              conversation: conversation,
+              showProfilePopover: $showProfilePopover
+            )
           }
           ToolbarItem() {
             Button {

@@ -15,99 +15,32 @@ struct PrivacySettingsView: View {
   var body: some View {
     NavigationStack {
       VStack(alignment: .leading) {
-        Button {
+        BlockedRecipientsButton(blockedUsersCount: blockedUsers.count) {
           withAnimation {
             blockedRecipientsSubview = true
           }
-        } label: {
-          HStack {
-            Text("Blocked recipients")
-            Spacer()
-            Text(String(blockedUsers.count))
-            Image(systemName: "chevron.right")
-          }
-          .padding(.all, 10)
-          .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
-        .background(Color.cardBackground)
-        .cornerRadius(8)
-        Text("New chats")
-          .font(.system(size: 12).smallCaps())
-          .foregroundStyle(Color.gray.opacity(0.75))
-          .padding(.top, 11)
-          .padding(.horizontal, 10)
-        VStack(spacing: 0) {
-          Button {
-            withAnimation {
-              autoarchiveNewChats.toggle()
-            }
-          } label: {
-            Toggle(isOn: $autoarchiveNewChats.animation()) {
-              HStack {
-                Text("Autoarchive new chats")
-                Spacer()
-              }
-            }
-            .toggleStyle(.switch)
-            .padding(.all, 10)
-            .contentShape(Rectangle())
-          }
-          .buttonStyle(.plain)
-          Divider().padding(.horizontal, 10)
-          Button {
-            withAnimation {
-              autoacceptNewChats.toggle()
-            }
-          } label: {
-            Toggle(isOn: $autoacceptNewChats.animation()) {
-              HStack {
-                Text("Autoaccept new chats")
-                Spacer()
-              }
-            }
-            .toggleStyle(.switch)
-            .padding(.all, 10)
-            .contentShape(Rectangle())
-          }
-          .buttonStyle(.plain)
-          Divider().padding(.horizontal, 10)
-          Button {
-            withAnimation {
-              showTypingIndicatorsByDefault.toggle()
-            }
-          } label: {
-            Toggle(isOn: $showTypingIndicatorsByDefault.animation()) {
-              HStack {
-                Text("Show typing indicators")
-                Spacer()
-              }
-            }
-            .toggleStyle(.switch)
-            .padding(.all, 10)
-            .contentShape(Rectangle())
-          }
-          .buttonStyle(.plain)
-          Divider().padding(.horizontal, 10)
-          Button {
-            withAnimation {
-              sendReadCheckmarksByDefault.toggle()
-            }
-          } label: {
-            Toggle(isOn: $sendReadCheckmarksByDefault.animation()) {
-              HStack {
-                Text("Send read checkmarks")
-                Spacer()
-              }
-            }
-            .toggleStyle(.switch)
-            .padding(.all, 10)
-            .contentShape(Rectangle())
-          }
-          .buttonStyle(.plain)
+        SettingsSection(title: "New chats") {
+          SettingToggle(
+            title: "Autoarchive new chats",
+            isOn: $autoarchiveNewChats
+          )
+          Divider().padding(.horizontal, 8)
+          SettingToggle(
+            title: "Autoaccept new chats",
+            isOn: $autoacceptNewChats
+          )
+          Divider().padding(.horizontal, 8)
+          SettingToggle(
+            title: "Show typing indicators",
+            isOn: $showTypingIndicatorsByDefault
+          )
+          Divider().padding(.horizontal, 8)
+          SettingToggle(
+            title: "Send read checkmarks",
+            isOn: $sendReadCheckmarksByDefault
+          )
         }
-        .background(Color.cardBackground)
-        .cornerRadius(8)
         Text("You can enable/disable sending typing indicators and read receipts per conversation in recipient's profile settings.")
           .font(.system(size: 10))
           .foregroundStyle(Color.gray.opacity(0.75))
@@ -132,31 +65,7 @@ struct PrivacySettingsView: View {
         loadBlockedUsersCount()
       }
       .navigationDestination(isPresented: $blockedRecipientsSubview) {
-        if blockedUsers.count > 0 {
-          ScrollView {
-            List(blockedUsers) { user in
-              Button {
-                withAnimation {
-                  blockedRecipientsSubview = true
-                }
-              } label: {
-                HStack {
-                  Text(user.contact?.name ?? user.recipient.displayName ?? user.recipient.sessionId)
-                  Spacer()
-                  Text("Unblock")
-                }
-                .padding(.all, 10)
-                .contentShape(Rectangle())
-              }
-              .buttonStyle(.plain)
-              .background(Color.cardBackground)
-              .cornerRadius(8)
-            }
-          }
-        } else {
-          Text("No blocked recipients")
-            .font(.title3)
-        }
+        BlockedRecipientsView(blockedUsers: $blockedUsers)
       }
     }
   }
@@ -173,6 +82,125 @@ struct PrivacySettingsView: View {
         print("Error fetching blocked users: \(error)")
       }
     }
+  }
+}
+
+struct BlockedRecipientsButton: View {
+  @EnvironmentObject var userManager: UserManager
+  let blockedUsersCount: Int
+  let action: () -> Void
+  
+  var body: some View {
+    Button(action: action) {
+      HStack {
+        (
+          Text("Blocked recipients for ") +
+          Text(userManager.activeUser!.displayName ?? getSessionIdPlaceholder(sessionId: userManager.activeUser!.sessionId))
+            .fontWeight(.semibold)
+        )
+        Spacer()
+        Text(String(blockedUsersCount))
+        Image(systemName: "chevron.right")
+      }
+      .padding(.all, 10)
+      .contentShape(Rectangle())
+    }
+    .buttonStyle(.plain)
+    .background(Color.cardBackground)
+    .cornerRadius(8)
+  }
+}
+
+struct SettingsSection<Content: View>: View {
+  let title: String
+  let content: Content
+  
+  init(title: String, @ViewBuilder content: () -> Content) {
+    self.title = title
+    self.content = content()
+  }
+  
+  var body: some View {
+    VStack(alignment: .leading) {
+      Text(title)
+        .font(.system(size: 12).smallCaps())
+        .foregroundStyle(Color.gray.opacity(0.75))
+        .padding(.top, 11)
+        .padding(.horizontal, 10)
+      VStack(alignment: .leading, spacing: 0) {
+        content
+      }
+      .background(Color.cardBackground)
+      .cornerRadius(8)
+    }
+  }
+}
+
+struct SettingToggle: View {
+  let title: String
+  @Binding var isOn: Bool
+  
+  var body: some View {
+    Button {
+      withAnimation {
+        isOn.toggle()
+      }
+    } label: {
+      Toggle(isOn: $isOn.animation()) {
+        HStack {
+          Text(title)
+          Spacer()
+        }
+      }
+      .toggleStyle(.switch)
+      .padding(.all, 10)
+      .contentShape(Rectangle())
+    }
+    .buttonStyle(.plain)
+  }
+}
+
+struct BlockedRecipientsView: View {
+  @EnvironmentObject var userManager: UserManager
+  @Binding var blockedUsers: [Conversation]
+  
+  var body: some View {
+    Group {
+      if blockedUsers.count > 0 {
+        ScrollView {
+          VStack(spacing: 0) {
+            ForEach(Array(zip(blockedUsers.indices, blockedUsers)), id: \.0) { index, conversation in
+              Button {
+                withAnimation {
+                  conversation.blocked = false
+                  blockedUsers.remove(at: index)
+                }
+              } label: {
+                HStack {
+                  Avatar(avatar: conversation.recipient.avatar, width: 24, height: 24)
+                  Text(conversation.contact?.name ?? conversation.recipient.displayName ?? getSessionIdPlaceholder(sessionId: conversation.recipient.sessionId))
+                  Spacer()
+                  Text("Unblock")
+                }
+                .padding(.all, 10)
+                .contentShape(Rectangle())
+              }
+              .buttonStyle(.plain)
+              if index < blockedUsers.count - 1 {
+                Divider()
+              }
+            }
+          }
+          .background(Color.cardBackground)
+          .cornerRadius(8)
+          .padding()
+        }
+      } else {
+        Text("No blocked recipients")
+          .font(.title3)
+      }
+    }
+    .navigationTitle("Blocked recipients for " + (userManager.activeUser!.displayName ?? getSessionIdPlaceholder(sessionId: userManager.activeUser!.sessionId)))
   }
 }
 

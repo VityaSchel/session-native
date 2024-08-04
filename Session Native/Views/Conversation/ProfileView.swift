@@ -1,12 +1,15 @@
 import Foundation
 import SwiftUI
+import SwiftData
 
 struct ProfileView: View {
   @Environment (\.modelContext) var modelContext
   @EnvironmentObject var userManager: UserManager
   var conversation: Conversation
-  @State var showProfilePopover: Bool = false
+  @Binding var showProfilePopover: Bool
   @State var isContact: Bool = false
+  @State var showTypingIndicator = UserDefaults.standard.optionalBool(forKey: "showTypingIndicatorsByDefault") ?? true
+  @State var sendReadCheckmarks = UserDefaults.standard.optionalBool(forKey: "sendReadCheckmarksByDefault") ?? true
   
   var body: some View {
     Button {
@@ -88,9 +91,55 @@ struct ProfileView: View {
         }
         .background(Color.cardBackground)
         .cornerRadius(8)
+        VStack(spacing: 0) {
+          Button {
+            withAnimation {
+              showTypingIndicator.toggle()
+            }
+          } label: {
+            Toggle(isOn: $showTypingIndicator.animation()) {
+              HStack(alignment: .center, spacing: 0) {
+                Text("Display typing indicator (")
+                TypingIndicatorView(staticView: true, size: 4)
+                Text(") to recipient")
+                Spacer()
+              }
+            }
+            .toggleStyle(.switch)
+            .padding(.all, 10)
+            .contentShape(Rectangle())
+          }
+          .buttonStyle(.plain)
+          Divider()
+            .padding(.horizontal, 10)
+          Button {
+            withAnimation {
+              sendReadCheckmarks.toggle()
+            }
+          } label: {
+            Toggle(isOn: $sendReadCheckmarks.animation()) {
+              HStack(spacing: 0) {
+                Text("Show read checkmarks (")
+                Checkmark(style: .dark, double: true, size: 16)
+                  .padding(.trailing, 2)
+                Text(") to recipient")
+                Spacer()
+              }
+            }
+            .toggleStyle(.switch)
+            .padding(.all, 10)
+            .contentShape(Rectangle())
+          }
+          .buttonStyle(.plain)
+        }
+        .background(Color.cardBackground)
+        .cornerRadius(8)
       }
       .padding()
-      .frame(width: 320)
+      .frame(width: 350)
+      .onChange(of: showTypingIndicator) {
+        conversation.showTypingIndicator = showTypingIndicator
+      }
     }
   }
 }
@@ -123,6 +172,34 @@ struct ProfileButton: View {
       .contentShape(Rectangle())
     }
     .buttonStyle(.plain)
-    //      .frame(maxWidth: .infinity)
   }
+}
+
+struct ProfileView_Previews: PreviewProvider {
+  static var previews: some View {
+    var conversations: [Conversation] = []
+    
+    let inMemoryModelContainer: ModelContainer = {
+      do {
+        let container = try ModelContainer(for: Schema(storageSchema), configurations: [.init(isStoredInMemoryOnly: true)])
+        let users = getUsersPreviewMocks()
+        conversations = getConversationsPreviewMocks(user: users[0])
+        container.mainContext.insert(users[0])
+        container.mainContext.insert(conversations[0])
+        try! container.mainContext.save()
+        return container
+      } catch {
+        fatalError("Could not create ModelContainer: \(error)")
+      }
+    }()
+    
+    return ProfileView(
+      conversation: conversations[0],
+      showProfilePopover: .constant(true)
+    )
+      .modelContainer(inMemoryModelContainer)
+      .environmentObject(UserManager(container: inMemoryModelContainer))
+      .frame(width: 48, height: 48)
+      .previewLayout(.sizeThatFits)
   }
+}
