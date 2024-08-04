@@ -159,7 +159,7 @@ struct ConversationPreviewItem: View {
     } label: {
       HStack {
         Avatar(avatar: conversation.recipient.avatar)
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 4) {
           HStack(alignment: .center, spacing: 4) {
             Text(conversation.contact?.name ?? conversation.recipient.displayName ?? getSessionIdPlaceholder(sessionId: conversation.recipient.sessionId))
               .fontWeight(.bold)
@@ -169,12 +169,18 @@ struct ConversationPreviewItem: View {
                 .resizable()
                 .scaledToFit()
                 .frame(height: 12)
-                .padding(.top, 4)
                 .foregroundStyle(selected ? Color.black : Color.white)
                 .opacity(0.45)
             }
           }
-          if let lastMessage = conversation.lastMessage {
+          if conversation.typingIndicator {
+            HStack(alignment: .center, spacing: 2) {
+              Text("typing")
+                .foregroundStyle(Color.gray)
+              TypingIndicatorView(size: 4)
+                .padding(.top, 8)
+            }
+          } else if let lastMessage = conversation.lastMessage {
             if lastMessage.from == nil {
               if selected {
                 (Text("You: ")
@@ -204,8 +210,14 @@ struct ConversationPreviewItem: View {
         }
         Spacer()
         VStack(alignment: .trailing) {
-          Text(shortConversationUpdatedAt(conversation.updatedAt))
-            .foregroundStyle(selected ? Color.black.opacity(0.3) : Color.white.opacity(0.4))
+          HStack(spacing: 0) {
+            if let lastMessage = conversation.lastMessage,
+               lastMessage.from == nil {
+              Checkmark(style: .dark, double: lastMessage.read, size: 20)
+            }
+            Text(shortConversationUpdatedAt(conversation.updatedAt))
+              .foregroundStyle(selected ? Color.black.opacity(0.3) : Color.white.opacity(0.4))
+          }
           Spacer()
           HStack {
             if conversation.unreadMessages > 0 {

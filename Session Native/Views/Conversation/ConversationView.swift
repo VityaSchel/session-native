@@ -100,6 +100,17 @@ struct Messages: View {
             ForEach(viewModel.items) { message in
               ChatMessage(message, viewModel: viewModel)
             }
+            if conversation.typingIndicator {
+              HStack(alignment: .center) {
+                Text("typing")
+                  .foregroundStyle(Color.gray)
+                TypingIndicatorView(size: 6)
+                  .padding(.top, 2)
+              }
+              .frame(maxWidth: .infinity, alignment: .leading)
+              .padding(.top, 2)
+              .padding(.leading, 12)
+            }
             Spacer()
               .id("ConversationBottom")
           }
