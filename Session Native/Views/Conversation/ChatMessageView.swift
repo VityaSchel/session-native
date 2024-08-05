@@ -12,14 +12,12 @@ struct ChatMessage: View {
   
   var body: some View {
     MessageBubble(
-      direction: message.from == nil ? .right : .left,
-      timestamp: getFormattedDate(date: message.timestamp),
-      status: message.status,
-      read: message.read
+      message: message
     ) {
       (Text(message.body)
-       /*.textSelection(.enabled)*/ + Text("\u{2066}" +   String(repeating: "\u{2004}", count: message.from == nil ? 11 : 7) + "\u{2800}"))
+       /*.textSelection(.enabled)*/ + Text("\u{2066}" +   String(repeating: "\u{2004}", count: message.from == nil ? 10 : 7) + "\u{2800}"))
       .foregroundStyle(message.from == nil ? Color.black : Color.messageBubbleText)
+      .fixedSize(horizontal: false, vertical: true)
     }
     .contentShape(Rectangle())
     .contextMenu(menuItems: {
@@ -74,4 +72,8 @@ struct ChatMessage: View {
       }
     }
   }
-  }
+}
+
+#Preview {
+  ConversationView_Preview.previews
+}

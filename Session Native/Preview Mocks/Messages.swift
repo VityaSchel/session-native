@@ -10,7 +10,7 @@ func getMessagePreviewMocks(conversation: Conversation) -> [Message] {
         hash: "Hello",
         timestamp: Date(timeIntervalSince1970: Date().timeIntervalSince1970 - Double(103-i)),
         body: String(i),
-        read: false
+        read: true
       )
     )
   }
@@ -22,6 +22,7 @@ func getMessagePreviewMocks(conversation: Conversation) -> [Message] {
       timestamp: Date(timeIntervalSince1970: Date().timeIntervalSince1970 - 2),
       from: conversation.recipient,
       body: String("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."),
+      replyTo: messages.last!,
       read: false
     )
   )

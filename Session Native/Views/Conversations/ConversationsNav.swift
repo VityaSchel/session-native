@@ -213,7 +213,21 @@ struct ConversationPreviewItem: View {
           HStack(spacing: 2) {
             if let lastMessage = conversation.lastMessage,
                lastMessage.from == nil {
-              Checkmark(style: .dark, double: lastMessage.read, size: 20)
+              switch(lastMessage.status) {
+              case .sending:
+                Spinner(style: selected ? .light : .dark, size: 8)
+                  .padding(.trailing, 4)
+              case .sent:
+                Checkmark(style: selected ? .light : .dark, double: lastMessage.read, size: 20)
+              case .errored:
+                ZStack {
+                  Circle()
+                    .foregroundStyle(Color.white)
+                    .frame(width: 12, height: 12)
+                  Image(systemName: "exclamationmark.circle.fill")
+                    .foregroundColor(Color(hex: "#f95252"))
+                }
+              }
             }
             Text(shortConversationUpdatedAt(conversation.updatedAt))
               .foregroundStyle(selected ? Color.black.opacity(0.3) : Color.text.opacity(0.4))

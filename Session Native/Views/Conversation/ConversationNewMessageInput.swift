@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import MessagePack
 
 struct NewMessageInput: View {
   @State private var messageText = ""
@@ -102,12 +103,13 @@ struct NewMessageInput: View {
     let message = Message(
       id: UUID(),
       conversation: conversation,
-      hash: "aasnda",
       timestamp: Date(),
       body: body,
+      replyTo: messageModel.replyTo,
       read: false,
       status: .sending
     )
+    messageModel.replyTo = nil
     modelContext.insert(message)
     
     conversation.lastMessage = message
@@ -120,5 +122,34 @@ struct NewMessageInput: View {
     }
     
     messageModel.items.append(message)
+    
+    var messageRequest: [MessagePackValue: MessagePackValue] = [
+      "type": "send_message",
+      "body": .string(body),
+      "recipient": .string(conversation.recipient.sessionId),
+    ]
+    if let replyTo = message.replyTo {
+      messageRequest["replyTo"] = .map([
+        "author": .string(replyTo.from != nil ? replyTo.from!.sessionId : userManager.activeUser!.sessionId),
+        "timestamp": .double(replyTo.timestamp.timeIntervalSince1970),
+        "text": .string(replyTo.from?.sessionId ?? "")
+      ])
+    }
+    request(MessagePackValue.map(messageRequest)) { response in
+      if response["ok"]?.boolValue == false {
+        DispatchQueue.main.async {
+          message.status = .errored(reason: response["error"]?.stringValue ?? "Unknown error")
+        }
+      } else {
+        if let hash = response["hash"]?.stringValue,
+           let timestamp = response["timestamp"]?.intValue {
+          DispatchQueue.main.async {
+            message.hash = hash
+            message.timestamp = Date(timeIntervalSince1970: Double(timestamp))
+            message.status = .sent
+          }
+        }
+      }
+    }
   }
 }

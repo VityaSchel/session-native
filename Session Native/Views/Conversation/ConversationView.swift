@@ -190,7 +190,7 @@ struct ConversationView_Preview: PreviewProvider {
     ConversationView()
       .modelContainer(inMemoryModelContainer)
       .environmentObject(ViewManager(.conversations, convo))
-      .environmentObject(UserManager(container: inMemoryModelContainer))
+      .environmentObject(UserManager(container: inMemoryModelContainer, preview: true))
       .frame(width: 500, height: 300)
   }
 }

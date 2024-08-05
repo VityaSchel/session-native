@@ -10,8 +10,11 @@ class UserManager: ObservableObject {
   private var container: ModelContainer
   private var cancellables: Set<AnyCancellable> = []
   
-  init(container: ModelContainer) {
+  var preview: Bool
+  
+  init(container: ModelContainer, preview: Bool = false) {
     self.container = container
+    self.preview = preview
     loadUsers()
   }
   
@@ -20,11 +23,25 @@ class UserManager: ObservableObject {
       let fetchRequest = FetchDescriptor<User>()
       self.users = try container.mainContext.fetch(fetchRequest)
       if let activeUserID = UserDefaults.standard.string(forKey: "activeUser") {
-        if let user = users.first(where: { $0.id.uuidString == activeUserID }) {
-          self.activeUser = user
+        if let user = users.first(where: { $0.id.uuidString == activeUserID }),
+           let mnemonic = preview ? "" : readStringFromKeychain(account: user.sessionId, service: "mnemonic") {
+          request([
+            "type": "set_session",
+            "mnemonic": .string(mnemonic)
+          ]) { response in
+            self.activeUser = user
+          }
         }
       } else {
-        self.activeUser = users[0]
+        let user = users[0]
+        if let mnemonic = preview ? "" : readStringFromKeychain(account: user.sessionId, service: "mnemonic") {
+          request([
+            "type": "set_session",
+            "mnemonic": .string(mnemonic)
+          ]) { response in
+            self.activeUser = user
+          }
+        }
       }
     } catch {
       print("Failed to fetch users: \(error.localizedDescription)")

@@ -2,20 +2,17 @@ import Foundation
 import SwiftUI
 
 struct MessageBubble<Content>: View where Content: View {
-  let direction: ChatBubbleShape.Direction
+  @EnvironmentObject var userManager: UserManager
+  var message: Message
   let content: () -> Content
-  var timestamp: String
-  var status: MessageStatus
-  var read: Bool
-  @State var errorVisible: Bool = false
-  @State var errorReason: String = ""
+  var direction: ChatBubbleShapeDirection {
+    message.from == nil ? .right : .left
+  }
+  @State var width: CGFloat = 100
   
-  init(direction: ChatBubbleShape.Direction, timestamp: String, status: MessageStatus, read: Bool, @ViewBuilder content: @escaping () -> Content) {
+  init(message: Message, @ViewBuilder content: @escaping () -> Content) {
+    self.message = message
     self.content = content
-    self.direction = direction
-    self.timestamp = timestamp
-    self.status = status
-    self.read = read
   }
   
   var body: some View {
@@ -23,58 +20,54 @@ struct MessageBubble<Content>: View where Content: View {
       if direction == .right {
         Spacer()
       }
-      ZStack {
-        content()
-          .padding(.vertical, 6)
-          .padding(direction == .left ? .leading : .trailing, 11)
-          .padding(direction == .left ? .trailing : .leading, 8)
-          .background(direction == .left ? Color.messageBubble : Color.accentColor)
-          .clipShape(ChatBubbleShape(direction: direction))
-          .overlay(
-            GeometryReader { geometry in
-              Text(timestamp)
-                .font(.system(size: 11))
-                .italic()
-                .padding(5)
-                .cornerRadius(5)
-                .foregroundStyle(direction == .left ? Color.gray : Color.black.opacity(0.8))
-                .position(x: geometry.size.width - (direction == .left ? 25 : 43), y: geometry.size.height - 13)
-              if(direction == .right) {
-                Group {
-                  switch(status) {
-                  case .sending:
-                    Spinner(style: .light, size: 8)
-                  case .sent:
-                    if read {
-                      Checkmark(style: .light, double: true, size: 16, thickness: 1)
-                        .offset(x: -1)
-                    } else {
-                      Checkmark(style: .light, size: 16, thickness: 1)
-                    }
-                  case .errored(let reason):
-                    Button() {
-                      errorVisible = true
-                      errorReason = reason
-                    } label: {
-                      ZStack {
-                        Circle()
-                          .foregroundStyle(Color.white)
-                          .frame(width: 12, height: 12)
-                        Image(systemName: "exclamationmark.circle.fill")
-                          .foregroundColor(Color(hex: "#f95252"))
-                      }
-                    }
-                    .buttonStyle(.plain)
-                    .alert(isPresented: $errorVisible) {
-                      Alert(title: Text("Error sending message"), message: Text(errorReason), dismissButton: .cancel())
-                    }
-                  }
+      VStack(alignment: .leading) {
+          if let reply = message.replyTo {
+            Group {
+              HStack(spacing: 0) {
+                Rectangle()
+                  .background(Color.white)
+                  .frame(width: 2)
+                VStack(alignment: .leading) {
+                  Text(
+                    reply.from != nil
+                    ? (
+                      reply.from!.displayName ??
+                      getSessionIdPlaceholder(sessionId: reply.from!.sessionId)
+                    ) : (
+                      userManager.activeUser?.displayName ??
+                      getSessionIdPlaceholder(sessionId: userManager.activeUser!.sessionId)
+                    )
+                  )
+                  .fontWeight(.medium)
+                  Text(
+                    reply.body
+                  )
                 }
-                .position(x: geometry.size.width - 17, y: geometry.size.height - 13)
+                .padding(.horizontal, 5)
+                .padding(.vertical, 2)
               }
-            }, alignment: .bottomTrailing
-          )
+              .frame(width: width, height: 40, alignment: .leading)
+              .background(message.from == nil ? Color.black.opacity(0.1) : Color.white.opacity(0.1))
+              .foregroundStyle(message.from == nil ? Color.black : Color.messageBubbleText)
+              .cornerRadius(3.0)
+            }
+          }
+          content()
+            .overlay(
+              GeometryReader { geometry in
+                MessageStatusBar(message: message)
+                  .onAppear {
+                    width = geometry.size.width
+                  }
+              },
+              alignment: .bottomTrailing
+            )
       }
+      .padding(.vertical, 6)
+      .padding(direction == .left ? .leading : .trailing, 11)
+      .padding(direction == .left ? .trailing : .leading, 8)
+      .background(direction == .left ? Color.messageBubble : Color.accentColor)
+      .clipShape(ChatBubbleShape(direction: direction))
       if direction == .left {
         Spacer()
       }
@@ -86,13 +79,13 @@ struct MessageBubble<Content>: View where Content: View {
 
 let roundness: CGFloat = 0.65
 
+enum ChatBubbleShapeDirection {
+  case left
+  case right
+}
+
 struct ChatBubbleShape: Shape {
-  enum Direction {
-    case left
-    case right
-  }
-  
-  let direction: Direction
+  let direction: ChatBubbleShapeDirection
   
   func path(in rect: CGRect) -> Path {
     return (direction == .left) ? getLeftBubblePath(in: rect) : getRightBubblePath(in: rect)
@@ -165,28 +158,60 @@ struct ChatBubbleShape: Shape {
   }
 }
 
-#Preview {
-  VStack {
-    MessageBubble(direction: .left, timestamp: "12:00", status: .sent, read: false) {
-      Text("Hello, World!\u{2066}" + String(repeating: "\u{2004}", count: false ? 11 : 7) + "\u{2800}")
-        .foregroundStyle(Color.white)
-    }
-    MessageBubble(direction: .right, timestamp: "12:00", status: .sent, read: true) {
-      Text("Hello, World!\u{2066}" + String(repeating: "\u{2004}", count: true ? 11 : 7) + "\u{2800}")
-        .foregroundStyle(Color.black)
-    }
-    MessageBubble(direction: .right, timestamp: "12:00", status: .sent, read: false) {
-      Text("Hello, World!\u{2066}" + String(repeating: "\u{2004}", count: true ? 11 : 7) + "\u{2800}")
-        .foregroundStyle(Color.black)
-    }
-    MessageBubble(direction: .right, timestamp: "00:00", status: .errored(reason: "Preview error"), read: false) {
-      Text("Hello, World!\u{2066}" + String(repeating: "\u{2004}", count: true ? 11 : 7) + "\u{2800}")
-        .foregroundStyle(Color.black)
-    }
-    MessageBubble(direction: .right, timestamp: "00:00", status: .sending, read: false) {
-      Text("Hello, World!\u{2066}" + String(repeating: "\u{2004}", count: true ? 11 : 7) + "\u{2800}")
-        .foregroundStyle(Color.black)
+struct MessageStatusBar: View {
+  var message: Message
+  var direction: ChatBubbleShapeDirection {
+    message.from == nil ? .right : .left
+  }
+  @State var errorVisible: Bool = false
+  @State var errorReason: String = ""
+  
+  var body: some View {
+    GeometryReader { geometry in
+      Text(getFormattedDate(date: message.timestamp))
+        .font(.system(size: 11))
+        .italic()
+        .padding(5)
+        .cornerRadius(5)
+        .foregroundStyle(direction == .left ? Color.gray : Color.black.opacity(0.8))
+        .position(x: geometry.size.width - (direction == .left ? 18 : 32), y: geometry.size.height - 7)
+      if(direction == .right) {
+        Group {
+          switch(message.status) {
+          case .sending:
+            Spinner(style: .light, size: 8)
+          case .sent:
+            if message.read {
+              Checkmark(style: .light, double: true, size: 16, thickness: 1)
+                .offset(x: -1)
+            } else {
+              Checkmark(style: .light, size: 16, thickness: 1)
+            }
+          case .errored(let reason):
+            Button() {
+              errorVisible = true
+              errorReason = reason
+            } label: {
+              ZStack {
+                Circle()
+                  .foregroundStyle(Color.white)
+                  .frame(width: 12, height: 12)
+                Image(systemName: "exclamationmark.circle.fill")
+                  .foregroundColor(Color(hex: "#f95252"))
+              }
+            }
+            .buttonStyle(.plain)
+            .alert(isPresented: $errorVisible) {
+              Alert(title: Text("Error sending message"), message: Text(errorReason), dismissButton: .cancel())
+            }
+          }
+        }
+        .position(x: geometry.size.width - 6, y: geometry.size.height - 7)
+      }
     }
   }
-  .background(Color.conversationDefaultBackground)
+}
+
+#Preview {
+  ConversationView_Preview.previews
 }

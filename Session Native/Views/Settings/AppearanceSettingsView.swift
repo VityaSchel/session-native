@@ -10,7 +10,7 @@ struct AppearanceSettingsView: View {
         .padding(.top, 11)
         .padding(.horizontal, 10)
       ScrollView([.horizontal], showsIndicators: true) {
-        HStack(alignment: .center, spacing: 6) {
+        HStack(alignment: .center, spacing: 10) {
           Button {
             
           } label: {

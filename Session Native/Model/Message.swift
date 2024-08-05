@@ -11,15 +11,16 @@ enum MessageStatus: Codable {
 final class Message {
   var id: UUID
   var conversation: Conversation
-  var hash: String
+  var hash: String?
   var timestamp: Date
   var from: Recipient?
   var body: String
   @Attribute(.externalStorage) var attachments: [Data]?
   var read: Bool
   var status: MessageStatus
+  var replyTo: Message?
   
-  init(id: UUID, conversation: Conversation, hash: String, timestamp: Date, from: Recipient? = nil, body: String, attachments: [Data]? = nil, read: Bool = false, status: MessageStatus = MessageStatus.sent) {
+  init(id: UUID, conversation: Conversation, hash: String? = nil, timestamp: Date, from: Recipient? = nil, body: String, attachments: [Data]? = nil, replyTo: Message? = nil, read: Bool = false, status: MessageStatus = MessageStatus.sent) {
     self.id = id
     self.conversation = conversation
     self.hash = hash
@@ -29,5 +30,6 @@ final class Message {
     self.attachments = attachments
     self.read = read
     self.status = status
+    self.replyTo = replyTo
   }
 }
