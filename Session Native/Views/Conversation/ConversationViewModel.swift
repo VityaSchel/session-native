@@ -38,7 +38,7 @@ class MessageViewModel: ObservableObject {
       })
       fetchDescriptor.fetchLimit = pageSize
       fetchDescriptor.fetchOffset = currentPage * pageSize
-      fetchDescriptor.sortBy = [SortDescriptor(\Message.timestamp, order: .reverse)]
+      fetchDescriptor.sortBy = [SortDescriptor(\Message.createdAt, order: .reverse)]
       
       let fetchedItems = try dbContext.fetch(fetchDescriptor).reversed()
       

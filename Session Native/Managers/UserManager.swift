@@ -1,6 +1,7 @@
 import SwiftData
 import Combine
 import SwiftUI
+import MessagePack
 
 @MainActor
 class UserManager: ObservableObject {
@@ -25,10 +26,14 @@ class UserManager: ObservableObject {
       if let activeUserID = UserDefaults.standard.string(forKey: "activeUser") {
         if let user = users.first(where: { $0.id.uuidString == activeUserID }),
            let mnemonic = preview ? "" : readStringFromKeychain(account: user.sessionId, service: "mnemonic") {
-          request([
+          var setSessionRequest: [MessagePackValue: MessagePackValue] = [
             "type": "set_session",
-            "mnemonic": .string(mnemonic)
-          ]) { response in
+            "mnemonic": .string(mnemonic),
+          ]
+          if let displayName = user.displayName {
+            setSessionRequest["displayName"] = .string(displayName)
+          }
+          request(.map(setSessionRequest)) { response in
             self.activeUser = user
           }
         }

@@ -13,6 +13,8 @@ struct ConversationsNav: View {
   @State private var archive: Bool = false
   @State private var deleteAlertVisible: Bool = false
   @State private var deleteAlertConversation: Conversation?
+  @State private var clearConversationAlertVisible: Bool = false
+  @State private var clearConversationAlert: Conversation?
   
   init(userManager: UserManager) {
     let activeUserId = userManager.activeUser!.persistentModelID
@@ -100,6 +102,10 @@ struct ConversationsNav: View {
       ) { conversation in
           ConversationPreviewItem(
             conversation: conversation,
+            onClear: {
+              clearConversationAlertVisible = true
+              clearConversationAlert = conversation
+            },
             onDelete: {
               deleteAlertVisible = true
               deleteAlertConversation = conversation
@@ -112,37 +118,98 @@ struct ConversationsNav: View {
       .listStyle(.sidebar)
       .background(.clear)
     }
-    .onChange(of: viewManager.searchVisible) { prev, cur in
-      if(prev == true && cur == false) {
-        searchText = ""
-      }
-    }
-    .onChange(of: viewManager.navigationSelection, {
-      if let conversationId = viewManager.navigationSelection {
-        if let conversationUuid = UUID(uuidString: conversationId) {
-          if let conversation = try? modelContext.fetch(
-            FetchDescriptor(predicate: #Predicate<Conversation> { conversation in
-              conversation.id == conversationUuid
-            })
-          ).first {
-            archive = conversation.archived
-          }
-        }
-      }
-    })
-    .alert("Delete this conversation?", isPresented: $deleteAlertVisible) {
-      Button("Delete everywhere", role: .destructive) {
-        // TODO: delete messages request to backend
-      }
-      Button("Delete locally", role: .destructive) {
-        if let conversation = deleteAlertConversation {
-          modelContext.delete(conversation)
-        }
-      }
-      Button("Cancel", role: .cancel) {
-        deleteAlertVisible = false
-      }
-    }
+//    .onChange(of: viewManager.searchVisible) { prev, cur in
+//      if(prev == true && cur == false) {
+//        searchText = ""
+//      }
+//    }
+//    .onChange(of: viewManager.navigationSelection, {
+//      if let conversationId = viewManager.navigationSelection {
+//        if let conversationUuid = UUID(uuidString: conversationId) {
+//          if let conversation = try? modelContext.fetch(
+//            FetchDescriptor(predicate: #Predicate<Conversation> { conversation in
+//              conversation.id == conversationUuid
+//            })
+//          ).first {
+//            archive = conversation.archived
+//          }
+//        }
+//      }
+//    })
+//    .alert("Clear this conversation?", isPresented: $clearConversationAlertVisible) {
+//      Button("Clear everywhere", role: .destructive) {
+//        if let conversation = clearConversationAlert {
+//          let messages = conversation.messages.map({ message in
+//            .map([
+//              "timestamp": .int(message.timestamp!),
+//              "hash": .string(message.messageHash!)
+//            ])
+//          })
+//          let deleteMessageRequest: [MessagePackValue: MessagePackValue] = [
+//            "type": "delete_messages",
+//            "conversation": .string(conversation.recipient.sessionId),
+//            "messages": .array(messages)
+//          ]
+//          request(.map(deleteMessageRequest), { response in
+//            if(response["ok"]?.boolValue == true) {
+//              DispatchQueue.main.async {
+//                deleteAlertVisible = false
+//                deleteAlertConversation = nil
+//              }
+//            }
+//          })
+//          conversation.messages.forEach({ msg in
+//            modelContext.delete(msg)
+//          })
+//          try! modelContext.save()
+//        }
+//      }
+//      Button("Clear locally", role: .destructive) {
+//        if let conversation = deleteAlertConversation {
+//          conversation.messages.forEach({ msg in
+//            modelContext.delete(msg)
+//          })
+//          try! modelContext.save()
+//        }
+//      }
+//      Button("Cancel", role: .cancel) {
+//        clearConversationAlertVisible = false
+//      }
+//    }
+//    .alert("Delete this conversation?", isPresented: $deleteAlertVisible) {
+//      Button("Delete everywhere", role: .destructive) {
+//        if let conversation = deleteAlertConversation {
+//          let messages = conversation.messages.map({ message in
+//            .map([
+//              "timestamp": .int(message.timestamp!),
+//              "hash": .string(message.messageHash!)
+//            ])
+//          })
+//          let deleteMessageRequest: [MessagePackValue: MessagePackValue] = [
+//            "type": "delete_messages",
+//            "conversation": .string(conversation.recipient.sessionId),
+//            "messages": .array(messages)
+//          ]
+//          request(.map(deleteMessageRequest), { response in
+//            if(response["ok"]?.boolValue == true) {
+//              DispatchQueue.main.async {
+//                deleteAlertVisible = false
+//                deleteAlertConversation = nil
+//              }
+//            }
+//          })
+//          modelContext.delete(conversation)
+//        }
+//      }
+//      Button("Delete locally", role: .destructive) {
+//        if let conversation = deleteAlertConversation {
+//          modelContext.delete(conversation)
+//        }
+//      }
+//      Button("Cancel", role: .cancel) {
+//        deleteAlertVisible = false
+//      }
+//    }
   }
 }
 
@@ -151,6 +218,7 @@ struct ConversationPreviewItem: View {
   @EnvironmentObject var userManager: UserManager
   @EnvironmentObject var viewManager: ViewManager
   @State var selected: Bool = false
+  var onClear: () -> Void
   var onDelete: () -> Void
   
   var body: some View {
@@ -185,15 +253,23 @@ struct ConversationPreviewItem: View {
               if selected {
                 (Text("You: ")
                   .foregroundStyle(Color.black.opacity(0.3))
-                 + Text(lastMessage.body)
+                 + (lastMessage.deletedByUser
+                    ? Text("Deleted message")
+                  .foregroundStyle(Color.black.opacity(0.3))
+                    : Text(lastMessage.body)
                   .foregroundStyle(Color.black.opacity(0.6))
+                  )
                 )
                 .lineLimit(2)
               } else {
                 (Text("You: ")
                   .foregroundStyle(.opacity(0.4))
-                 + Text(lastMessage.body)
+                 + (lastMessage.deletedByUser
+                    ? Text("Deleted message")
+                  .foregroundStyle(.opacity(0.4))
+                    : Text(lastMessage.body)
                   .foregroundStyle(.opacity(0.6))
+                  )
                 )
                 .lineLimit(2)
               }
@@ -267,7 +343,7 @@ struct ConversationPreviewItem: View {
       selected = viewManager.navigationSelection == conversation.id.uuidString
     }
     .if(selected) { view in
-      view.listRowBackground(Color.accentColor)
+      view.listRowBackground(Color.accentColorConstant)
     }
     .swipeActions(edge: .leading) {
       Button {
@@ -320,16 +396,27 @@ struct ConversationPreviewItem: View {
         Button("􀋝 Mute") {
           // TODO: notifications
           conversation.notifications.enabled = false
-          //          try? modelContext.save()
         }
       } else {
         Button("􀋙 Unmute") {
           conversation.notifications.enabled = true
-          //          try? modelContext.save()
         }
       }
       Button("􀌤 Mark as read") {
-        // TODO: unread counter
+        conversation.unreadMessages = 0
+        let unreadMessages = conversation.messages.filter({ msg in
+          msg.from != nil && msg.read == false && msg.timestamp != nil
+        })
+        request([
+          "type": "mark_as_read",
+          "conversation": .string(conversation.recipient.sessionId),
+          "messagesTimestamps": .array(unreadMessages.map({ msg in
+            .int(msg.timestamp!)
+          }))
+        ])
+        unreadMessages.forEach({ msg in
+          msg.read = true
+        })
       }
       Divider()
       if(conversation.archived) {
@@ -343,7 +430,7 @@ struct ConversationPreviewItem: View {
       }
       Divider()
       Button("􀁠 Clear history") {
-        // TODO: clear history of messages without deleting conversation (with confirmation dialog)
+        onClear()
       }
       Button {
         onDelete()

@@ -2,6 +2,8 @@ import Foundation
 import SwiftUI
 
 struct AppearanceSettingsView: View {
+  @AppStorage("theme") private var theme: String = "auto"
+  
   var body: some View {
     VStack(alignment: .leading) {
       Text("App theme")
@@ -12,7 +14,9 @@ struct AppearanceSettingsView: View {
       ScrollView([.horizontal], showsIndicators: true) {
         HStack(alignment: .center, spacing: 10) {
           Button {
-            
+            withAnimation {
+              theme = "light"
+            }
           } label: {
             VStack {
               Image("LightThemePreview")
@@ -26,8 +30,16 @@ struct AppearanceSettingsView: View {
             .contentShape(Rectangle())
           }
           .buttonStyle(.plain)
+          .if(theme == "light") { view in
+            view.overlay(
+              RoundedRectangle(cornerRadius: 10)
+                .stroke(.blue, lineWidth: 3)
+            )
+          }
           Button {
-            
+            withAnimation {
+              theme = "dark"
+            }
           } label: {
             VStack {
               Image("DarkThemePreview")
@@ -42,12 +54,16 @@ struct AppearanceSettingsView: View {
             .contentShape(Rectangle())
           }
           .buttonStyle(.plain)
-          .overlay(
-            RoundedRectangle(cornerRadius: 10)
-              .stroke(.blue, lineWidth: 3)
-          )
+          .if(theme == "dark") { view in
+            view.overlay(
+              RoundedRectangle(cornerRadius: 10)
+                .stroke(.blue, lineWidth: 3)
+            )
+          }
           Button {
-            
+            withAnimation {
+              theme = "auto"
+            }
           } label: {
             VStack {
               Image("AutoThemePreview")
@@ -61,8 +77,13 @@ struct AppearanceSettingsView: View {
             .contentShape(Rectangle())
           }
           .buttonStyle(.plain)
+          .if(theme == "auto") { view in
+            view.overlay(
+              RoundedRectangle(cornerRadius: 10)
+                .stroke(.blue, lineWidth: 3)
+            )
+          }
         }
-//          .frame(maxWidth: .infinity, alignment: .leading)
         .frame(minWidth: 0)
         .padding(.all, 10)
         .background(Color.cardBackground)
@@ -71,7 +92,6 @@ struct AppearanceSettingsView: View {
     }
     .frame(maxWidth: .infinity, alignment: .leading)
     .padding()
-    // TODO: check light theme
   }
 }
 

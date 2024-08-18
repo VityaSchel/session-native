@@ -15,8 +15,8 @@ func getConversationsPreviewMocks(user: User) -> [Conversation] {
   convo1.lastMessage = Message(
     id: UUID(),
     conversation: convo1,
-    hash: "asjdasdkas",
-    timestamp: Date(),
+    messageHash: "asjdasdkas",
+    createdAt: Date(),
     from: recipients[1],
     body: "Hello hloth",
     read: false
@@ -34,8 +34,8 @@ func getConversationsPreviewMocks(user: User) -> [Conversation] {
   convo2.lastMessage = Message(
     id: UUID(),
     conversation: convo2,
-    hash: "Hello",
-    timestamp: Date(),
+    messageHash: "Hello",
+    createdAt: Date(),
     body: "Hi user, welcome to Session Native swift previews glad to see you there",
     read: false
   )

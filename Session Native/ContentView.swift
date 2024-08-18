@@ -13,8 +13,11 @@ enum AppView {
 struct ContentView: View {
   @EnvironmentObject var appViewManager: ViewManager
   @EnvironmentObject var userManager: UserManager
+  @Environment(\.modelContext) private var modelContext
   @State private var searchText = ""
   @State private var connected = false
+  @AppStorage("theme") private var theme: String = "auto"
+  @State private var eventHandler: EventHandler? = nil
     
   var body: some View {
     Group {
@@ -119,6 +122,17 @@ struct ContentView: View {
         }
       })
     }
+    .preferredColorScheme(
+      theme == "dark"
+      ? .dark
+      : theme == "light"
+      ? .light
+      : .none
+    )
+    .onAppear {
+      self.eventHandler = EventHandler(modelContext: modelContext)
+      self.eventHandler?.subscribeToEvents()
+    }
   }
 }
 
@@ -134,7 +148,7 @@ struct ContentView_Previews: PreviewProvider {
                                   
     return ContentView()
       .modelContainer(inMemoryModelContainer)
-      .environmentObject(UserManager(container: inMemoryModelContainer))
+      .environmentObject(UserManager(container: inMemoryModelContainer, preview: true))
       .environmentObject(ViewManager())
   }
 }

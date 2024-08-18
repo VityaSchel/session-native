@@ -50,6 +50,7 @@ struct SettingsNav: View {
             .frame(width: 24, height: 24)
             .background(Color.gray.gradient)
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .foregroundColor(.white)
           Text("Add Session")
         }
         Section {
@@ -60,6 +61,7 @@ struct SettingsNav: View {
               .frame(width: 24, height: 24)
               .background(Color.gray.gradient)
               .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+              .foregroundColor(.white)
             Text("General")
           }
           NavigationLink(
@@ -69,6 +71,7 @@ struct SettingsNav: View {
               .frame(width: 24, height: 24)
               .background(Color.red.gradient)
               .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+              .foregroundColor(.white)
             Text("Notifications & Sound")
           }
           NavigationLink(
@@ -78,6 +81,7 @@ struct SettingsNav: View {
               .frame(width: 24, height: 24)
               .background(Color.blue.gradient)
               .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+              .foregroundColor(.white)
             Text("Privacy")
           }
           NavigationLink(
@@ -90,6 +94,7 @@ struct SettingsNav: View {
               .frame(width: 24, height: 24)
               .background(Color.green.gradient)
               .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+              .foregroundColor(.white)
             Text("Chats & appearance")
           }
         }
@@ -119,9 +124,9 @@ struct SettingsNav: View {
         Section {
           VStack(alignment: .leading) {
             Text("Session Native by hloth.dev")
-              .foregroundStyle(Color.white.opacity(0.5))
+              .foregroundStyle(Color.text.opacity(0.5))
             Text("v1.0.0 Stable standalone")
-              .foregroundStyle(Color.white.opacity(0.5))
+              .foregroundStyle(Color.text.opacity(0.5))
           }
         }
       }

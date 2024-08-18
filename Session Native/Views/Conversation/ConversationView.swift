@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 import SwiftData
+import MessagePack
 
 struct ConversationView: View {
   @Environment(\.modelContext) var modelContext
@@ -12,13 +13,27 @@ struct ConversationView: View {
   private func fetchConversation() {
     if let conversationId = viewManager.navigationSelection {
       if let conversationUuid = UUID(uuidString: conversationId) {
-        let conversation = try? modelContext.fetch(
+        if let conversation = try? modelContext.fetch(
           FetchDescriptor(predicate: #Predicate<Conversation> { conversation in
             conversation.id == conversationUuid
           })
-        ).first
-        conversationModel = conversation
-        conversationModel?.unreadMessages = 0
+        ).first {
+          conversationModel = conversation
+          conversationModel?.unreadMessages = 0
+          let unreadMessages = conversation.messages.filter({ msg in
+            msg.from != nil && msg.read == false && msg.timestamp != nil
+          })
+          .map({ msg in
+            MessagePackValue.int(msg.timestamp!)
+          })
+          if !unreadMessages.isEmpty {
+            request([
+              "type": "mark_as_read",
+              "conversation": .string(conversation.recipient.sessionId),
+              "messagesTimestamps": .array(unreadMessages)
+            ])
+          }
+        }
       } else {
         conversationModel = nil
       }
@@ -36,7 +51,7 @@ struct ConversationView: View {
             userManager: userManager,
             conversation: conversation
           )
-          .navigationTitle(conversation.recipient.displayName ?? getSessionIdPlaceholder(sessionId: conversation.recipient.sessionId))
+          .navigationTitle(conversation.contact?.name ?? conversation.recipient.displayName ?? getSessionIdPlaceholder(sessionId: conversation.recipient.sessionId))
           .background(Color.conversationDefaultBackground)
         }
         .toolbar {
@@ -140,12 +155,39 @@ struct Messages: View {
     }
     .alert("Delete message?", isPresented: $viewModel.deleteConfirmation) {
       Button("Delete everywhere", role: .destructive) {
-        
+        if let message = viewModel.deleteConfirmationMessage {
+          let deleteMessageRequest: [MessagePackValue: MessagePackValue] = [
+            "type": "delete_messages",
+            "conversation": .string(conversation.recipient.sessionId),
+            "messages": .array([
+              .map([
+                "timestamp": .int(message.timestamp!),
+                "hash": .string(message.messageHash!)
+              ])
+            ])
+          ]
+          request(.map(deleteMessageRequest), { response in
+            if(response["ok"]?.boolValue == true) {
+              DispatchQueue.main.async {
+                viewModel.deleteConfirmationMessage!.deletedByUser = true
+                viewModel.deleteConfirmationMessage = nil
+              }
+            }
+          })
+        }
       }
       Button("Delete locally", role: .destructive) {
-        withAnimation {
-          if let deletedMessage = viewModel.deleteConfirmationMessage {
-            modelContext.delete(deletedMessage)
+        if let message = viewModel.deleteConfirmationMessage {
+          let messageId = message.persistentModelID
+          var predicate = FetchDescriptor<Message>(predicate: #Predicate<Message> { msg in
+            msg.persistentModelID == messageId
+          })
+          predicate.fetchLimit = 1
+          let messages = try! modelContext.fetch(predicate)
+          if !messages.isEmpty {
+            DispatchQueue.main.async {
+              messages[0].deletedByUser = true
+            }
           }
         }
         viewModel.deleteConfirmationMessage = nil

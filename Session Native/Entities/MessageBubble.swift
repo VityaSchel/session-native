@@ -34,8 +34,7 @@ struct MessageBubble<Content>: View where Content: View {
                       reply.from!.displayName ??
                       getSessionIdPlaceholder(sessionId: reply.from!.sessionId)
                     ) : (
-                      userManager.activeUser?.displayName ??
-                      getSessionIdPlaceholder(sessionId: userManager.activeUser!.sessionId)
+                      userManager.activeUser?.displayName ?? getSessionIdPlaceholder(sessionId: userManager.activeUser!.sessionId)
                     )
                   )
                   .fontWeight(.medium)
@@ -66,7 +65,7 @@ struct MessageBubble<Content>: View where Content: View {
       .padding(.vertical, 6)
       .padding(direction == .left ? .leading : .trailing, 11)
       .padding(direction == .left ? .trailing : .leading, 8)
-      .background(direction == .left ? Color.messageBubble : Color.accentColor)
+      .background(direction == .left ? Color.messageBubble : Color.accentColorConstant)
       .clipShape(ChatBubbleShape(direction: direction))
       if direction == .left {
         Spacer()
@@ -168,7 +167,7 @@ struct MessageStatusBar: View {
   
   var body: some View {
     GeometryReader { geometry in
-      Text(getFormattedDate(date: message.timestamp))
+      Text(getFormattedDate(date: message.createdAt))
         .font(.system(size: 11))
         .italic()
         .padding(5)

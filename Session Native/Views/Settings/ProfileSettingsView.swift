@@ -158,13 +158,13 @@ struct ProfileSettingsView: View {
       .toolbar {
         ToolbarItem {
           Button(action: {
-            do {
-              user.displayName = displayName
-              user.avatar = avatar
-              try modelContext.save()
-            } catch {
-              print("Failed to save user")
-            }
+            user.displayName = displayName
+            user.avatar = avatar
+            request([
+              "type": "set_session",
+              "mnemonic": .string(readStringFromKeychain(account: user.sessionId, service: "mnemonic") ?? ""),
+              "displayName": .string(displayName)
+            ])
           }) {
             Text("Save")
           }

@@ -21,6 +21,7 @@ struct AvatarSelector: View {
             .resizable()
             .scaledToFit()
             .padding(18)
+            .foregroundStyle(Color.white)
         }
       }
       .frame(width: 64, height: 64)

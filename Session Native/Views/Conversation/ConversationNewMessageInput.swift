@@ -75,6 +75,13 @@ struct NewMessageInput: View {
             .onSubmit {
               handleSubmit()
             }
+            .onChange(of: messageText, {
+              request([
+                "type": "set_typing_indicator",
+                "recipient": .string(conversation.recipient.sessionId),
+                "show": .bool(messageText.isEmpty == false)
+              ])
+            })
           Button(
             action: {
               handleSubmit()
@@ -103,7 +110,7 @@ struct NewMessageInput: View {
     let message = Message(
       id: UUID(),
       conversation: conversation,
-      timestamp: Date(),
+      createdAt: Date(),
       body: body,
       replyTo: messageModel.replyTo,
       read: false,
@@ -131,21 +138,21 @@ struct NewMessageInput: View {
     if let replyTo = message.replyTo {
       messageRequest["replyTo"] = .map([
         "author": .string(replyTo.from != nil ? replyTo.from!.sessionId : userManager.activeUser!.sessionId),
-        "timestamp": .double(replyTo.timestamp.timeIntervalSince1970),
+        "timestamp": .int(replyTo.timestamp!),
         "text": .string(replyTo.from?.sessionId ?? "")
       ])
     }
     request(MessagePackValue.map(messageRequest)) { response in
       if response["ok"]?.boolValue == false {
         DispatchQueue.main.async {
-          message.status = .errored(reason: response["error"]?.stringValue ?? "Unknown error")
+          message.status = MessageStatus.errored(reason: response["error"]?.stringValue ?? "Unknown error")
         }
       } else {
         if let hash = response["hash"]?.stringValue,
            let timestamp = response["timestamp"]?.intValue {
           DispatchQueue.main.async {
-            message.hash = hash
-            message.timestamp = Date(timeIntervalSince1970: Double(timestamp))
+            message.messageHash = hash
+            message.timestamp = Int64(timestamp)
             message.status = .sent
           }
         }

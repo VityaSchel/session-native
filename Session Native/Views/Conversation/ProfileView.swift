@@ -10,6 +10,8 @@ struct ProfileView: View {
   @State var isContact: Bool = false
   @State var showTypingIndicator = UserDefaults.standard.optionalBool(forKey: "showTypingIndicatorsByDefault") ?? true
   @State var sendReadCheckmarks = UserDefaults.standard.optionalBool(forKey: "sendReadCheckmarksByDefault") ?? true
+  @State var name: String = ""
+  @State var editingContactName: Bool = false
   
   var body: some View {
     Button {
@@ -30,8 +32,33 @@ struct ProfileView: View {
           width: 148,
           height: 148
         )
-        Text(conversation.recipient.displayName ?? getSessionIdPlaceholder(sessionId: conversation.recipient.sessionId))
-          .font(.title)
+        HStack {
+          if editingContactName {
+            TextField("Contact name", text: $name)
+              .onSubmit {
+                if conversation.contact != nil {
+                  conversation.contact!.name = name.isEmpty ? nil : name
+                  editingContactName = false
+                }
+              }
+              .frame(width: 256)
+          } else {
+            Text(conversation.contact?.name ?? conversation.recipient.displayName ?? getSessionIdPlaceholder(sessionId: conversation.recipient.sessionId))
+              .font(.title)
+          }
+          if isContact && !editingContactName {
+            Button {
+              editingContactName = true
+            } label: {
+              Image(systemName: "pencil")
+                .padding(.all, 6)
+                .background(Color.text.opacity(0.2))
+                .contentShape(Circle())
+                .cornerRadius(.infinity)
+            }
+            .buttonStyle(.plain)
+          }
+        }
         HStack(spacing: 0) {
           ProfileButton(icon: "phone.fill", name: "Call")
           ProfileButton(icon: isContact ? "person.crop.circle.fill.badge.xmark" : "person.crop.circle.fill.badge.plus", name: isContact ? "Remove contact" : "Add as contact") {
@@ -83,6 +110,7 @@ struct ProfileView: View {
             Text(conversation.recipient.sessionId)
               .font(.system(size: 11, design: .monospaced))
               .textSelection(.enabled)
+              .fixedSize(horizontal: false, vertical: true)
           }
           .frame(maxWidth: .infinity, alignment: .leading)
           .padding(.horizontal, 10)
@@ -140,6 +168,14 @@ struct ProfileView: View {
       .onChange(of: showTypingIndicator) {
         conversation.showTypingIndicator = showTypingIndicator
       }
+      .onAppear {
+        isContact = conversation.contact != nil
+        if let contactName = conversation.contact?.name {
+          name = contactName
+        } else {
+          name = conversation.recipient.displayName ?? ""
+        }
+      }
     }
   }
 }
@@ -162,6 +198,7 @@ struct ProfileButton: View {
             .frame(width: 28, height: 28)
             .background(Color.linkButton)
             .cornerRadius(.infinity)
+            .foregroundColor(.white)
           Text(name)
             .multilineTextAlignment(.center)
             .foregroundStyle(Color.linkButton)

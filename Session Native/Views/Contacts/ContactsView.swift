@@ -78,7 +78,7 @@ struct ContactItem: View {
     isEditing = false
     withAnimation {
       do {
-        contact.name = name
+        contact.name = name.isEmpty ? nil : name
         try context.save()
       } catch {
         print("Failed to save contact name.")
