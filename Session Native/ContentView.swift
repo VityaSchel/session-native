@@ -117,7 +117,9 @@ struct ContentView: View {
         if(response["ok"]?.boolValue == true) {
           connected = true
           if userManager.activeUser != nil {
-            appViewManager.setActiveView(.conversations)
+            DispatchQueue.main.async {
+              appViewManager.setActiveView(.conversations)
+            }
           }
         }
       })
@@ -130,7 +132,10 @@ struct ContentView: View {
       : .none
     )
     .onAppear {
-      self.eventHandler = EventHandler(modelContext: modelContext)
+      self.eventHandler = EventHandler(
+        modelContext: modelContext,
+        userManager: userManager
+      )
       self.eventHandler?.subscribeToEvents()
     }
   }

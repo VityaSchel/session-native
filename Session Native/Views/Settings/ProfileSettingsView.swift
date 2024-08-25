@@ -1,4 +1,5 @@
 import Foundation
+import SwiftData
 import SwiftUI
 
 struct ProfileSettingsView: View {
@@ -131,8 +132,12 @@ struct ProfileSettingsView: View {
               do {
                 modelContext.delete(user)
                 try modelContext.save()
+                
                 let indexOfActiveUser = userManager.users.firstIndex(of: user)
                 userManager.users.remove(at: indexOfActiveUser!)
+                request([
+                  "type": "logout_session"
+                ])
                 if(userManager.users.count > 0) {
                   let nextUser = userManager.users[0]
                   userManager.setActiveUser(nextUser)
@@ -140,6 +145,8 @@ struct ProfileSettingsView: View {
                   viewManager.setActiveView(.auth)
                   userManager.setActiveUser(nil)
                 }
+                userManager.saveUsers()
+                deleteFromKeychain(account: user.sessionId, service: "mnemonic")
               } catch {
                 print("Failed to delete user: \(error.localizedDescription)")
               }

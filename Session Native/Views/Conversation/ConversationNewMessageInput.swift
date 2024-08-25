@@ -45,7 +45,7 @@ struct NewMessageInput: View {
               Text("Reply to " + getReplyToText(replyTo: replyTo, userManager: userManager))
                 .fontWeight(.medium)
                 .foregroundStyle(Color.accentColor)
-              Text(replyTo.body)
+              Text(replyTo.body ?? "Empty message")
             }
             .padding(.leading, 10)
             .border(width: 2, edges: [.leading], color: Color.accentColor)

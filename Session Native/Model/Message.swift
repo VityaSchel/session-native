@@ -15,14 +15,14 @@ final class Message {
   var createdAt: Date
   var timestamp: Int64?
   var from: Recipient?
-  var body: String
+  var body: String?
   @Attribute(.externalStorage) var attachments: [Data]?
   var read: Bool
   var status: MessageStatus
   var replyTo: Message?
   var deletedByUser: Bool
   
-  init(id: UUID, conversation: Conversation, messageHash: String? = nil, createdAt: Date, from: Recipient? = nil, body: String, attachments: [Data]? = nil, replyTo: Message? = nil, read: Bool = false, status: MessageStatus = MessageStatus.sent) {
+  init(id: UUID, conversation: Conversation, messageHash: String? = nil, createdAt: Date, from: Recipient? = nil, body: String?, attachments: [Data]? = nil, replyTo: Message? = nil, read: Bool = false, status: MessageStatus = MessageStatus.sent) {
     self.id = id
     self.conversation = conversation
     self.messageHash = messageHash

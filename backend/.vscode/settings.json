@@ -1,0 +1,12 @@
+{
+  "editor.tabCompletion": "on",
+  "path-intellisense.mappings": {
+    "@/*": "${workspaceFolder}/src/*"
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "files.exclude": {
+    "out/**": true,
+  },
+}

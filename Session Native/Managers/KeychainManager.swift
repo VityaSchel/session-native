@@ -46,3 +46,13 @@ func readStringFromKeychain(account: String, service: String) -> String? {
   }
   return nil
 }
+
+func deleteFromKeychain(account: String, service: String) {
+  let query: [String: Any] = [
+    kSecClass as String: kSecClassGenericPassword,
+    kSecAttrAccount as String: account,
+    kSecAttrService as String: service
+  ]
+  
+  SecItemDelete(query as CFDictionary)
+}

@@ -39,7 +39,7 @@ struct MessageBubble<Content>: View where Content: View {
                   )
                   .fontWeight(.medium)
                   Text(
-                    reply.body
+                    reply.body ?? ""
                   )
                 }
                 .padding(.horizontal, 5)

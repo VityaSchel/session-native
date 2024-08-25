@@ -37,7 +37,7 @@ class UserManager: ObservableObject {
             self.activeUser = user
           }
         }
-      } else {
+      } else if !users.isEmpty {
         let user = users[0]
         if let mnemonic = preview ? "" : readStringFromKeychain(account: user.sessionId, service: "mnemonic") {
           request([

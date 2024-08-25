@@ -19,8 +19,8 @@ struct ChatMessage: View {
       if message.deletedByUser {
         Text("􀈑 This message was deleted" + self.messageStatusBarSuffix)
           .foregroundStyle(Color.text.opacity(0.5))
-      } else {
-        (Text(message.body)
+      } else if let text = message.body {
+        (Text(text)
          /*.textSelection(.enabled)*/ + Text("\u{2066}" + self.messageStatusBarSuffix))
         .foregroundStyle(message.from == nil ? Color.black : Color.messageBubbleText)
         .fixedSize(horizontal: false, vertical: true)
@@ -58,13 +58,15 @@ struct ChatMessage: View {
       }
       .disabled(message.status != .sent)
       Divider()
-      Button() {
-        NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(message.body, forType: .string)
-      } label: {
-        Label("􀉁 Copy", systemImage: "doc.on.doc")
+      if let text = message.body {
+        Button() {
+          NSPasteboard.general.clearContents()
+          NSPasteboard.general.setString(text, forType: .string)
+        } label: {
+          Label("􀉁 Copy", systemImage: "doc.on.doc")
+        }
+        Divider()
       }
-      Divider()
       Button() {
         print("Forward")
       } label: {

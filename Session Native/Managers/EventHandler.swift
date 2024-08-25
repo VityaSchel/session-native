@@ -5,6 +5,7 @@ import SwiftUI
 
 class EventHandler: ObservableObject {
   @Published var modelContext: ModelContext
+  @Published var userManager: UserManager
   
   private var isSubscribed = false
   
@@ -13,8 +14,9 @@ class EventHandler: ObservableObject {
   private var typingIndicatorHandler: (([MessagePackValue : MessagePackValue]) -> Void)?
   private var messageReadHandler: (([MessagePackValue : MessagePackValue]) -> Void)?
   
-  init(modelContext: ModelContext) {
+  init(modelContext: ModelContext, userManager: UserManager) {
     self.modelContext = modelContext
+    self.userManager = userManager
   }
   
   func subscribeToEvents() {
@@ -62,23 +64,106 @@ class EventHandler: ObservableObject {
   
   private func handleNewMessage(_ message: [MessagePackValue : MessagePackValue]) {
     DispatchQueue.main.async {
-      print("New message: \(message)")
-//      message["message"]
+      if let newMessage = message["message"]?.dictionaryValue,
+         let sessionId = newMessage["from"]?.stringValue,
+         let messageHash = newMessage["id"]?.stringValue,
+         let timestamp = newMessage["timestamp"]?.uintValue,
+         let activeUser = self.userManager.activeUser {
+        let activeUserId = activeUser.persistentModelID
+        do {
+          var conversation = try self.modelContext.fetch(FetchDescriptor<Conversation>(predicate: #Predicate { conversation in
+            conversation.recipient.sessionId == sessionId
+            && conversation.user.persistentModelID == activeUserId
+          })).first
+          if conversation == nil {
+            var recipient = try self.modelContext.fetch(FetchDescriptor<Recipient>(predicate: #Predicate { recipient in
+              recipient.sessionId == sessionId
+            })).first
+            if(recipient == nil) {
+              recipient = Recipient(
+                id: UUID(),
+                sessionId: sessionId
+              )
+              self.modelContext.insert(recipient!)
+            }
+            var contact = try self.modelContext.fetch(FetchDescriptor<Contact>(predicate: #Predicate { contact in
+              contact.recipient.sessionId == sessionId
+              && contact.user.persistentModelID == activeUserId
+            })).first
+            let autoarchiveNewChats = UserDefaults.standard.optionalBool(forKey: "autoarchiveNewChats") ?? false
+            conversation = Conversation(
+              id: UUID(),
+              user: activeUser,
+              recipient: recipient!,
+              archived: autoarchiveNewChats,
+              lastMessage: nil,
+              typingIndicator: false,
+              notifications: Notification(enabled: autoarchiveNewChats ? false : true),
+              pinned: false,
+              contact: contact
+            )
+            self.modelContext.insert(conversation!)
+          }
+          let message = Message(
+            id: UUID(),
+            conversation: conversation!,
+            messageHash: messageHash,
+            createdAt: Date(),
+            from: conversation!.recipient,
+            body: newMessage["text"]?.stringValue ?? "",
+            attachments: [],
+            replyTo: nil,
+            read: false,
+            status: .sent
+          )
+          self.modelContext.insert(message)
+          conversation!.updatedAt = Date()
+          conversation!.lastMessage = message
+          conversation!.unreadMessages += 1
+          try self.modelContext.save()
+        } catch {
+          print("Failed to save new message.")
+        }
+      }
     }
   }
   
   private func handleMessageDeleted(_ message: [MessagePackValue : MessagePackValue]) {
     DispatchQueue.main.async {
-      print("Message deleted: \(message)")
+      if let readMessage = message["message"]?.dictionaryValue,
+         let sessionId = readMessage["from"]?.stringValue,
+         let timestamp = readMessage["timestamp"]?.int64Value {
+        do {
+          if let messageDb = try self.modelContext.fetch(FetchDescriptor<Message>(predicate: #Predicate { message in
+            if let msgTimestamp = message.timestamp {
+              return message.conversation.recipient.sessionId == sessionId 
+                && msgTimestamp == timestamp
+            } else {
+              return false
+            }
+          })).first {
+            // Dirty hack: instead of actually deleting this message, we assign it a deleted state
+            // For security we also clear its content in database so that it cannot be easily recovered
+            messageDb.deletedByUser = true
+            messageDb.body = ""
+            messageDb.attachments = []
+            try self.modelContext.save()
+          }
+        } catch {
+          print("Failed to update deleted state of message.")
+        }
+      }
     }
   }
   
   private func handleTypingIndicator(_ message: [MessagePackValue : MessagePackValue]) {
     DispatchQueue.main.async {
-      print("Typing indicator: \(message)")
       if let indicator = message["indicator"]?.dictionaryValue,
          let sessionId = indicator["conversation"]?.stringValue,
          let isTyping = indicator["isTyping"]?.boolValue {
+        if(sessionId == self.userManager.activeUser?.sessionId) {
+          return
+        }
         do {
           if let conversation = try self.modelContext.fetch(FetchDescriptor<Conversation>(predicate: #Predicate { conversation in
             conversation.recipient.sessionId == sessionId
@@ -95,7 +180,24 @@ class EventHandler: ObservableObject {
   
   private func handleMessageRead(_ message: [MessagePackValue : MessagePackValue]) {
     DispatchQueue.main.async {
-      print("Message read: \(message)")
+      if let readMessage = message["message"]?.dictionaryValue,
+         let sessionId = readMessage["conversation"]?.stringValue,
+         let timestamp = readMessage["timestamp"]?.int64Value {
+        do {
+          if let messageDb = try self.modelContext.fetch(FetchDescriptor<Message>(predicate: #Predicate { message in
+            if let msgTimestamp = message.timestamp {
+              return message.conversation.recipient.sessionId == sessionId && msgTimestamp == timestamp
+            } else {
+              return false
+            }
+          })).first {
+            messageDb.read = true
+            try self.modelContext.save()
+          }
+        } catch {
+          print("Failed to update read state of message.")
+        }
+      }
     }
   }
 }

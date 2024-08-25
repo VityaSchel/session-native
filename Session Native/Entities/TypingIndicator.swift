@@ -1,7 +1,13 @@
 import Foundation
 import SwiftUI
 
+enum TypingIndicatorStyle {
+  case dark
+  case light
+}
+
 struct TypingIndicatorView: View {
+  public var style: TypingIndicatorStyle = .dark
   var staticView = false
   @State private var animate = false
   var size: CGFloat = 10
@@ -11,7 +17,7 @@ struct TypingIndicatorView: View {
       ForEach(0..<3) { index in
         Circle()
           .frame(width: size, height: size)
-          .foregroundColor(.gray)
+          .foregroundColor(style == .dark ? .gray : Color.black.opacity(0.6))
           .opacity(self.animate ? 0.3 : 1)
           .animation(
             Animation.easeInOut(duration: 0.8)
