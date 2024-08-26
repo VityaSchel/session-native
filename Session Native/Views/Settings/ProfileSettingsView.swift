@@ -165,13 +165,38 @@ struct ProfileSettingsView: View {
       .toolbar {
         ToolbarItem {
           Button(action: {
-            user.displayName = displayName
-            user.avatar = avatar
             request([
-              "type": "set_session",
-              "mnemonic": .string(readStringFromKeychain(account: user.sessionId, service: "mnemonic") ?? ""),
+              "type": "set_display_name",
               "displayName": .string(displayName)
-            ])
+            ], { dnResponse in
+              if(dnResponse["ok"]?.boolValue == true) {
+                user.displayName = displayName
+                
+                if let avatarData = avatar {
+                  print("Avatar count", avatarData.count, avatarData.prefix(100))
+                  request([
+                    "type": "set_avatar",
+                    "avatar": .binary(avatarData)
+                  ], { aResponse in
+                    if(aResponse["ok"]?.boolValue == true) {
+                      user.avatar = avatarData
+                      
+                      do {
+                        try modelContext.save()
+                      } catch {
+                        print("Failed to save user: \(error)")
+                      }
+                    }
+                  })
+                } else {
+                  do {
+                    try modelContext.save()
+                  } catch {
+                    print("Failed to save user: \(error)")
+                  }
+                }
+              }
+            })
           }) {
             Text("Save")
           }

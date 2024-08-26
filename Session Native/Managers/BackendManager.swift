@@ -37,30 +37,12 @@ class UnixDomainSocketClient {
   }
   
   private func sendData(data: Data) {
-//    var addr = sockaddr_un()
-//    addr.sun_family = sa_family_t(AF_UNIX)
-//    strcpy(&addr.sun_path, socketPath)
-//    
-//    let sockfd = socket(AF_UNIX, SOCK_STREAM, 0)
-//    guard sockfd != -1 else {
-//      print("Failed to create socket")
-//      return
-//    }
-//    
-//    let size = MemoryLayout.size(ofValue: addr)
-//    let connected = withUnsafePointer(to: &addr) {
-//      $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {
-//        connect(sockfd, $0, socklen_t(size))
-//      }
-//    }
-//    
-//    guard connected != -1 else {
-//      print("Failed to connect to socket")
-//      return
-//    }
-    
-    data.withUnsafeBytes { (ptr: UnsafeRawBufferPointer) in
-      send(self.listeningSocket, ptr.baseAddress!, data.count, 0)
+    let payload: Data = data + Data(Array(repeating: 0x03, count: 64))
+    payload.withUnsafeBytes { (ptr: UnsafeRawBufferPointer) in
+      let bytesSent = send(self.listeningSocket, ptr.baseAddress!, payload.count, 0)
+      if bytesSent < 0 {
+        print("Failed to send data")
+      }
     }
   }
   
@@ -91,16 +73,23 @@ class UnixDomainSocketClient {
         return
       }
       
+      var receivedData = Data()
+      
       while self.listening == true {
         var buffer = [UInt8](repeating: 0, count: 1024)
         let bytesRead = recv(self.listeningSocket, &buffer, buffer.count, 0)
         
         if bytesRead > 0 {
-          do {
-            let value = try unpack(Data(buffer.prefix(bytesRead)))
-            self.handleIncomingMessage(value.value)
-          } catch {
-            print("Failed to decode incoming message")
+          receivedData.append(buffer, count: bytesRead)
+          
+          if bytesRead < 1024 {
+            do {
+              let value = try unpack(receivedData)
+              self.handleIncomingMessage(value.value)
+              receivedData.removeAll()
+            } catch {
+              print("Failed to decode incoming message")
+            }
           }
         }
       }

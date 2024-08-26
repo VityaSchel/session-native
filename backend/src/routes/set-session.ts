@@ -10,10 +10,12 @@ export const sessionDataPath = path.join(process.env.HOME!, 'Library/Containers/
 export async function setSession(message: unknown): Promise<MessageResponse> {
   const {
     mnemonic,
-    displayName
+    displayName,
+    avatar
   } = z.object({
     mnemonic: z.string(),
-    displayName: z.string().optional()
+    displayName: z.string().optional(),
+    avatar: z.instanceof(Uint8Array).nullable().optional()
   }).parse(message)
 
   poller?.stopPolling()
@@ -24,6 +26,11 @@ export async function setSession(message: unknown): Promise<MessageResponse> {
     })
   })
   session.setMnemonic(mnemonic, displayName || undefined)
+  if (avatar) {
+    const b = avatar.buffer.slice(avatar.byteOffset, avatar.byteOffset + avatar.byteLength) as ArrayBuffer
+    await session.setAvatar(b)
+  }
+
   const newPoller = new Poller()
   session.addPoller(newPoller)
 

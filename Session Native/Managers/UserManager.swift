@@ -30,7 +30,8 @@ class UserManager: ObservableObject {
             var setSessionRequest: [MessagePackValue: MessagePackValue] = [
               "type": "set_session",
               "mnemonic": .string(mnemonic),
-              "displayName": .string(user.displayName ?? "")
+              "displayName": .string(user.displayName ?? ""),
+              "avatar": user.avatar != nil ? .binary(user.avatar!) : .nil
             ]
             if let displayName = user.displayName {
               setSessionRequest["displayName"] = .string(displayName)
@@ -45,7 +46,8 @@ class UserManager: ObservableObject {
             request([
               "type": "set_session",
               "mnemonic": .string(mnemonic),
-              "displayName": .string(user.displayName ?? "")
+              "displayName": .string(user.displayName ?? ""),
+              "avatar": user.avatar != nil ? .binary(user.avatar!) : .nil
             ]) { response in
               self.activeUser = user
             }

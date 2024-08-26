@@ -3,6 +3,8 @@ import { z } from 'zod'
 import { mnemonicToSessionId } from '@/routes/mnemonic-to-session-id'
 import { generateSession } from '@/routes/generate-session'
 import { resolveONS } from '@/routes/resolve-ons'
+import { setDisplayName } from '@/routes/set-display-name'
+import { setAvatar } from '@/routes/set-avatar'
 import { setSession } from '@/routes/set-session'
 import { logoutSession } from '@/routes/logout-session'
 import { sendMessage } from '@/routes/send-message'
@@ -20,6 +22,8 @@ enum MessageType {
   GenerateSession = 'generate_session',
   ResolveONS = 'resolve_ons',
   SetSession = 'set_session',
+  SetDisplayName = 'set_display_name',
+  SetAvatar = 'set_avatar',
   LogoutSession = 'logout_session',
   SendMessage = 'send_message',
   SetTypingIndicator = 'set_typing_indicator',
@@ -54,6 +58,10 @@ export async function processMessage(message: unknown): Promise<MessageResponse>
       return resolveONS(message)
     case MessageType.SetSession:
       return setSession(message)
+    case MessageType.SetDisplayName:
+      return setDisplayName(message)
+    case MessageType.SetAvatar:
+      return setAvatar(message)
     case MessageType.LogoutSession:
       return logoutSession()
     case MessageType.SendMessage:

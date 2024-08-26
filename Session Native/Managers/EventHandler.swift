@@ -14,6 +14,8 @@ class EventHandler: ObservableObject {
   private var typingIndicatorHandler: (([MessagePackValue : MessagePackValue]) -> Void)?
   private var messageReadHandler: (([MessagePackValue : MessagePackValue]) -> Void)?
   
+  private var typingIndicatorTimer: Timer?
+  
   init(modelContext: ModelContext, userManager: UserManager) {
     self.modelContext = modelContext
     self.userManager = userManager
@@ -131,6 +133,37 @@ class EventHandler: ObservableObject {
           conversation!.lastMessage = message
           conversation!.unreadMessages += 1
           
+          if let reply = newMessage["replyToMessage"],
+             let replyReferenceTimestamp = reply["timestamp"]?.uintValue,
+             let replyReferenceAuthorSessionId = reply["author"]?.stringValue {
+            
+            let replyReferenceTimestampInt64 = Int64(replyReferenceTimestamp)
+            
+            let isReplyReferenceAuthorMe = replyReferenceAuthorSessionId == activeUser.sessionId
+            
+            if let replyReferenceMessage = try self.modelContext.fetch(FetchDescriptor<Message>(predicate: #Predicate { message in
+              if isReplyReferenceAuthorMe {
+                return message.from == nil 
+                  && message.timestamp == replyReferenceTimestampInt64
+              } else {
+                if let curMsgFrom = message.from,
+                   let conversation = message.conversation {
+                  return curMsgFrom.sessionId == replyReferenceAuthorSessionId
+                    && message.timestamp == replyReferenceTimestampInt64
+                    && conversation.user.persistentModelID == activeUserId
+                } else {
+                  return false
+                }
+              }
+            })).first {
+              message.replyTo = replyReferenceMessage
+            }
+              
+            if let attachments = reply["attachments"]?.arrayValue {
+              // TODO: attachments
+            }
+          }
+          
           if recipient != nil {
             recipient!.displayName = author["displayName"]?.stringValue
             if let avatar = author["avatar"]?.dictionaryValue,
@@ -205,6 +238,22 @@ class EventHandler: ObservableObject {
             conversation.recipient.sessionId == sessionId
           })).first {
             conversation.typingIndicator = isTyping
+            
+            self.typingIndicatorTimer?.invalidate()
+            
+            if isTyping {
+              self.typingIndicatorTimer = Timer.scheduledTimer(withTimeInterval: 20.0, repeats: false) { [weak self] _ in
+                DispatchQueue.main.async {
+                  conversation.typingIndicator = false
+                  do {
+                    try self?.modelContext.save()
+                  } catch {
+                    print("Failed to update typing indicator after timer.")
+                  }
+                }
+              }
+            }
+            
             try self.modelContext.save()
           }
         } catch {

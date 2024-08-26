@@ -66,8 +66,19 @@ try {
   const server = createServer((socket) => {
     unixSocket = socket
 
+    let buffers: Buffer[] = []
+
     socket.on('data', async (data) => {
-      const message = decode(data)
+      let concatenatedData: Buffer
+      if(data.length > 64 && data.subarray(-64).every(b => b === 0x03)) {
+        concatenatedData = Buffer.concat([...buffers, data]).subarray(0, -64)
+        buffers = []
+      } else {
+        buffers.push(data)
+        return
+      }
+
+      const message = decode(concatenatedData)
       const requestIdData = await z.object({ requestId: z.string() }).safeParseAsync(message)
       let requestId: string | null = null
       if (requestIdData.success) {
