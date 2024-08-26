@@ -20,49 +20,55 @@ class UserManager: ObservableObject {
   }
   
   func loadUsers() {
-    do {
-      let fetchRequest = FetchDescriptor<User>()
-      self.users = try container.mainContext.fetch(fetchRequest)
-      if let activeUserID = UserDefaults.standard.string(forKey: "activeUser") {
-        if let user = users.first(where: { $0.id.uuidString == activeUserID }),
-           let mnemonic = preview ? "" : readStringFromKeychain(account: user.sessionId, service: "mnemonic") {
-          var setSessionRequest: [MessagePackValue: MessagePackValue] = [
-            "type": "set_session",
-            "mnemonic": .string(mnemonic),
-          ]
-          if let displayName = user.displayName {
-            setSessionRequest["displayName"] = .string(displayName)
+    DispatchQueue.main.async {
+      do {
+        let fetchRequest = FetchDescriptor<User>()
+        self.users = try self.container.mainContext.fetch(fetchRequest)
+        if let activeUserID = UserDefaults.standard.string(forKey: "activeUser") {
+          if let user = self.users.first(where: { $0.id.uuidString == activeUserID }),
+             let mnemonic = self.preview ? "" : readStringFromKeychain(account: user.sessionId, service: "mnemonic") {
+            var setSessionRequest: [MessagePackValue: MessagePackValue] = [
+              "type": "set_session",
+              "mnemonic": .string(mnemonic),
+              "displayName": .string(user.displayName ?? "")
+            ]
+            if let displayName = user.displayName {
+              setSessionRequest["displayName"] = .string(displayName)
+            }
+            request(.map(setSessionRequest)) { response in
+              self.activeUser = user
+            }
           }
-          request(.map(setSessionRequest)) { response in
-            self.activeUser = user
+        } else if !self.users.isEmpty {
+          let user = self.users[0]
+          if let mnemonic = self.preview ? "" : readStringFromKeychain(account: user.sessionId, service: "mnemonic") {
+            request([
+              "type": "set_session",
+              "mnemonic": .string(mnemonic),
+              "displayName": .string(user.displayName ?? "")
+            ]) { response in
+              self.activeUser = user
+            }
           }
         }
-      } else if !users.isEmpty {
-        let user = users[0]
-        if let mnemonic = preview ? "" : readStringFromKeychain(account: user.sessionId, service: "mnemonic") {
-          request([
-            "type": "set_session",
-            "mnemonic": .string(mnemonic)
-          ]) { response in
-            self.activeUser = user
-          }
-        }
+      } catch {
+        print("Failed to fetch users: \(error.localizedDescription)")
       }
-    } catch {
-      print("Failed to fetch users: \(error.localizedDescription)")
     }
   }
   
   func saveUsers() {
-    do {
-      try container.mainContext.save()
-      if let activeUser = activeUser {
-        UserDefaults.standard.set(activeUser.id.uuidString, forKey: "activeUser")
-      } else {
-        UserDefaults.standard.removeObject(forKey: "activeUser")
+    DispatchQueue.main.async {
+      do {
+        try self.container.mainContext.save()
+        if let activeUser = self.activeUser {
+          UserDefaults.standard.set(activeUser.id.uuidString, forKey: "activeUser")
+        } else {
+          UserDefaults.standard.removeObject(forKey: "activeUser")
+        }
+      } catch {
+        print("Failed to save users: \(error.localizedDescription)")
       }
-    } catch {
-      print("Failed to save users: \(error.localizedDescription)")
     }
   }
   

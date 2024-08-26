@@ -68,21 +68,24 @@ class EventHandler: ObservableObject {
          let sessionId = newMessage["from"]?.stringValue,
          let messageHash = newMessage["id"]?.stringValue,
          let timestamp = newMessage["timestamp"]?.uintValue,
-         let activeUser = self.userManager.activeUser {
+         let activeUser = self.userManager.activeUser,
+         let author = newMessage["author"]?.dictionaryValue {
         let activeUserId = activeUser.persistentModelID
         do {
           var conversation = try self.modelContext.fetch(FetchDescriptor<Conversation>(predicate: #Predicate { conversation in
             conversation.recipient.sessionId == sessionId
             && conversation.user.persistentModelID == activeUserId
           })).first
+          var recipient: Recipient?
           if conversation == nil {
-            var recipient = try self.modelContext.fetch(FetchDescriptor<Recipient>(predicate: #Predicate { recipient in
+            recipient = try self.modelContext.fetch(FetchDescriptor<Recipient>(predicate: #Predicate { recipient in
               recipient.sessionId == sessionId
             })).first
             if(recipient == nil) {
               recipient = Recipient(
                 id: UUID(),
-                sessionId: sessionId
+                sessionId: sessionId,
+                displayName: author["displayName"]?.stringValue
               )
               self.modelContext.insert(recipient!)
             }
@@ -103,7 +106,13 @@ class EventHandler: ObservableObject {
               contact: contact
             )
             self.modelContext.insert(conversation!)
+            if(contact != nil) {
+              contact!.conversation = conversation
+            }
+          } else {
+            recipient = conversation!.recipient
           }
+          
           let message = Message(
             id: UUID(),
             conversation: conversation!,
@@ -113,6 +122,7 @@ class EventHandler: ObservableObject {
             body: newMessage["text"]?.stringValue ?? "",
             attachments: [],
             replyTo: nil,
+            timestamp: Int64(timestamp),
             read: false,
             status: .sent
           )
@@ -120,6 +130,29 @@ class EventHandler: ObservableObject {
           conversation!.updatedAt = Date()
           conversation!.lastMessage = message
           conversation!.unreadMessages += 1
+          
+          if recipient != nil {
+            recipient!.displayName = author["displayName"]?.stringValue
+            if let avatar = author["avatar"]?.dictionaryValue,
+               let avatarUrl = avatar["url"]?.stringValue,
+               let newProfileKey = avatar["key"]?.stringValue {
+              if(recipient!._profileKey != newProfileKey) {
+                DispatchQueue.main.async {
+                  request([
+                    "type": "download_avatar",
+                    "url": .string(avatarUrl),
+                    "key": .string(newProfileKey)
+                  ], { response in
+                    if let newAvatar = response["avatar"]?.dataValue {
+                      recipient!.avatar = newAvatar
+                      recipient!._profileKey = newProfileKey
+                    }
+                  })
+                }
+              }
+            }
+          }
+          
           try self.modelContext.save()
         } catch {
           print("Failed to save new message.")
@@ -136,8 +169,11 @@ class EventHandler: ObservableObject {
         do {
           if let messageDb = try self.modelContext.fetch(FetchDescriptor<Message>(predicate: #Predicate { message in
             if let msgTimestamp = message.timestamp {
-              return message.conversation.recipient.sessionId == sessionId 
-                && msgTimestamp == timestamp
+              if let conversation = message.conversation {
+                return conversation.recipient.sessionId == sessionId && msgTimestamp == timestamp
+              } else {
+                return false
+              }
             } else {
               return false
             }
@@ -186,7 +222,7 @@ class EventHandler: ObservableObject {
         do {
           if let messageDb = try self.modelContext.fetch(FetchDescriptor<Message>(predicate: #Predicate { message in
             if let msgTimestamp = message.timestamp {
-              return message.conversation.recipient.sessionId == sessionId && msgTimestamp == timestamp
+              return message.conversation!.recipient.sessionId == sessionId && msgTimestamp == timestamp
             } else {
               return false
             }

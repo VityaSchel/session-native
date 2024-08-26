@@ -9,6 +9,8 @@ import { sendMessage } from '@/routes/send-message'
 import { setTypingIndicator } from '@/routes/set-typing-indicator'
 import { markAsRead } from '@/routes/mark-as-read'
 import { deleteMessages } from '@/routes/delete-messages'
+import { downloadAvatar } from '@/routes/download-avatar'
+import { downloadFile } from '@/routes/download-file'
 import { poller } from '@/index'
 await ready
 
@@ -25,6 +27,8 @@ enum MessageType {
   DeleteMessages = 'delete_messages',
   StartPolling = 'start_polling',
   StopPolling = 'stop_polling',
+  DownloadAvatar = 'download_avatar',
+  DownloadFile = 'download_file',
 }
 
 export type MessageResponse = {
@@ -74,5 +78,9 @@ export async function processMessage(message: unknown): Promise<MessageResponse>
       } else {
         return { ok: false, error: 'Poller not found' }
       }
+    case MessageType.DownloadAvatar:
+      return downloadAvatar(message)
+    case MessageType.DownloadFile:
+      return downloadFile(message)
   }
 }

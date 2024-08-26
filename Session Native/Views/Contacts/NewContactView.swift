@@ -19,36 +19,46 @@ struct NewContactView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
       TextField("Session ID", text: $contactSessionId)
         .padding(.top, 24)
+        .onSubmit {
+          handleSubmit()
+        }
       if sessionIdError {
         Text("Invalid Session ID")
           .fontWeight(.medium)
           .foregroundStyle(Color.red)
       }
       TextField("Display name (optional)", text: $contactDisplayName)
+        .onSubmit {
+          handleSubmit()
+        }
       if displayNameError {
         Text("Display name must be less than 64 characters")
           .fontWeight(.medium)
           .foregroundStyle(Color.red)
       }
       PrimaryButton("Add contact") {
-        sessionIdError = false
-        displayNameError = false
-        if(contactSessionId.count != 66 || !isSessionID(contactSessionId)) {
-          sessionIdError = true
-        }
-        if(contactDisplayName.count > 64) {
-          displayNameError = true
-        }
-        if(sessionIdError == false && displayNameError == false) {
-          addContact()
-          contactSessionId = ""
-          contactDisplayName = ""
-        }
+        handleSubmit()
       }
       .padding(.top, 12)
     }
     .frame(width: 200)
     .padding(.horizontal, 24)
+  }
+  
+  private func handleSubmit() {
+    sessionIdError = false
+    displayNameError = false
+    if(contactSessionId.count != 66 || !isSessionID(contactSessionId)) {
+      sessionIdError = true
+    }
+    if(contactDisplayName.count > 64) {
+      displayNameError = true
+    }
+    if(sessionIdError == false && displayNameError == false) {
+      addContact()
+      contactSessionId = ""
+      contactDisplayName = ""
+    }
   }
   
   private func addContact() {

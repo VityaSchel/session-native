@@ -23,7 +23,7 @@ export async function setSession(message: unknown): Promise<MessageResponse> {
       filePath: path.join(sessionDataPath, 'session_data_' + Bun.hash(mnemonic).toString())
     })
   })
-  session.setMnemonic(mnemonic, displayName)
+  session.setMnemonic(mnemonic, displayName || undefined)
   const newPoller = new Poller()
   session.addPoller(newPoller)
 

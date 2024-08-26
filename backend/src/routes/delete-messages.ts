@@ -13,6 +13,7 @@ export async function deleteMessages(message: unknown): Promise<MessageResponse>
       timestamp: z.number()
     }))
   }).parse(message)
+  console.log('conversation', conversation, 'messages', messages)
 
   if (session === null) {
     return { ok: false, error: 'Backend instance not authorized' }

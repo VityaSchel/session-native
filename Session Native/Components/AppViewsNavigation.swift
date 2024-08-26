@@ -25,7 +25,7 @@ struct AppViewsNavigation: View {
                   })
                 ).forEach({ conversation in
                   conversation.unreadMessages = 0
-                  conversation.messages.forEach({ message in
+                  conversation.messages!.forEach({ message in
                     message.read = true
                   })
                 })

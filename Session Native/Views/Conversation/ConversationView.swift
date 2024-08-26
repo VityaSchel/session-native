@@ -20,7 +20,7 @@ struct ConversationView: View {
         ).first {
           conversationModel = conversation
           conversationModel?.unreadMessages = 0
-          let unreadMessages = conversation.messages.filter({ msg in
+          let unreadMessages = conversation.messages!.filter({ msg in
             msg.from != nil && msg.read == false && msg.timestamp != nil
           })
           .map({ msg in

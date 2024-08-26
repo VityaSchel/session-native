@@ -21,8 +21,6 @@ export async function sendMessage(message: unknown): Promise<MessageResponse> {
     return { ok: false, error: 'Backend instance not authorized' }
   }
 
-  console.log('sending message to', body, recipient)
-
   const response = await session.sendMessage({
     to: recipient,
     text: body,

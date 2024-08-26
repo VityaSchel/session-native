@@ -27,6 +27,9 @@ struct SignupView: View {
         TextField("Profile name (optional)", text: $displayName)
           .textFieldStyle(.plain)
           .onReceive(Just(displayName)) { _ in limitText(64) }
+          .onSubmit {
+            signup()
+          }
       }
       .padding(.top, 24)
       .frame(maxWidth: 385)

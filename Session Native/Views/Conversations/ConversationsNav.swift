@@ -47,17 +47,21 @@ struct ConversationsNav: View {
               Image(systemName: "arrow.left")
                 .padding(.leading, 6)
             } else {
-              Spacer()
+              Rectangle()
+                .opacity(0)
+                .frame(width: 15)
+                .padding(.leading, 6)
             }
-            Spacer()
             Spacer()
             Image(systemName: "archivebox.fill")
             Text("Archive")
               .fontWeight(.medium)
             Spacer()
-            Spacer()
             if archive {
-              Spacer()
+              Rectangle()
+                .opacity(0)
+                .frame(width: 15)
+                .padding(.trailing, 6)
             } else {
               Image(systemName: "arrow.right")
                 .padding(.trailing, 6)
@@ -66,7 +70,6 @@ struct ConversationsNav: View {
           .animation(.none)
           .foregroundStyle(Color.gray)
           .padding(.vertical, 6)
-          .frame(width: .infinity)
           .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -98,20 +101,19 @@ struct ConversationsNav: View {
             return false
           }
           return lhs.pinned && !rhs.pinned
-        },
-        id: \.id
+        }
       ) { conversation in
-          ConversationPreviewItem(
-            conversation: conversation,
-            onClear: {
-              clearConversationAlertVisible = true
-              clearConversationAlert = conversation
-            },
-            onDelete: {
-              deleteAlertVisible = true
-              deleteAlertConversation = conversation
-            }
-          )
+        ConversationPreviewItem(
+          conversation: conversation,
+          onClear: {
+            clearConversationAlertVisible = true
+            clearConversationAlert = conversation
+          },
+          onDelete: {
+            deleteAlertVisible = true
+            deleteAlertConversation = conversation
+          }
+        )
       }
 //      .onDeleteCommand(perform: {
 //        // TODO: find conversation by selection and delete it on esc press
@@ -140,7 +142,7 @@ struct ConversationsNav: View {
     .alert("Clear this conversation?", isPresented: $clearConversationAlertVisible) {
       Button("Clear everywhere", role: .destructive) {
         if let conversation = clearConversationAlert {
-          let messages = conversation.messages.map({ message in
+          let messages = conversation.messages!.map({ message in
             MessagePackValue.map([
               "timestamp": MessagePackValue.int(message.timestamp!),
               "hash": MessagePackValue.string(message.messageHash!)
@@ -156,27 +158,15 @@ struct ConversationsNav: View {
               DispatchQueue.main.async {
                 deleteAlertVisible = false
                 deleteAlertConversation = nil
+                deleteMessagesFromDb(conversation)
               }
             }
           })
-          conversation.messages.forEach({ msg in
-            modelContext.delete(msg)
-          })
-          try! modelContext.save()
-          DispatchQueue.main.async {
-            viewManager.setActiveNavigationSelection(nil)
-          }
         }
       }
       Button("Clear locally", role: .destructive) {
-        if let conversation = deleteAlertConversation {
-          conversation.messages.forEach({ msg in
-            modelContext.delete(msg)
-          })
-          try! modelContext.save()
-          DispatchQueue.main.async {
-            viewManager.setActiveNavigationSelection(nil)
-          }
+        if let conversation = clearConversationAlert {
+          deleteMessagesFromDb(conversation)
         }
       }
       Button("Cancel", role: .cancel) {
@@ -186,7 +176,7 @@ struct ConversationsNav: View {
     .alert("Delete this conversation?", isPresented: $deleteAlertVisible) {
       Button("Delete everywhere", role: .destructive) {
         if let conversation = deleteAlertConversation {
-          let messages = conversation.messages.map({ message in
+          let messages = conversation.messages!.map({ message in
             MessagePackValue.map([
               "timestamp": MessagePackValue.int(message.timestamp!),
               "hash": MessagePackValue.string(message.messageHash!)
@@ -202,60 +192,67 @@ struct ConversationsNav: View {
               DispatchQueue.main.async {
                 deleteAlertVisible = false
                 deleteAlertConversation = nil
+                
+                if(viewManager.navigationSelection == conversation.id.uuidString) {
+                  viewManager.setActiveNavigationSelection(nil)
+                }
+                deleteMessagesFromDb(conversation)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                  deleteConversationFromDb(conversation)
+                }
               }
             }
           })
-          do {
-            modelContext.delete(conversation)
-            try modelContext.save()
-            DispatchQueue.main.async {
-              viewManager.setActiveNavigationSelection(nil)
-            }
-          } catch {
-            print("Failed to delete conversation: \(error.localizedDescription)")
-          }
         }
       }
       Button("Delete locally", role: .destructive) {
         if let conversation = deleteAlertConversation {
-
           DispatchQueue.main.async {
-            viewManager.setActiveNavigationSelection(nil)
-            
-            let conversationId = conversation.persistentModelID
-            do {
-              try modelContext.delete(model: Message.self, where: #Predicate { message in
-                message.conversation.persistentModelID == conversationId
-              })
-              try modelContext.save()
-              
-              DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                do {
-                  modelContext.delete(conversation)
-                  try modelContext.save()
-                  
-//                  DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-//                    viewManager.setActiveView(.settings)
-//                  }
-                } catch {
-                  print("Failed to delete conversation: \(error.localizedDescription)")
-                }
-              }
-            } catch {
-              print("Failed to delete messages: \(error.localizedDescription)")
+            if(viewManager.navigationSelection == conversation.id.uuidString) {
+              viewManager.setActiveNavigationSelection(nil)
+            }
+            deleteMessagesFromDb(conversation)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+              deleteConversationFromDb(conversation)
             }
           }
         }
-        
-//          dispatchGroup.notify(queue: .main) {
-//            DispatchQueue.global(qos: .background).async {
-//              modelContext.delete(conversation)
-//            }
-//          }
       }
       Button("Cancel", role: .cancel) {
         deleteAlertVisible = false
       }
+    }
+  }
+  
+  private func deleteMessagesFromDb(_ conversation: Conversation) {
+    let conversationId = conversation.persistentModelID
+    do {
+      let messages = try modelContext.fetch(FetchDescriptor<Message>(predicate: #Predicate { message in
+        if let conversation = message.conversation {
+          return conversation.persistentModelID == conversationId
+        } else {
+          return false
+        }
+      }))
+      messages.forEach({ msg in
+        modelContext.delete(msg)
+      })
+      try modelContext.save()
+      MessageDeletionNotifier.shared.messageDeleted.send(conversation)
+    } catch {
+      print("Failed to delete messages: \(error.localizedDescription)")
+    }
+  }
+  
+  private func deleteConversationFromDb(_ conversation: Conversation) {
+    do {	
+      if let contact = conversation.contact {
+        contact.conversation = nil
+      }
+      modelContext.delete(conversation)
+      try modelContext.save()
+    } catch {
+      print("Failed to delete conversation: \(error.localizedDescription)")
     }
   }
 }
@@ -395,7 +392,7 @@ struct ConversationPreviewItem: View {
       }
       .swipeActions(edge: .leading) {
         Button {
-          conversation.messages.forEach({ message in
+          conversation.messages!.forEach({ message in
             message.read = true
           })
         } label: {
@@ -452,7 +449,7 @@ struct ConversationPreviewItem: View {
         }
         Button("􀌤 Mark as read") {
           conversation.unreadMessages = 0
-          let unreadMessages = conversation.messages.filter({ msg in
+          let unreadMessages = conversation.messages!.filter({ msg in
             msg.from != nil && msg.read == false && msg.timestamp != nil
           })
           request([

@@ -10,7 +10,7 @@ enum MessageStatus: Codable, Equatable {
 @Model
 final class Message {
   var id: UUID
-  var conversation: Conversation
+  var conversation: Conversation?
   var messageHash: String?
   var createdAt: Date
   var timestamp: Int64?
@@ -22,12 +22,12 @@ final class Message {
   var replyTo: Message?
   var deletedByUser: Bool
   
-  init(id: UUID, conversation: Conversation, messageHash: String? = nil, createdAt: Date, from: Recipient? = nil, body: String?, attachments: [Data]? = nil, replyTo: Message? = nil, read: Bool = false, status: MessageStatus = MessageStatus.sent) {
+  init(id: UUID, conversation: Conversation, messageHash: String? = nil, createdAt: Date, from: Recipient? = nil, body: String?, attachments: [Data]? = nil, replyTo: Message? = nil, timestamp: Int64? = nil, read: Bool = false, status: MessageStatus = MessageStatus.sent) {
     self.id = id
     self.conversation = conversation
     self.messageHash = messageHash
     self.createdAt = createdAt
-    self.timestamp = nil
+    self.timestamp = timestamp
     self.from = from
     self.body = body
     self.attachments = attachments

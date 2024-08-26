@@ -11,10 +11,10 @@ final class Conversation {
   var typingIndicator: Bool
   var notifications: Notification
   @Relationship(
-    deleteRule: .cascade,
+    deleteRule: .nullify,
     inverse: \Message.conversation
   )
-  var messages: [Message] = []
+  var messages: [Message]? = []
   var pinned: Bool = false
   var user: User
   var blocked: Bool = false

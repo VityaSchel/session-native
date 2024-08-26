@@ -9,6 +9,15 @@ const onMessage = (message: Message) => {
     message: {
       id: message.id,
       from: message.from,
+      author: {
+        displayName: message.author.displayName,
+        ...(message.author.avatar && {
+          avatar: {
+            url: message.author.avatar.url,
+            key: Buffer.from(message.author.avatar.key).toString('hex')
+          }
+        })
+      },
       text: message.text,
       attachments: message.attachments,
       replyToMessage: message.replyToMessage,
