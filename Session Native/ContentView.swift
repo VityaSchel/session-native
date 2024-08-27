@@ -123,6 +123,7 @@ struct ContentView: View {
           }
         }
       })
+      requestNotificationAuthorization()
     }
     .preferredColorScheme(
       theme == "dark"
@@ -134,7 +135,8 @@ struct ContentView: View {
     .onAppear {
       self.eventHandler = EventHandler(
         modelContext: modelContext,
-        userManager: userManager
+        userManager: userManager,
+        viewManager: appViewManager
       )
       self.eventHandler?.subscribeToEvents()
     }

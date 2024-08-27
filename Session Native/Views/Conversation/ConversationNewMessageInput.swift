@@ -76,11 +76,16 @@ struct NewMessageInput: View {
               handleSubmit()
             }
             .onChange(of: messageText, {
-              request([
-                "type": "set_typing_indicator",
-                "recipient": .string(conversation.recipient.sessionId),
-                "show": .bool(messageText.isEmpty == false)
-              ])
+              let privacySettings_sendTypingIndicator = UserDefaults.standard.optionalBool(forKey: "showTypingIndicators_" + conversation.id.uuidString)
+                ?? UserDefaults.standard.optionalBool(forKey: "showTypingIndicatorsByDefault")
+                ?? true
+              if(privacySettings_sendTypingIndicator) {
+                request([
+                  "type": "set_typing_indicator",
+                  "recipient": .string(conversation.recipient.sessionId),
+                  "show": .bool(messageText.isEmpty == false)
+                ])
+              }
             })
           Button(
             action: {
@@ -128,7 +133,7 @@ struct NewMessageInput: View {
       print("Failed to save message: \(error)")
     }
     
-    messageModel.items.append(message)
+    messageModel.addNewMessage(message)
     
     var messageRequest: [MessagePackValue: MessagePackValue] = [
       "type": "send_message",

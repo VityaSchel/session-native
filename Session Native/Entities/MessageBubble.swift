@@ -4,15 +4,17 @@ import SwiftUI
 struct MessageBubble<Content>: View where Content: View {
   @EnvironmentObject var userManager: UserManager
   var message: Message
+  var scrollProxy: ScrollViewProxy
   let content: () -> Content
   var direction: ChatBubbleShapeDirection {
     message.from == nil ? .right : .left
   }
   @State var width: CGFloat = 100
   
-  init(message: Message, @ViewBuilder content: @escaping () -> Content) {
+  init(message: Message, scrollProxy: ScrollViewProxy, @ViewBuilder content: @escaping () -> Content) {
     self.message = message
     self.content = content
+    self.scrollProxy = scrollProxy
   }
   
   var body: some View {
@@ -22,7 +24,13 @@ struct MessageBubble<Content>: View where Content: View {
       }
       VStack(alignment: .leading) {
           if let reply = message.replyTo {
-            Group {
+            Button {
+              if let replyReferenceHash = reply.messageHash {
+                withAnimation {
+                  scrollProxy.scrollTo(replyReferenceHash)
+                }
+              }
+            } label: {
               HStack(spacing: 0) {
                 Rectangle()
                   .background(Color.white)
@@ -49,7 +57,9 @@ struct MessageBubble<Content>: View where Content: View {
               .background(message.from == nil ? Color.black.opacity(0.1) : Color.white.opacity(0.1))
               .foregroundStyle(message.from == nil ? Color.black : Color.messageBubbleText)
               .cornerRadius(3.0)
+              .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
           }
           content()
             .overlay(

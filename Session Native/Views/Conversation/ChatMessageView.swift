@@ -4,17 +4,20 @@ import SwiftUI
 struct ChatMessage: View {
   var message: Message
   var viewModel: MessageViewModel
+  var scrollProxy: ScrollViewProxy
   let messageStatusBarSuffix: String
   
-  init(_ message: Message, viewModel: MessageViewModel) {
+  init(_ message: Message, scrollProxy: ScrollViewProxy, viewModel: MessageViewModel) {
     self.message = message
+    self.scrollProxy = scrollProxy
     self.viewModel = viewModel
     self.messageStatusBarSuffix = String(repeating: "\u{2004}", count: message.from == nil ? 10 : 7) + "\u{2800}"
   }
   
   var body: some View {
     MessageBubble(
-      message: message
+      message: message,
+      scrollProxy: scrollProxy
     ) {
       if message.deletedByUser {
         Text("􀈑 This message was deleted" + self.messageStatusBarSuffix)
@@ -40,6 +43,7 @@ struct ChatMessage: View {
         }
       }
     }
+    .id(String(message.messageHash ?? ""))
   }
   
   struct MessageContextMenu: View {

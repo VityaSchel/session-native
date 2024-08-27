@@ -11,6 +11,7 @@ class MessageViewModel: ObservableObject {
   
   private var currentPage = 0
   private let pageSize = 20
+  private var offset = 0
   
   private var dbContext: ModelContext
   private var conversation: Conversation
@@ -22,12 +23,19 @@ class MessageViewModel: ObservableObject {
     self.conversation = conversation
     fetchItems()
     
-    MessageDeletionNotifier.shared.messageDeleted
+    MessageViewModelNotifier.shared.messageDeleted
       .sink { [weak self] deletedConversation in
         guard let self = self else { return }
         if deletedConversation.id == self.conversation.id {
           self.items.removeAll()
         }
+      }
+      .store(in: &cancellables)
+    
+    MessageViewModelNotifier.shared.newMessageReceived
+      .sink { [weak self] newMessage in
+        guard let self = self else { return }
+        self.addNewMessage(newMessage)
       }
       .store(in: &cancellables)
   }
@@ -53,13 +61,16 @@ class MessageViewModel: ObservableObject {
         }
       })
       fetchDescriptor.fetchLimit = pageSize
-      fetchDescriptor.fetchOffset = currentPage * pageSize
+      fetchDescriptor.fetchOffset = currentPage * pageSize + offset
       fetchDescriptor.sortBy = [SortDescriptor(\Message.createdAt, order: .reverse)]
       
       let fetchedItems = try dbContext.fetch(fetchDescriptor).reversed()
       
       DispatchQueue.main.async {
-        self.items.insert(contentsOf: fetchedItems, at: 0)
+        let newItems = fetchedItems.filter { newItem in
+          !self.items.contains(where: { $0.id == newItem.id })
+        }
+        self.items.insert(contentsOf: newItems, at: 0)
         self.isLoading = false
         self.currentPage += 1
       }
@@ -68,10 +79,16 @@ class MessageViewModel: ObservableObject {
       self.isLoading = false
     }
   }
+  
+  func addNewMessage(_ message: Message) {
+    items.append(message)
+    offset += 1
+  }
 }
 
-class MessageDeletionNotifier {
-  static let shared = MessageDeletionNotifier()
+class MessageViewModelNotifier {
+  static let shared = MessageViewModelNotifier()
   
   let messageDeleted = PassthroughSubject<Conversation, Never>()
+  let newMessageReceived = PassthroughSubject<Message, Never>()
 }

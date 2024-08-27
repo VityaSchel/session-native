@@ -6,6 +6,7 @@ import SwiftUI
 class EventHandler: ObservableObject {
   @Published var modelContext: ModelContext
   @Published var userManager: UserManager
+  @Published var appViewManager: ViewManager
   
   private var isSubscribed = false
   
@@ -16,9 +17,10 @@ class EventHandler: ObservableObject {
   
   private var typingIndicatorTimer: Timer?
   
-  init(modelContext: ModelContext, userManager: UserManager) {
+  init(modelContext: ModelContext, userManager: UserManager, viewManager: ViewManager) {
     self.modelContext = modelContext
     self.userManager = userManager
+    self.appViewManager = viewManager
   }
   
   func subscribeToEvents() {
@@ -131,7 +133,15 @@ class EventHandler: ObservableObject {
           self.modelContext.insert(message)
           conversation!.updatedAt = Date()
           conversation!.lastMessage = message
-          conversation!.unreadMessages += 1
+          
+          var conversationVisible = false
+          if let selectedConversationSessionId = self.appViewManager.navigationSelection {
+            conversationVisible = selectedConversationSessionId == conversation!.id.uuidString
+          }
+          
+          if(!conversationVisible) {
+            conversation!.unreadMessages += 1
+          }
           
           if let reply = newMessage["replyToMessage"],
              let replyReferenceTimestamp = reply["timestamp"]?.uintValue,
@@ -187,6 +197,16 @@ class EventHandler: ObservableObject {
           }
           
           try self.modelContext.save()
+          
+          if (conversationVisible) {
+            MessageViewModelNotifier.shared.newMessageReceived.send(message)
+          }
+          
+          pushNotification(
+            id: messageHash,
+            title: conversation?.recipient.displayName ?? getSessionIdPlaceholder(sessionId: sessionId),
+            body: message.body ?? "New message"
+          )
         } catch {
           print("Failed to save new message.")
         }
@@ -267,11 +287,13 @@ class EventHandler: ObservableObject {
     DispatchQueue.main.async {
       if let readMessage = message["message"]?.dictionaryValue,
          let sessionId = readMessage["conversation"]?.stringValue,
-         let timestamp = readMessage["timestamp"]?.int64Value {
+         let timestamp = readMessage["timestamp"]?.uintValue {
         do {
+          let timestampInt64 = Int64(timestamp)
           if let messageDb = try self.modelContext.fetch(FetchDescriptor<Message>(predicate: #Predicate { message in
-            if let msgTimestamp = message.timestamp {
-              return message.conversation!.recipient.sessionId == sessionId && msgTimestamp == timestamp
+            if let msgTimestamp = message.timestamp,
+               let conversation = message.conversation {
+              return conversation.recipient.sessionId == sessionId && msgTimestamp == timestampInt64
             } else {
               return false
             }

@@ -8,8 +8,8 @@ struct ProfileView: View {
   var conversation: Conversation
   @Binding var showProfilePopover: Bool
   @State var isContact: Bool = false
-  @State var showTypingIndicator = UserDefaults.standard.optionalBool(forKey: "showTypingIndicatorsByDefault") ?? true
-  @State var sendReadCheckmarks = UserDefaults.standard.optionalBool(forKey: "sendReadCheckmarksByDefault") ?? true
+  @State var showTypingIndicator = true
+  @State var sendReadCheckmarks = true
   @State var name: String = ""
   @State var editingContactName: Bool = false
   
@@ -176,6 +176,24 @@ struct ProfileView: View {
           name = conversation.recipient.displayName ?? ""
         }
       }
+    }
+    .onAppear {
+      if let sendTypingIndicatorForConvo = UserDefaults.standard.optionalBool(forKey: "showTypingIndicators_" + conversation.id.uuidString) {
+        showTypingIndicator = sendTypingIndicatorForConvo
+      } else {
+        showTypingIndicator = UserDefaults.standard.optionalBool(forKey: "showTypingIndicatorsByDefault") ?? true
+      }
+      if let showReadCheckmarksForConvo = UserDefaults.standard.optionalBool(forKey: "sendReadCheckmarks_" + conversation.id.uuidString) {
+        sendReadCheckmarks = showReadCheckmarksForConvo
+      } else {
+        sendReadCheckmarks = UserDefaults.standard.optionalBool(forKey: "sendReadCheckmarksByDefault") ?? true
+      }
+    }
+    .onChange(of: sendReadCheckmarks) {
+      UserDefaults.standard.set(sendReadCheckmarks, forKey: "sendReadCheckmarks_" + conversation.id.uuidString)
+    }
+    .onChange(of: showTypingIndicator) {
+      UserDefaults.standard.set(showTypingIndicator, forKey: "showTypingIndicators_" + conversation.id.uuidString)
     }
   }
 }

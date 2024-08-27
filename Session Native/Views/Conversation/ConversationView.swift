@@ -26,7 +26,11 @@ struct ConversationView: View {
           .map({ msg in
             MessagePackValue.int(msg.timestamp!)
           })
-          if !unreadMessages.isEmpty {
+          
+          let privacySettings_showReadCheckmarks = UserDefaults.standard.optionalBool(forKey: "sendReadCheckmarks_" + conversation.id.uuidString)
+            ?? UserDefaults.standard.optionalBool(forKey: "sendReadCheckmarksByDefault")
+            ?? true
+          if !unreadMessages.isEmpty && privacySettings_showReadCheckmarks {
             request([
               "type": "mark_as_read",
               "conversation": .string(conversation.recipient.sessionId),
@@ -113,7 +117,11 @@ struct Messages: View {
                 }
               }
             ForEach(viewModel.items) { message in
-              ChatMessage(message, viewModel: viewModel)
+              ChatMessage(
+                message,
+                scrollProxy: proxy,
+                viewModel: viewModel
+              )
             }
             if conversation.typingIndicator {
               HStack(alignment: .center) {

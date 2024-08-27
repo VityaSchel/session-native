@@ -76,6 +76,8 @@
 		A7E68C712C57D6F1005D8819 /* MessageBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E68C702C57D6F1005D8819 /* MessageBubble.swift */; };
 		A7E68C732C5903CD005D8819 /* Messages.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E68C722C5903CD005D8819 /* Messages.swift */; };
 		A7EB5E6E2C53B46800A887B3 /* ToolbarStyleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7EB5E6D2C53B46800A887B3 /* ToolbarStyleButton.swift */; };
+		A7FBEEDC2C7D4E410093468B /* ConversationPreviewItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7FBEEDB2C7D4E410093468B /* ConversationPreviewItem.swift */; };
+		A7FBEEDE2C7D500F0093468B /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7FBEEDD2C7D500F0093468B /* NotificationManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -149,6 +151,8 @@
 		A7E68C702C57D6F1005D8819 /* MessageBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageBubble.swift; sourceTree = "<group>"; };
 		A7E68C722C5903CD005D8819 /* Messages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Messages.swift; sourceTree = "<group>"; };
 		A7EB5E6D2C53B46800A887B3 /* ToolbarStyleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarStyleButton.swift; sourceTree = "<group>"; };
+		A7FBEEDB2C7D4E410093468B /* ConversationPreviewItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationPreviewItem.swift; sourceTree = "<group>"; };
+		A7FBEEDD2C7D500F0093468B /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -291,6 +295,7 @@
 				A76FE56A2C52B483009B1D19 /* UserManager.swift */,
 				A7037D102C55562C00B53FBD /* BackendManager.swift */,
 				A77C0B492C5E279000343A5D /* ContactsManager.swift */,
+				A7FBEEDD2C7D500F0093468B /* NotificationManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -339,6 +344,7 @@
 			isa = PBXGroup;
 			children = (
 				A7E68C6E2C56CB94005D8819 /* ConversationView.swift */,
+				A7FBEEDB2C7D4E410093468B /* ConversationPreviewItem.swift */,
 				A77C0B472C5E23F100343A5D /* ProfileView.swift */,
 				A77C0B452C5E23A600343A5D /* ChatMessageView.swift */,
 				A77C0B322C5E227C00343A5D /* ConversationNewMessageInput.swift */,
@@ -482,6 +488,7 @@
 				A76FE5502C51DA93009B1D19 /* AppViewsNavigation.swift in Sources */,
 				A77C0B312C5E225400343A5D /* ConversationViewModel.swift in Sources */,
 				A77C0B4A2C5E279000343A5D /* ContactsManager.swift in Sources */,
+				A7FBEEDC2C7D4E410093468B /* ConversationPreviewItem.swift in Sources */,
 				A7EB5E6E2C53B46800A887B3 /* ToolbarStyleButton.swift in Sources */,
 				A77C0B2E2C5E221500343A5D /* ConversationsToolbar.swift in Sources */,
 				A7E68C5A2C55B4B4005D8819 /* KeychainManager.swift in Sources */,
@@ -490,6 +497,7 @@
 				A77C0B382C5E22C500343A5D /* GeneralSettingsView.swift in Sources */,
 				A76FE5652C52A5D4009B1D19 /* SessionId.swift in Sources */,
 				A719F74B2C51C23100E9487A /* Session_NativeApp.swift in Sources */,
+				A7FBEEDE2C7D500F0093468B /* NotificationManager.swift in Sources */,
 				A7037D112C55562C00B53FBD /* BackendManager.swift in Sources */,
 				A76FE5762C52C698009B1D19 /* SecondaryButton.swift in Sources */,
 				A77C0B4C2C5E37C000343A5D /* Accordion.swift in Sources */,
