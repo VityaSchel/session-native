@@ -55,14 +55,14 @@ struct SettingsNav: View {
         }
         Section {
           NavigationLink(
-            value: "general"
+            value: "connection"
           ) {
-            Image(systemName: "gear")
+            Image(systemName: "cloud")
               .frame(width: 24, height: 24)
-              .background(Color.gray.gradient)
+              .background(Color.blue.gradient)
               .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
               .foregroundColor(.white)
-            Text("General")
+            Text("Connection")
           }
           NavigationLink(
             value: "notifications"
@@ -79,7 +79,7 @@ struct SettingsNav: View {
           ) {
             Image(systemName: "lock")
               .frame(width: 24, height: 24)
-              .background(Color.blue.gradient)
+              .background(Color.gray.gradient)
               .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
               .foregroundColor(.white)
             Text("Privacy")
@@ -133,7 +133,7 @@ struct SettingsNav: View {
     }
     .onChange(of: viewManager.navigationSelection) {
       switch(viewManager.navigationSelection) {
-      case "profile", "general", "notifications", "privacy", "appearance", "help", nil:
+      case "profile", "connection", "notifications", "privacy", "appearance", "help", nil:
         break
       case "add-session":
         viewManager.setActiveView(.auth)

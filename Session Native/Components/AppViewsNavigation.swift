@@ -38,7 +38,6 @@ struct AppViewsNavigation: View {
       NavButton(view: .settings, icon: "gear")
         .layoutPriority(1)
     }
-    .padding(.vertical, 12.5)
     .border(width: 1, edges: [.top], color: Color("Separator"))
     .background(.ultraThinMaterial)
   }
@@ -56,6 +55,7 @@ struct AppViewsNavigation: View {
           .resizable()
           .frame(width: buttonSize, height: buttonSize)
           .frame(maxWidth: .infinity)
+          .padding(.vertical, 12.5)
           .contentShape(Rectangle())
       }
       .foregroundColor(appViewManager.appView == view ? Color.accentColor : Color.gray)

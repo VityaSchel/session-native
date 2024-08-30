@@ -19,10 +19,17 @@ if (!existsSync(logDir)) {
   mkdirSync(logDir, { recursive: true })
 }
 
+type ProxyOptions = { hostname: string, port: number, username?: string, password?: string, protocol: 'https' | 'http' }
+
 export let unixSocket: Socket
 
 export let session: Session | null = null
 export let poller: Poller | null = null
+export let pollingIntervalId: Timer | null = null
+export let proxy: ProxyOptions | null = null
+export const setConnectionProxy = (newProxy: ProxyOptions | null) => {
+  proxy = newProxy
+}
 export const setSessionObject = (objects: {
   newSession: Session,
   newPoller: Poller
@@ -30,9 +37,33 @@ export const setSessionObject = (objects: {
   if (session) {
     removeEventsHandlers(session)
   }
+  if (pollingIntervalId !== null) {
+    clearInterval(pollingIntervalId)
+  }
 
   session = objects === null ? null : objects.newSession
   poller = objects === null ? null : objects.newPoller
+  pollingIntervalId = setInterval(async () => {
+    if (poller) {
+      await poller.poll()
+        .then(() => {
+          unixSocket.write(encode({
+            event: 'connection_report',
+            connected: true,
+          }))
+        })
+        .catch(e => {
+          console.error('Polling error:', e instanceof Error ? e.toString() : 'Unknown unhandled error')
+          unixSocket.write(encode({
+            event: 'connection_report',
+            connected: false,
+            connectionError: e instanceof Error ? e.toString() : 'Unknown unhandled error',
+          }))
+        })
+    } else {
+      clearInterval(pollingIntervalId!)
+    }
+  }, 2500)
 
   if (objects?.newSession) {
     addEventsHandlers(objects.newSession)

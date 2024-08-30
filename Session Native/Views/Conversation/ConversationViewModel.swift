@@ -2,10 +2,19 @@ import Foundation
 import SwiftData
 import Combine
 
+struct Attachment: Identifiable {
+  var id: UUID
+  var name: String
+  var size: Int
+  var mimeType: String
+  var data: Data
+}
+
 class MessageViewModel: ObservableObject {
   @Published var items: [Message] = []
   @Published var isLoading = false
   @Published var replyTo: Message?
+  @Published var attachments: [Attachment] = []
   @Published var deleteConfirmation: Bool = false
   @Published var deleteConfirmationMessage: Message?
   

@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 import MessagePack
+import UniformTypeIdentifiers
 
 struct NewMessageInput: View {
   @State private var messageText = ""
@@ -39,6 +40,21 @@ struct NewMessageInput: View {
       .border(width: 1, edges: [.top], color: Color.separator)
     } else {
       VStack(spacing: 0) {
+        ScrollView([.horizontal]) {
+          HStack {
+            ForEach(messageModel.attachments) { attachment in
+              AttachmentPreviewSend(
+                attachment: attachment,
+                onRemove: {
+                  withAnimation {
+                    messageModel.attachments.removeAll(where: { $0.id == attachment.id })
+                  }
+                }
+              )
+            }
+          }
+          .padding(.all, messageModel.attachments.count > 0 ? 8 : 0)
+        }
         if let replyTo = messageModel.replyTo {
           HStack {
             VStack(alignment: .leading) {
@@ -66,11 +82,21 @@ struct NewMessageInput: View {
           .padding(.top, 6)
         }
         HStack {
+          Button(
+            action: {
+              openFileSelector()
+            },
+            label: {
+              Image(systemName: "paperclip")
+                .foregroundColor(.accentColor)
+            }
+          )
+          .buttonStyle(.plain)
           TextField("Message...", text: $messageText, axis: .vertical)
             .textFieldStyle(.plain)
             .padding(.top, 17)
             .padding(.bottom, 16)
-            .padding(.leading, 16)
+            .padding(.leading, 8)
             .lineLimit(1...5)
             .onSubmit {
               handleSubmit()
@@ -99,9 +125,48 @@ struct NewMessageInput: View {
           .buttonStyle(.plain)
         }
         .padding(.trailing, 12)
+        .padding(.leading, 16)
       }
       .border(width: 1, edges: [.top], color: Color.separator)
       .background(.windowBackground)
+    }
+  }
+  
+  private func openFileSelector() {
+    let openPanel = NSOpenPanel()
+    openPanel.canChooseFiles = true
+    openPanel.canChooseDirectories = false
+    openPanel.allowsMultipleSelection = true
+    
+    if openPanel.runModal() == .OK {
+      openPanel.urls.forEach { url in
+        loadFileData(from: url)
+      }
+    }
+  }
+  
+  private func loadFileData(from url: URL) {
+    DispatchQueue.global(qos: .userInitiated).async {
+      do {
+        let data = try Data(contentsOf: url)
+        DispatchQueue.main.async {
+          let fileExtension = url.pathExtension
+          let type = UTType(filenameExtension: fileExtension)
+          withAnimation {
+            messageModel.attachments.append(
+              Attachment(
+                id: UUID(),
+                name: url.lastPathComponent,
+                size: Int(data.count),
+                mimeType: type?.preferredMIMEType ?? "text/plain",
+                data: data
+              )
+            )
+          }
+        }
+      } catch {
+        print("Error loading image data: \(error)")
+      }
     }
   }
   

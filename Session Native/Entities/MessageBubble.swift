@@ -23,54 +23,54 @@ struct MessageBubble<Content>: View where Content: View {
         Spacer()
       }
       VStack(alignment: .leading) {
-          if let reply = message.replyTo {
-            Button {
-              if let replyReferenceHash = reply.messageHash {
-                withAnimation {
-                  scrollProxy.scrollTo(replyReferenceHash)
-                }
+        if let reply = message.replyTo {
+          Button {
+            if let replyReferenceHash = reply.messageHash {
+              withAnimation {
+                scrollProxy.scrollTo(replyReferenceHash)
               }
-            } label: {
-              HStack(spacing: 0) {
-                Rectangle()
-                  .background(Color.white)
-                  .frame(width: 2)
-                VStack(alignment: .leading) {
-                  Text(
-                    reply.from != nil
-                    ? (
-                      reply.from!.displayName ??
-                      getSessionIdPlaceholder(sessionId: reply.from!.sessionId)
-                    ) : (
-                      userManager.activeUser?.displayName ?? getSessionIdPlaceholder(sessionId: userManager.activeUser!.sessionId)
-                    )
-                  )
-                  .fontWeight(.medium)
-                  Text(
-                    reply.body ?? ""
-                  )
-                }
-                .padding(.horizontal, 5)
-                .padding(.vertical, 2)
-              }
-              .frame(width: width, height: 40, alignment: .leading)
-              .background(message.from == nil ? Color.black.opacity(0.1) : Color.white.opacity(0.1))
-              .foregroundStyle(message.from == nil ? Color.black : Color.messageBubbleText)
-              .cornerRadius(3.0)
-              .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+          } label: {
+            HStack(spacing: 0) {
+              Rectangle()
+                .background(Color.white)
+                .frame(width: 2)
+              VStack(alignment: .leading) {
+                Text(
+                  reply.from != nil
+                  ? (
+                    reply.from!.displayName ??
+                    getSessionIdPlaceholder(sessionId: reply.from!.sessionId)
+                  ) : (
+                    userManager.activeUser?.displayName ?? getSessionIdPlaceholder(sessionId: userManager.activeUser!.sessionId)
+                  )
+                )
+                .fontWeight(.medium)
+                Text(
+                  reply.body ?? ""
+                )
+              }
+              .padding(.horizontal, 5)
+              .padding(.vertical, 2)
+            }
+            .frame(width: width, height: 40, alignment: .leading)
+            .background(message.from == nil ? Color.black.opacity(0.1) : Color.white.opacity(0.1))
+            .foregroundStyle(message.from == nil ? Color.black : Color.messageBubbleText)
+            .cornerRadius(3.0)
+            .contentShape(Rectangle())
           }
-          content()
-            .overlay(
-              GeometryReader { geometry in
-                MessageStatusBar(message: message)
-                  .onAppear {
-                    width = geometry.size.width
-                  }
-              },
-              alignment: .bottomTrailing
-            )
+          .buttonStyle(.plain)
+        }
+        content()
+          .overlay(
+            GeometryReader { geometry in
+              MessageStatusBar(message: message)
+                .onAppear {
+                  width = geometry.size.width
+                }
+            },
+            alignment: .bottomTrailing
+          )
       }
       .padding(.vertical, 6)
       .padding(direction == .left ? .leading : .trailing, 11)

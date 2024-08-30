@@ -16,6 +16,7 @@ struct Session_NativeApp: App {
   
   @StateObject private var userManager: UserManager
   @StateObject private var viewManager = ViewManager()
+  @StateObject private var connectionStatusManager = ConnectionStatusManager()
   
   init() {
     let userManager = UserManager(container: sharedModelContainer)
@@ -27,6 +28,7 @@ struct Session_NativeApp: App {
       ContentView()
         .environmentObject(userManager)
         .environmentObject(viewManager)
+        .environmentObject(connectionStatusManager)
     }
     .modelContainer(sharedModelContainer)
   }

@@ -139,6 +139,7 @@ struct SettingsSection<Content: View>: View {
 struct SettingToggle: View {
   let title: String
   @Binding var isOn: Bool
+  var padding: CGFloat = 10
   
   var body: some View {
     Button {
@@ -153,7 +154,7 @@ struct SettingToggle: View {
         }
       }
       .toggleStyle(.switch)
-      .padding(.all, 10)
+      .padding(.all, padding)
       .contentShape(Rectangle())
     }
     .buttonStyle(.plain)

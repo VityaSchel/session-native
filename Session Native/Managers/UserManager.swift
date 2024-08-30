@@ -27,16 +27,10 @@ class UserManager: ObservableObject {
         if let activeUserID = UserDefaults.standard.string(forKey: "activeUser") {
           if let user = self.users.first(where: { $0.id.uuidString == activeUserID }),
              let mnemonic = self.preview ? "" : readStringFromKeychain(account: user.sessionId, service: "mnemonic") {
-            var setSessionRequest: [MessagePackValue: MessagePackValue] = [
+            request([
               "type": "set_session",
-              "mnemonic": .string(mnemonic),
-              "displayName": .string(user.displayName ?? ""),
-              "avatar": user.avatar != nil ? .binary(user.avatar!) : .nil
-            ]
-            if let displayName = user.displayName {
-              setSessionRequest["displayName"] = .string(displayName)
-            }
-            request(.map(setSessionRequest)) { response in
+              "mnemonic": .string(mnemonic)
+            ]) { response in
               self.activeUser = user
             }
           }
@@ -45,9 +39,7 @@ class UserManager: ObservableObject {
           if let mnemonic = self.preview ? "" : readStringFromKeychain(account: user.sessionId, service: "mnemonic") {
             request([
               "type": "set_session",
-              "mnemonic": .string(mnemonic),
-              "displayName": .string(user.displayName ?? ""),
-              "avatar": user.avatar != nil ? .binary(user.avatar!) : .nil
+              "mnemonic": .string(mnemonic)
             ]) { response in
               self.activeUser = user
             }
@@ -74,10 +66,23 @@ class UserManager: ObservableObject {
     }
   }
   
-  func addUser(_ user: User) {
-    container.mainContext.insert(user)
-    saveUsers()
-    loadUsers()
+  func addUser(_ user: User, mnemonic: String) {
+    request([
+      "type": "set_session",
+      "mnemonic": .string(mnemonic),
+      "displayName": .string(user.displayName ?? ""),
+      "avatar": user.avatar != nil ? .binary(user.avatar!) : .nil
+    ]) { response in
+      self.container.mainContext.insert(user)
+      self.activeUser = user
+      self.saveUsers()
+      let fetchRequest = FetchDescriptor<User>()
+      do {
+        self.users = try self.container.mainContext.fetch(fetchRequest)
+      } catch {
+        print("Failed to fetch users: \(error.localizedDescription)")
+      }
+    }
   }
   
   func removeUser(_ user: User) {

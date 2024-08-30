@@ -13,7 +13,9 @@ import { markAsRead } from '@/routes/mark-as-read'
 import { deleteMessages } from '@/routes/delete-messages'
 import { downloadAvatar } from '@/routes/download-avatar'
 import { downloadFile } from '@/routes/download-file'
+import { setProxy } from '@/routes/set-proxy'
 import { poller } from '@/index'
+import { disableProxy } from '@/routes/disable-proxy'
 await ready
 
 enum MessageType {
@@ -33,6 +35,8 @@ enum MessageType {
   StopPolling = 'stop_polling',
   DownloadAvatar = 'download_avatar',
   DownloadFile = 'download_file',
+  SetProxy = 'set_proxy',
+  DisableProxy = 'disable_proxy',
 }
 
 export type MessageResponse = {
@@ -90,5 +94,9 @@ export async function processMessage(message: unknown): Promise<MessageResponse>
       return downloadAvatar(message)
     case MessageType.DownloadFile:
       return downloadFile(message)
+    case MessageType.SetProxy:
+      return setProxy(message)
+    case MessageType.DisableProxy:
+      return disableProxy()
   }
 }

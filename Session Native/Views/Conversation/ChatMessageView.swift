@@ -24,7 +24,7 @@ struct ChatMessage: View {
           .foregroundStyle(Color.text.opacity(0.5))
       } else if let text = message.body {
         (Text(text)
-         /*.textSelection(.enabled)*/ + Text("\u{2066}" + self.messageStatusBarSuffix))
+        + Text("\u{2066}" + self.messageStatusBarSuffix))
         .foregroundStyle(message.from == nil ? Color.black : Color.messageBubbleText)
         .fixedSize(horizontal: false, vertical: true)
       }
@@ -83,12 +83,14 @@ struct ChatMessage: View {
         Label("􀁢 Select", systemImage: "checkmark.circle")
       }
       .disabled(true)
-      Divider()
-      Button() {
-        viewModel.deleteConfirmation = true
-        viewModel.deleteConfirmationMessage = message
-      } label: {
-        Label("􀈑 Delete", systemImage: "trash")
+      if message.from == nil {
+        Divider()
+        Button() {
+          viewModel.deleteConfirmation = true
+          viewModel.deleteConfirmationMessage = message
+        } label: {
+          Label("􀈑 Delete", systemImage: "trash")
+        }
       }
     }
   }

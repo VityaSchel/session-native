@@ -7,6 +7,7 @@ class EventHandler: ObservableObject {
   @Published var modelContext: ModelContext
   @Published var userManager: UserManager
   @Published var appViewManager: ViewManager
+  @Published var connectionStatusManager: ConnectionStatusManager
   
   private var isSubscribed = false
   
@@ -14,13 +15,15 @@ class EventHandler: ObservableObject {
   private var messageDeletedHandler: (([MessagePackValue : MessagePackValue]) -> Void)?
   private var typingIndicatorHandler: (([MessagePackValue : MessagePackValue]) -> Void)?
   private var messageReadHandler: (([MessagePackValue : MessagePackValue]) -> Void)?
+  private var connectionReportHandler: (([MessagePackValue : MessagePackValue]) -> Void)?
   
   private var typingIndicatorTimer: Timer?
   
-  init(modelContext: ModelContext, userManager: UserManager, viewManager: ViewManager) {
+  init(modelContext: ModelContext, userManager: UserManager, viewManager: ViewManager, connectionStatusManager: ConnectionStatusManager) {
     self.modelContext = modelContext
     self.userManager = userManager
     self.appViewManager = viewManager
+    self.connectionStatusManager = connectionStatusManager
   }
   
   func subscribeToEvents() {
@@ -37,11 +40,15 @@ class EventHandler: ObservableObject {
       messageReadHandler = { [weak self] message in
         self?.handleMessageRead(message)
       }
+      connectionReportHandler = { [weak self] message in
+        self?.handleConnectionReport(message)
+      }
       
       backendApiClient.on(event: "new_message", handler: newMessageHandler!)
       backendApiClient.on(event: "message_deleted", handler: messageDeletedHandler!)
       backendApiClient.on(event: "typing_indicator", handler: typingIndicatorHandler!)
       backendApiClient.on(event: "message_read", handler: messageReadHandler!)
+      backendApiClient.on(event: "connection_report", handler: connectionReportHandler!)
       
       isSubscribed = true
     }
@@ -60,6 +67,9 @@ class EventHandler: ObservableObject {
       }
       if let messageReadHandler = messageReadHandler {
         backendApiClient.off(event: "message_read", handler: messageReadHandler)
+      }
+      if let connectionReportHandler = connectionReportHandler {
+        backendApiClient.off(event: "connection_report", handler: connectionReportHandler)
       }
       
       isSubscribed = false
@@ -200,13 +210,13 @@ class EventHandler: ObservableObject {
           
           if (conversationVisible) {
             MessageViewModelNotifier.shared.newMessageReceived.send(message)
+          } else {
+            pushNotification(
+              id: messageHash,
+              title: conversation?.recipient.displayName ?? getSessionIdPlaceholder(sessionId: sessionId),
+              body: message.body ?? "New message"
+            )
           }
-          
-          pushNotification(
-            id: messageHash,
-            title: conversation?.recipient.displayName ?? getSessionIdPlaceholder(sessionId: sessionId),
-            body: message.body ?? "New message"
-          )
         } catch {
           print("Failed to save new message.")
         }
@@ -304,6 +314,17 @@ class EventHandler: ObservableObject {
         } catch {
           print("Failed to update read state of message.")
         }
+      }
+    }
+  }
+  
+  private func handleConnectionReport(_ message: [MessagePackValue : MessagePackValue]) {
+    DispatchQueue.main.async {
+      if let connected = message["connected"]?.boolValue {
+        self.connectionStatusManager.setConnected(connected)
+      }
+      if let error = message["connectionError"]?.stringValue {
+        self.connectionStatusManager.setError(error)
       }
     }
   }

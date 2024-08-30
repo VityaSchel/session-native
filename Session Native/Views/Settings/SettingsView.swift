@@ -9,8 +9,8 @@ struct SettingsView: View {
       switch(viewManager.navigationSelection) {
       case "profile":
         ProfileSettingsView()
-      case "general":
-        GeneralSettingsView()
+      case "connection":
+        ConnectionSettingsView()
       case "notifications":
         NotificationsSettingsView()
       case "privacy":

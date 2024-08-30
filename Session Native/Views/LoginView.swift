@@ -94,9 +94,7 @@ struct LoginView: View {
     let result = saveToKeychain(account: derivedSessionId!, service: "mnemonic", data: mnemonic.data(using: .utf8)!)
     if(result == errSecSuccess) {
       let user = User(id: UUID(), sessionId: derivedSessionId!)
-      userManager.addUser(user)
-      userManager.setActiveUser(user)
-      userManager.saveUsers()
+      userManager.addUser(user, mnemonic: mnemonic)
       appViewManager.setActiveView(.conversations)
     }
   }

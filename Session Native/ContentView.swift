@@ -13,6 +13,7 @@ enum AppView {
 struct ContentView: View {
   @EnvironmentObject var appViewManager: ViewManager
   @EnvironmentObject var userManager: UserManager
+  @EnvironmentObject var connectionStatusManager: ConnectionStatusManager
   @Environment(\.modelContext) private var modelContext
   @State private var searchText = ""
   @State private var connected = false
@@ -36,6 +37,7 @@ struct ContentView: View {
               default:
                 EmptyView()
               }
+              ConnectionStatusView()
               AppViewsNavigation()
             }
             .toolbar {
@@ -136,7 +138,8 @@ struct ContentView: View {
       self.eventHandler = EventHandler(
         modelContext: modelContext,
         userManager: userManager,
-        viewManager: appViewManager
+        viewManager: appViewManager,
+        connectionStatusManager: connectionStatusManager
       )
       self.eventHandler?.subscribeToEvents()
     }
@@ -157,5 +160,6 @@ struct ContentView_Previews: PreviewProvider {
       .modelContainer(inMemoryModelContainer)
       .environmentObject(UserManager(container: inMemoryModelContainer, preview: true))
       .environmentObject(ViewManager())
+      .environmentObject(ConnectionStatusManager())
   }
 }
