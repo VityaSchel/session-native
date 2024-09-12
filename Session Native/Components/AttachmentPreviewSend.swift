@@ -6,7 +6,7 @@ struct AttachmentPreviewSend: View {
   var onRemove: () -> Void = {}
   
   var body: some View {
-    ZStack {
+    VStack {
       Group {
         if ["image/png", "image/jpeg", "image/gif", "image/tiff", "image/heic", "image/heif", "image/bmp", "image/x-icon"].contains(attachment.mimeType) {
           if let nsImage = NSImage(data: attachment.data) {
@@ -20,12 +20,15 @@ struct AttachmentPreviewSend: View {
               .multilineTextAlignment(.center)
             Text(getFilesizePlaceholder(filesize: attachment.size))
           }
+          .padding(20)
         }
       }
-      .padding(20)
       .frame(width: 200, height: 200)
       .background(Color.gray.secondary)
       .cornerRadius(6.0)
+    }
+    .frame(width: 200, height: 200)
+    .overlay(
       Button {
         onRemove()
       } label: {
@@ -34,13 +37,14 @@ struct AttachmentPreviewSend: View {
           .scaledToFit()
           .frame(width: 20, height: 20)
           .foregroundColor(.white)
+          .clipShape(Circle())
       }
-      .background(Color.gray)
-      .cornerRadius(999)
-      .buttonStyle(.plain)
-      .position(x: 195, y: 5)
-    }
-    .frame(width: 200, height: 200)
+        .background(Color.gray)
+        .cornerRadius(999)
+        .buttonStyle(.plain)
+        .position(x: 195, y: 5)
+        .zIndex(2)
+    )
   }
 }
 
@@ -57,13 +61,7 @@ struct AttachmentPreviewSend: View {
         )
       )
       AttachmentPreviewSend(
-        attachment: Attachment(
-          id: UUID(),
-          name: "nuclear_codes.txt",
-          size: 1024,
-          mimeType: "text/plain",
-          data: "".data(using: .utf8)!
-        )
+        attachment: fileAttachmentMock1
       )
       AttachmentPreviewSend(
         attachment: Attachment(

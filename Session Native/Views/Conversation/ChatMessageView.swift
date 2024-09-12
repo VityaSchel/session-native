@@ -6,6 +6,9 @@ struct ChatMessage: View {
   var viewModel: MessageViewModel
   var scrollProxy: ScrollViewProxy
   let messageStatusBarSuffix: String
+  var direction: ChatBubbleShapeDirection {
+    message.from == nil ? .right : .left
+  }
   
   init(_ message: Message, scrollProxy: ScrollViewProxy, viewModel: MessageViewModel) {
     self.message = message
@@ -22,9 +25,13 @@ struct ChatMessage: View {
       if message.deletedByUser {
         Text("􀈑 This message was deleted" + self.messageStatusBarSuffix)
           .foregroundStyle(Color.text.opacity(0.5))
+          .padding(direction == .left ? .leading : .trailing, 11)
+          .padding(direction == .left ? .trailing : .leading, 8)
       } else if let text = message.body {
         (Text(text)
         + Text("\u{2066}" + self.messageStatusBarSuffix))
+        .padding(direction == .left ? .leading : .trailing, 11)
+        .padding(direction == .left ? .trailing : .leading, 8)
         .foregroundStyle(message.from == nil ? Color.black : Color.messageBubbleText)
         .fixedSize(horizontal: false, vertical: true)
       }

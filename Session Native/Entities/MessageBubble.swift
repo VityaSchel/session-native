@@ -53,28 +53,49 @@ struct MessageBubble<Content>: View where Content: View {
               .padding(.horizontal, 5)
               .padding(.vertical, 2)
             }
-            .frame(width: width, height: 40, alignment: .leading)
+            .frame(width: width - 19, height: 40, alignment: .leading)
             .background(message.from == nil ? Color.black.opacity(0.1) : Color.white.opacity(0.1))
             .foregroundStyle(message.from == nil ? Color.black : Color.messageBubbleText)
-            .cornerRadius(3.0)
+            .clipShape(
+              .rect(
+                topLeadingRadius: 6,
+                bottomLeadingRadius: 3,
+                bottomTrailingRadius: 3,
+                topTrailingRadius: 6
+              )
+            )
+
+            .padding(.top, 2)
             .contentShape(Rectangle())
           }
           .buttonStyle(.plain)
+          .padding(direction == .left ? .leading : .trailing, 11)
+          .padding(direction == .left ? .trailing : .leading, 8)
         }
-        content()
-          .overlay(
-            GeometryReader { geometry in
-              MessageStatusBar(message: message)
-                .onAppear {
-                  width = geometry.size.width
-                }
-            },
-            alignment: .bottomTrailing
-          )
+        VStack(alignment: .leading) {
+          content()
+          if let attachments = message.attachments,
+             attachments.count > 0 {
+            AttachmentsPreview(
+              attachments: attachments,
+              style: direction == .right ? .dark : .light,
+              direction: direction
+            )
+          }
+        }
+        .overlay(
+          GeometryReader { geometry in
+            MessageStatusBar(message: message)
+              .onAppear {
+                width = geometry.size.width
+              }
+          },
+          alignment: .bottomTrailing
+        )
       }
       .padding(.vertical, 6)
-      .padding(direction == .left ? .leading : .trailing, 11)
-      .padding(direction == .left ? .trailing : .leading, 8)
+//      .padding(direction == .left ? .leading : .trailing, 11)
+//      .padding(direction == .left ? .trailing : .leading, 8)
       .background(direction == .left ? Color.messageBubble : Color.accentColorConstant)
       .clipShape(ChatBubbleShape(direction: direction))
       if direction == .left {
@@ -218,6 +239,8 @@ struct MessageStatusBar: View {
         .position(x: geometry.size.width - 6, y: geometry.size.height - 7)
       }
     }
+    .padding(direction == .left ? .leading : .trailing, 11)
+    .padding(direction == .left ? .trailing : .leading, 8)
   }
 }
 

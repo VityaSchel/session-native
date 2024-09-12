@@ -4,6 +4,7 @@ import MessagePack
 import UniformTypeIdentifiers
 
 struct NewMessageInput: View {
+  @EnvironmentObject var keyMonitor: GlobalKeyMonitor
   @State private var messageText = ""
   var conversation: Conversation
   @EnvironmentObject var userManager: UserManager
@@ -101,6 +102,11 @@ struct NewMessageInput: View {
             .onSubmit {
               handleSubmit()
             }
+            .onAppear {
+              keyMonitor.onFilePasted = { pastedData, pastedName, pastedMimeType in
+                self.handlePasteFile(pastedData, pastedName, pastedMimeType)
+              }
+            }
             .onChange(of: messageText, {
               let privacySettings_sendTypingIndicator = UserDefaults.standard.optionalBool(forKey: "showTypingIndicators_" + conversation.id.uuidString)
                 ?? UserDefaults.standard.optionalBool(forKey: "showTypingIndicatorsByDefault")
@@ -129,6 +135,20 @@ struct NewMessageInput: View {
       }
       .border(width: 1, edges: [.top], color: Color.separator)
       .background(.windowBackground)
+    }
+  }
+  
+  private func handlePasteFile(_ data: Data, _ name: String, _ type: String) {
+    withAnimation {
+      messageModel.attachments.append(
+        Attachment(
+          id: UUID(),
+          name: name,
+          size: Int(data.count),
+          mimeType: type,
+          data: data
+        )
+      )
     }
   }
   
@@ -176,12 +196,29 @@ struct NewMessageInput: View {
     }
     
     let body = messageText
+    let attachments = messageModel.attachments
     messageText = ""
+    messageModel.attachments = []
+    let attachmentsPreviews = attachments.map({ attachment in
+      let tempDirectory = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+      let attachmentName = UUID().uuidString
+      let attachmentTempFileURL = tempDirectory.appendingPathComponent(attachmentName)
+      try! attachment.data.write(to: attachmentTempFileURL)
+      
+      return AttachmentPreview(
+        id: UUID(),
+        name: attachment.name,
+        size: attachment.data.count,
+        mimeType: attachment.mimeType,
+        contentURL: attachmentTempFileURL
+      )
+    })
     let message = Message(
       id: UUID(),
       conversation: conversation,
       createdAt: Date(),
       body: body,
+      attachments: attachmentsPreviews,
       replyTo: messageModel.replyTo,
       read: false,
       status: .sending
@@ -203,6 +240,14 @@ struct NewMessageInput: View {
     var messageRequest: [MessagePackValue: MessagePackValue] = [
       "type": "send_message",
       "body": .string(body),
+      "attachments": .array(attachments.map { attachment in
+        .map([
+          "name": .string(attachment.name),
+          "type": .string(attachment.mimeType),
+          "size": .int(Int64(attachment.size)),
+          "data": .binary(attachment.data)
+        ])
+      }),
       "recipient": .string(conversation.recipient.sessionId),
     ]
     if let replyTo = message.replyTo {

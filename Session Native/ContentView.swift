@@ -11,6 +11,7 @@ enum AppView {
 }
 
 struct ContentView: View {
+  @StateObject private var keyMonitor = GlobalKeyMonitor()
   @EnvironmentObject var appViewManager: ViewManager
   @EnvironmentObject var userManager: UserManager
   @EnvironmentObject var connectionStatusManager: ConnectionStatusManager
@@ -143,6 +144,7 @@ struct ContentView: View {
       )
       self.eventHandler?.subscribeToEvents()
     }
+    .environmentObject(keyMonitor)
   }
 }
 

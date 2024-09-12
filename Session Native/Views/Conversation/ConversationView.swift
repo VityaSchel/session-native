@@ -2,6 +2,7 @@ import Foundation
 import SwiftUI
 import SwiftData
 import MessagePack
+import UniformTypeIdentifiers
 
 struct ConversationView: View {
   @Environment(\.modelContext) var modelContext
@@ -92,6 +93,7 @@ struct Messages: View {
   var userManager: UserManager
   var conversation: Conversation
   @StateObject private var viewModel: MessageViewModel
+  @State var dragndropVisible: Bool = false
   
   init(context: ModelContext, userManager: UserManager, conversation: Conversation) {
     self.userManager = userManager
@@ -160,6 +162,51 @@ struct Messages: View {
         conversation: conversation,
         messageModel: viewModel
       )
+    }
+    .overlay(
+      VStack {
+        Text("Drop your files here")
+          .font(.title)
+          .fontWeight(.semibold)
+        Text("to attach them to your message")
+          .font(.subheadline)
+          .padding(.top, 2)
+      }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .overlay(
+          RoundedRectangle(cornerRadius: 4)
+            .stroke(style: StrokeStyle(lineWidth: 2, dash: [2]))
+            .foregroundColor(Color.accentColor)
+        )
+        .padding(.all, 8)
+        .background(Color.black.opacity(0.75))
+        .opacity(dragndropVisible ? 1 : 0)
+    )
+    .onDrop(of: [.image, .fileURL], isTargeted: $dragndropVisible) { providers in
+      for provider in providers {
+        if provider.hasItemConformingToTypeIdentifier(UTType.data.identifier) {
+          provider.loadDataRepresentation(forTypeIdentifier: UTType.data.identifier, completionHandler: { item, error in
+            if let fileContent = item {
+              let filename = provider.suggestedName ?? "file"
+              let filesize = fileContent.count
+              let mimeType = provider.registeredTypeIdentifiers.first.flatMap { UTType($0)?.preferredMIMEType } ?? "application/octet-stream"
+  
+              DispatchQueue.main.async {
+                viewModel.attachments.append(
+                  Attachment(
+                    id: UUID(),
+                    name: filename,
+                    size: filesize,
+                    mimeType: mimeType,
+                    data: fileContent
+                  )
+                )
+              }
+            }
+          })
+        }
+      }
+      return true
     }
     .alert("Delete message?", isPresented: $viewModel.deleteConfirmation) {
       Button("Delete everywhere", role: .destructive) {
@@ -241,6 +288,7 @@ struct ConversationView_Preview: PreviewProvider {
       .modelContainer(inMemoryModelContainer)
       .environmentObject(ViewManager(.conversations, convo))
       .environmentObject(UserManager(container: inMemoryModelContainer, preview: true))
+      .environmentObject(GlobalKeyMonitor())
       .frame(width: 500, height: 300)
   }
 }

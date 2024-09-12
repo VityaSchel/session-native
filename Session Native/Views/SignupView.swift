@@ -67,8 +67,9 @@ struct SignupView: View {
     let result = saveToKeychain(account: sessionId, service: "mnemonic", data: mnemonic.data(using: .utf8)!)
     if(result == errSecSuccess) {
       let user = User(id: UUID(), sessionId: sessionId, displayName: displayName.count == 0 ? nil : displayName, avatar: avatar)
-      userManager.addUser(user, mnemonic: mnemonic)
-      appViewManager.setActiveView(.conversations)
+      userManager.addUser(user, mnemonic: mnemonic, onCompletion: {
+        appViewManager.setActiveView(.conversations)
+      })
     }
   }
 }

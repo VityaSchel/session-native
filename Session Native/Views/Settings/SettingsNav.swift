@@ -121,6 +121,19 @@ struct SettingsNav: View {
             Text("Report a bug")
           }
         }
+        if viewManager.navigationSelectionData?["option"] == "true" {
+          Section {
+            NavigationLink(
+              value: "debug"
+            ) {
+              Image(systemName: "wrench.and.screwdriver.fill")
+                .frame(width: 24, height: 24)
+                .background(Color.indigo.gradient.secondary)
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+              Text("Developer options")
+            }
+          }
+        }
         Section {
           VStack(alignment: .leading) {
             Text("Session Native by hloth.dev")
@@ -133,7 +146,7 @@ struct SettingsNav: View {
     }
     .onChange(of: viewManager.navigationSelection) {
       switch(viewManager.navigationSelection) {
-      case "profile", "connection", "notifications", "privacy", "appearance", "help", nil:
+      case "profile", "connection", "notifications", "privacy", "appearance", "help", "debug", nil:
         break
       case "add-session":
         viewManager.setActiveView(.auth)

@@ -50,6 +50,12 @@ struct AppViewsNavigation: View {
     var body: some View {
       Button(action: {
         appViewManager.setActiveView(view)
+        if view == .settings && NSEvent.modifierFlags.contains(.option) {
+          if appViewManager.navigationSelectionData == nil {
+            appViewManager.navigationSelectionData = [:]
+          }
+          appViewManager.navigationSelectionData!["option"] = "true"
+        }
       }) {
         Image(systemName: icon)
           .resizable()

@@ -24,7 +24,17 @@ class UserManager: ObservableObject {
       do {
         let fetchRequest = FetchDescriptor<User>()
         self.users = try self.container.mainContext.fetch(fetchRequest)
-        if let activeUserID = UserDefaults.standard.string(forKey: "activeUser") {
+        if self.preview {
+          let user = User(
+            id: UUID(),
+            sessionId: "test",
+            displayName: "Test User",
+            avatar: nil
+          )
+          self.container.mainContext.insert(user)
+          self.activeUser = user
+          self.users.append(user)
+        } else if let activeUserID = UserDefaults.standard.string(forKey: "activeUser") {
           if let user = self.users.first(where: { $0.id.uuidString == activeUserID }),
              let mnemonic = self.preview ? "" : readStringFromKeychain(account: user.sessionId, service: "mnemonic") {
             request([
@@ -66,7 +76,7 @@ class UserManager: ObservableObject {
     }
   }
   
-  func addUser(_ user: User, mnemonic: String) {
+  func addUser(_ user: User, mnemonic: String, onCompletion: @escaping () -> Void) {
     request([
       "type": "set_session",
       "mnemonic": .string(mnemonic),
@@ -79,6 +89,7 @@ class UserManager: ObservableObject {
       let fetchRequest = FetchDescriptor<User>()
       do {
         self.users = try self.container.mainContext.fetch(fetchRequest)
+        onCompletion()
       } catch {
         print("Failed to fetch users: \(error.localizedDescription)")
       }

@@ -19,6 +19,8 @@ struct SettingsView: View {
         AppearanceSettingsView()
       case "help":
         HelpView()
+      case "debug":
+        DeveloperSettingsView()
       default:
         EmptyView()
       }

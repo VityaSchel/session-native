@@ -10,6 +10,25 @@ struct Attachment: Identifiable {
   var data: Data
 }
 
+@Model
+final class AttachmentPreview: ObservableObject {
+  var id: UUID
+  var name: String
+  var size: Int
+  var mimeType: String
+  var contentURL: URL?
+  var downloading: Bool
+  
+  init(id: UUID, name: String, size: Int, mimeType: String, contentURL: URL? = nil, downloading: Bool = false) {
+    self.id = id
+    self.name = name
+    self.size = size
+    self.mimeType = mimeType
+    self.contentURL = contentURL
+    self.downloading = downloading
+  }
+}
+
 class MessageViewModel: ObservableObject {
   @Published var items: [Message] = []
   @Published var isLoading = false
