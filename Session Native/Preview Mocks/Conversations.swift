@@ -10,7 +10,7 @@ func getConversationsPreviewMocks(user: User) -> [Conversation] {
     archived: false,
     lastMessage: nil,
     typingIndicator: false,
-    notifications: Notification(enabled: false)
+    notifications: AppNotification(enabled: false)
   )
   convo1.lastMessage = Message(
     id: UUID(),

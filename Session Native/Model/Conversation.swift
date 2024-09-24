@@ -9,7 +9,7 @@ final class Conversation {
   var lastMessage: Message?
   var updatedAt: Date
   var typingIndicator: Bool
-  var notifications: Notification
+  var notifications: AppNotification
   @Relationship(
     deleteRule: .nullify,
     inverse: \Message.conversation
@@ -27,7 +27,7 @@ final class Conversation {
   var showTypingIndicator: Bool?
   var sendReadReceipts: Bool?
   
-  init(id: UUID, user: User, recipient: Recipient, archived: Bool, lastMessage: Message? = nil, typingIndicator: Bool, notifications: Notification = Notification(enabled: true), pinned: Bool = false, contact: Contact? = nil) {
+  init(id: UUID, user: User, recipient: Recipient, archived: Bool, lastMessage: Message? = nil, typingIndicator: Bool, notifications: AppNotification = AppNotification(enabled: true), pinned: Bool = false, contact: Contact? = nil) {
     self.id = id
     self.user = user
     self.recipient = recipient
@@ -47,7 +47,7 @@ final class Conversation {
   }
 }
 
-struct Notification: Codable {
+struct AppNotification: Codable {
   var enabled: Bool
   
   init(enabled: Bool) {

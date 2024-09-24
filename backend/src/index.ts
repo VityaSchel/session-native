@@ -7,6 +7,10 @@ import { processMessage } from './routes'
 import { z } from 'zod'
 import { addEventsHandlers, removeEventsHandlers } from '@/events'
 
+// @ts-expect-error Disable ssl check as all security is handled by Signal protocol
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0
+process.env['NODE_ENV'] = 'development'
+
 const homeDir = process.env.HOME
 if (!homeDir) {
   throw new Error('HOME environment variable not set')

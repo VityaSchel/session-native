@@ -3,6 +3,8 @@ import SwiftData
 
 @main
 struct Session_NativeApp: App {
+  @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
   var sharedModelContainer: ModelContainer = {
     let schema = Schema(storageSchema)
     let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
@@ -13,11 +15,13 @@ struct Session_NativeApp: App {
       fatalError("Could not create ModelContainer: \(error)")
     }
   }()
-  
+
   @StateObject private var userManager: UserManager
   @StateObject private var viewManager = ViewManager()
   @StateObject private var connectionStatusManager = ConnectionStatusManager()
-  
+  @State private var isSidecarRunning = false
+  @StateObject private var sidecarManager = SidecarManager.shared
+
   init() {
     let userManager = UserManager(container: sharedModelContainer)
     _userManager = StateObject(wrappedValue: userManager)
@@ -25,10 +29,19 @@ struct Session_NativeApp: App {
 
   var body: some Scene {
     WindowGroup {
-      ContentView()
-        .environmentObject(userManager)
-        .environmentObject(viewManager)
-        .environmentObject(connectionStatusManager)
+      if sidecarManager.isSidecarRunning {
+        ContentView()
+          .environmentObject(userManager)
+          .environmentObject(viewManager)
+          .environmentObject(connectionStatusManager)
+      } else {
+        if let appIcon = NSImage(named: NSImage.Name("AppIcon")) {
+          Image(nsImage: appIcon)
+            .resizable()
+            .scaledToFit()
+            .frame(width: 256, height: 256)
+        }
+      }
     }
     .modelContainer(sharedModelContainer)
   }

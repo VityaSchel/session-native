@@ -1,6 +1,14 @@
 import Foundation
 import MessagePack
 
+class SidecarManager: ObservableObject {
+  static let shared = SidecarManager()
+  
+  @Published var isSidecarRunning: Bool = false
+  
+  private init() {}
+}
+
 class UnixDomainSocketClient {
   private let socketPath: String
   private let dispatchQueue: DispatchQueue

@@ -1,8 +1,11 @@
 import Foundation
+import SwiftData
 import SwiftUI
 
 struct DeveloperSettingsView: View {
   @Environment (\.modelContext) var modelContext
+  @EnvironmentObject var userManager: UserManager
+  @EnvironmentObject var viewManager: ViewManager
   
   var body: some View {
     VStack(alignment: .leading) {
@@ -55,6 +58,35 @@ struct DeveloperSettingsView: View {
   
   private func clearAllLocalData() {
     print("Clearing all local data")
+    
+    request([
+      "type": "logout_session"
+    ])
+    
+    let userDefaults = UserDefaults.standard
+    let domain = Bundle.main.bundleIdentifier!
+    userDefaults.removePersistentDomain(forName: domain)
+    
+    do {
+      let users = try modelContext.fetch(FetchDescriptor<User>())
+      users.forEach({ user in
+        deleteFromKeychain(account: user.sessionId, service: "mnemonic")
+      })
+      try modelContext.delete(model: Message.self)
+//      try modelContext.delete(model: Contact.self)
+//      try modelContext.delete(model: Conversation.self)
+      try modelContext.delete(model: Recipient.self)
+      try modelContext.delete(model: User.self)
+      
+      try modelContext.save()
+      
+      userManager.activeUser = nil
+      userManager.loadUsers()
+      
+      viewManager.setActiveView(.auth)
+    } catch {
+      print("Failed to delete db: \(error.localizedDescription)")
+    }
   }
   
   private func addStresstestData() {

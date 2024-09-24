@@ -11,6 +11,7 @@
 		A70072652C5ACA9000C5370D /* ObjectNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = A70072642C5ACA9000C5370D /* ObjectNotification.swift */; };
 		A7037D112C55562C00B53FBD /* BackendManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7037D102C55562C00B53FBD /* BackendManager.swift */; };
 		A7037D142C5578C500B53FBD /* MessagePack in Frameworks */ = {isa = PBXBuildFile; productRef = A7037D132C5578C500B53FBD /* MessagePack */; };
+		A712210B2CA343C900019E9A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A712210A2CA343C900019E9A /* AppDelegate.swift */; };
 		A719F74B2C51C23100E9487A /* Session_NativeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A719F74A2C51C23100E9487A /* Session_NativeApp.swift */; };
 		A719F74D2C51C23100E9487A /* ConversationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A719F74C2C51C23100E9487A /* ConversationsView.swift */; };
 		A719F74F2C51C23100E9487A /* Conversation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A719F74E2C51C23100E9487A /* Conversation.swift */; };
@@ -96,6 +97,7 @@
 		A70072602C5A8C7B00C5370D /* AvatarSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarSelector.swift; sourceTree = "<group>"; };
 		A70072642C5ACA9000C5370D /* ObjectNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectNotification.swift; sourceTree = "<group>"; };
 		A7037D102C55562C00B53FBD /* BackendManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackendManager.swift; sourceTree = "<group>"; };
+		A712210A2CA343C900019E9A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A719F7472C51C23100E9487A /* Session Native.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Session Native.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A719F74A2C51C23100E9487A /* Session_NativeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session_NativeApp.swift; sourceTree = "<group>"; };
 		A719F74C2C51C23100E9487A /* ConversationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationsView.swift; sourceTree = "<group>"; };
@@ -155,6 +157,8 @@
 		A77C0B492C5E279000343A5D /* ContactsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsManager.swift; sourceTree = "<group>"; };
 		A77C0B4B2C5E37C000343A5D /* Accordion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Accordion.swift; sourceTree = "<group>"; };
 		A78C14FE2CA328C600419165 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		A78C15062CA33C3200419165 /* darwin_x64 */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = darwin_x64; path = backend/out/darwin_x64; sourceTree = "<group>"; };
+		A78C15072CA33C3200419165 /* darwin_arm */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = darwin_arm; path = backend/out/darwin_arm; sourceTree = "<group>"; };
 		A7C3C43F2C8655F000388526 /* DeveloperSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperSettingsView.swift; sourceTree = "<group>"; };
 		A7E68C592C55B4B4005D8819 /* KeychainManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainManager.swift; sourceTree = "<group>"; };
 		A7E68C5B2C566B08005D8819 /* Conversations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Conversations.swift; sourceTree = "<group>"; };
@@ -194,6 +198,8 @@
 		A719F73E2C51C23100E9487A = {
 			isa = PBXGroup;
 			children = (
+				A78C15072CA33C3200419165 /* darwin_arm */,
+				A78C15062CA33C3200419165 /* darwin_x64 */,
 				A719F7492C51C23100E9487A /* Session Native */,
 				A719F7482C51C23100E9487A /* Products */,
 			);
@@ -211,6 +217,7 @@
 			isa = PBXGroup;
 			children = (
 				A719F74A2C51C23100E9487A /* Session_NativeApp.swift */,
+				A712210A2CA343C900019E9A /* AppDelegate.swift */,
 				A76FE54C2C51D882009B1D19 /* ContentView.swift */,
 				A78C14FE2CA328C600419165 /* Constants.swift */,
 				A76FE54E2C51D886009B1D19 /* Views */,
@@ -427,6 +434,7 @@
 				A719F7432C51C23100E9487A /* Sources */,
 				A719F7442C51C23100E9487A /* Frameworks */,
 				A719F7452C51C23100E9487A /* Resources */,
+				A78C150E2CA33F7F00419165 /* Copy bun executable */,
 			);
 			buildRules = (
 			);
@@ -489,6 +497,28 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		A78C150E2CA33F7F00419165 /* Copy bun executable */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy bun executable";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "echo \"Current ARCHS: ${ARCHS}\"\n\nrm \"${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/Resources/backend\"\n\nif [ \"${ARCHS}\" == \"x86_64\" ]; then\n    cp \"${SRCROOT}/backend/out/darwin_x64\" \"${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/Resources/backend\"\nelif [ \"${ARCHS}\" == \"arm64\" ]; then\n    cp \"${SRCROOT}/backend/out/darwin_arm\" \"${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/Resources/backend\"\nelse\n    echo \"Unknown architecture: ${ARCHS}\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		A719F7432C51C23100E9487A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -502,6 +532,7 @@
 				A7626ECA2C60017900FDC80F /* UserDefaults.swift in Sources */,
 				A719F74D2C51C23100E9487A /* ConversationsView.swift in Sources */,
 				A719F74F2C51C23100E9487A /* Conversation.swift in Sources */,
+				A712210B2CA343C900019E9A /* AppDelegate.swift in Sources */,
 				A7626ECC2C6028C400FDC80F /* TypingIndicator.swift in Sources */,
 				A76FE5692C52B2B2009B1D19 /* User.swift in Sources */,
 				A7E68C732C5903CD005D8819 /* Messages.swift in Sources */,
@@ -579,10 +610,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		A719F7562C51C23200E9487A /* Debug */ = {
+		A719F7562C51C23200E9487A /* Debug-x64 */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = x86_64;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -640,12 +672,13 @@
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
-			name = Debug;
+			name = "Debug-x64";
 		};
-		A719F7572C51C23200E9487A /* Release */ = {
+		A719F7572C51C23200E9487A /* Release-x64 */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = x86_64;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -695,9 +728,9 @@
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
 			};
-			name = Release;
+			name = "Release-x64";
 		};
-		A719F7592C51C23200E9487A /* Debug */ = {
+		A719F7592C51C23200E9487A /* Debug-x64 */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -710,6 +743,7 @@
 				DEVELOPMENT_TEAM = 5QP6XSDPFK;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -724,9 +758,9 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
-			name = Debug;
+			name = "Debug-x64";
 		};
-		A719F75A2C51C23200E9487A /* Release */ = {
+		A719F75A2C51C23200E9487A /* Release-x64 */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -739,6 +773,7 @@
 				DEVELOPMENT_TEAM = 5QP6XSDPFK;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -753,7 +788,187 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
-			name = Release;
+			name = "Release-x64";
+		};
+		A78C150A2CA33CB400419165 /* Debug-arm */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.5;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = "Debug-arm";
+		};
+		A78C150B2CA33CB400419165 /* Debug-arm */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Session Native/Session_Native.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Session Native/Preview Content\"";
+				DEVELOPMENT_TEAM = 5QP6XSDPFK;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "dev.hloth.Session-Native";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = "Debug-arm";
+		};
+		A78C150C2CA33CBB00419165 /* Release-arm */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.5;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = "Release-arm";
+		};
+		A78C150D2CA33CBB00419165 /* Release-arm */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Session Native/Session_Native.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Session Native/Preview Content\"";
+				DEVELOPMENT_TEAM = 5QP6XSDPFK;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "dev.hloth.Session-Native";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = "Release-arm";
 		};
 /* End XCBuildConfiguration section */
 
@@ -761,20 +976,24 @@
 		A719F7422C51C23100E9487A /* Build configuration list for PBXProject "Session Native" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A719F7562C51C23200E9487A /* Debug */,
-				A719F7572C51C23200E9487A /* Release */,
+				A719F7562C51C23200E9487A /* Debug-x64 */,
+				A78C150A2CA33CB400419165 /* Debug-arm */,
+				A719F7572C51C23200E9487A /* Release-x64 */,
+				A78C150C2CA33CBB00419165 /* Release-arm */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = "Release-arm";
 		};
 		A719F7582C51C23200E9487A /* Build configuration list for PBXNativeTarget "Session Native" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A719F7592C51C23200E9487A /* Debug */,
-				A719F75A2C51C23200E9487A /* Release */,
+				A719F7592C51C23200E9487A /* Debug-x64 */,
+				A78C150B2CA33CB400419165 /* Debug-arm */,
+				A719F75A2C51C23200E9487A /* Release-x64 */,
+				A78C150D2CA33CBB00419165 /* Release-arm */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = "Release-arm";
 		};
 /* End XCConfigurationList section */
 

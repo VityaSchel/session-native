@@ -6,8 +6,8 @@
     "start": "bun --bun src/index.ts",
     "dev": "bun --watch --bun src/index.ts",
     "compile": "bun compile:darwin:arm && bun compile:darwin:x64",
-    "compile:darwin:arm": "bun build src/index.ts --compile --outfile=darwin_arm --target=bun-darwin-arm64 --minify",
-    "compile:darwin:x64": "bun build src/index.ts --compile --outfile=darwin_x64 --target=bun-darwin-x64 --minify"
+    "compile:darwin:arm": "bun build src/index.ts --compile --outfile=out/darwin_arm --target=bun-darwin-arm64 --minify",
+    "compile:darwin:x64": "bun build src/index.ts --compile --outfile=out/darwin_x64 --target=bun-darwin-x64 --minify"
   },
   "devDependencies": {
     "@types/bun": "latest",

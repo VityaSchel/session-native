@@ -117,6 +117,7 @@ struct ContentView: View {
       request([
         "type": "ping"
       ], { response in
+        NSLog("Ping received from sidecar" + (response["ok"]?.boolValue == true ? "true" : "false"))
         if(response["ok"]?.boolValue == true) {
           connected = true
           if userManager.activeUser != nil {

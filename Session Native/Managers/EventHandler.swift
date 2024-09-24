@@ -115,7 +115,7 @@ class EventHandler: ObservableObject {
               archived: autoarchiveNewChats,
               lastMessage: nil,
               typingIndicator: false,
-              notifications: Notification(enabled: autoarchiveNewChats ? false : true),
+              notifications: AppNotification(enabled: autoarchiveNewChats ? false : true),
               pinned: false,
               contact: contact
             )
