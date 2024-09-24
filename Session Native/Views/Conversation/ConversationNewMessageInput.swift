@@ -139,6 +139,10 @@ struct NewMessageInput: View {
   }
   
   private func handlePasteFile(_ data: Data, _ name: String, _ type: String) {
+    if(data.count > kMaxFileSize) {
+      messageModel.attachmentTooBigAlert = true
+      return
+    }
     withAnimation {
       messageModel.attachments.append(
         Attachment(
@@ -172,6 +176,10 @@ struct NewMessageInput: View {
         DispatchQueue.main.async {
           let fileExtension = url.pathExtension
           let type = UTType(filenameExtension: fileExtension)
+          if data.count > kMaxFileSize {
+            messageModel.attachmentTooBigAlert = true
+            return
+          }
           withAnimation {
             messageModel.attachments.append(
               Attachment(

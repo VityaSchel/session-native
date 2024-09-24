@@ -182,31 +182,50 @@ struct Messages: View {
         .background(Color.black.opacity(0.75))
         .opacity(dragndropVisible ? 1 : 0)
     )
-    .onDrop(of: [.image, .fileURL], isTargeted: $dragndropVisible) { providers in
-      for provider in providers {
-        if provider.hasItemConformingToTypeIdentifier(UTType.data.identifier) {
-          provider.loadDataRepresentation(forTypeIdentifier: UTType.data.identifier, completionHandler: { item, error in
-            if let fileContent = item {
-              let filename = provider.suggestedName ?? "file"
-              let filesize = fileContent.count
-              let mimeType = provider.registeredTypeIdentifiers.first.flatMap { UTType($0)?.preferredMIMEType } ?? "application/octet-stream"
-  
-              DispatchQueue.main.async {
-                viewModel.attachments.append(
-                  Attachment(
-                    id: UUID(),
-                    name: filename,
-                    size: filesize,
-                    mimeType: mimeType,
-                    data: fileContent
-                  )
-                )
-              }
+    .onDrop(of: [UTType.item], isTargeted: $dragndropVisible) {
+      providers, _ in
+      
+      providers.forEach { provider in
+        provider.loadFileRepresentation(forTypeIdentifier: UTType.item.identifier) { url, error in
+          guard let fileUrl = url else {
+            print("Failed to load file url: \(error)")
+            return
+          }
+          
+          do {
+            let fileData = try Data(contentsOf: fileUrl)
+            let filename = fileUrl.lastPathComponent
+            let filesize = fileData.count
+            if(filesize > kMaxFileSize) {
+              viewModel.attachmentTooBigAlert = true
+              return
             }
-          })
+            let mimeType = UTType(filenameExtension: fileUrl.pathExtension)
+            
+            DispatchQueue.main.async {
+              viewModel.attachments.append(
+                Attachment(
+                  id: UUID(),
+                  name: filename,
+                  size: filesize,
+                  mimeType: mimeType?.preferredMIMEType ?? "text/plain",
+                  data: fileData
+                )
+              )
+            }
+          } catch {
+            print("Error reading file data: \(error.localizedDescription)")
+          }
         }
       }
       return true
+    }
+    .alert(isPresented: $viewModel.attachmentTooBigAlert) {
+      Alert(
+        title: Text("Attachment is too big"),
+        message: Text("Session Network allows attachments up to " + getFilesizePlaceholder(filesize: kMaxFileSize)),
+        dismissButton: .cancel()
+      )
     }
     .alert("Delete message?", isPresented: $viewModel.deleteConfirmation) {
       Button("Delete everywhere", role: .destructive) {

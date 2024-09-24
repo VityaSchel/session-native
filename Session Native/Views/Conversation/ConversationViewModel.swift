@@ -16,14 +16,20 @@ final class AttachmentPreview: ObservableObject {
   var name: String
   var size: Int
   var mimeType: String
+  var digest: String?
+  var attachmentKey: String?
   var contentURL: URL?
+  var fileserverId: String?
   var downloading: Bool
   
-  init(id: UUID, name: String, size: Int, mimeType: String, contentURL: URL? = nil, downloading: Bool = false) {
+  init(id: UUID, name: String, size: Int, mimeType: String, digest: String? = nil, attachmentKey: String? = nil, fileserverId: String? = nil, contentURL: URL? = nil, downloading: Bool = false) {
     self.id = id
     self.name = name
     self.size = size
     self.mimeType = mimeType
+    self.digest = digest
+    self.attachmentKey = attachmentKey
+    self.fileserverId = fileserverId
     self.contentURL = contentURL
     self.downloading = downloading
   }
@@ -35,6 +41,7 @@ class MessageViewModel: ObservableObject {
   @Published var replyTo: Message?
   @Published var attachments: [Attachment] = []
   @Published var deleteConfirmation: Bool = false
+  @Published var attachmentTooBigAlert: Bool = false
   @Published var deleteConfirmationMessage: Message?
   
   private var currentPage = 0

@@ -127,6 +127,25 @@ class EventHandler: ObservableObject {
             recipient = conversation!.recipient
           }
           
+          var attachmentPreviews: [AttachmentPreview] = []
+          if let newMessageAttachments = newMessage["attachments"]?.arrayValue {
+            for attachment in newMessageAttachments {
+              if let fileserverId = attachment["id"]?.stringValue {
+                attachmentPreviews.append(
+                  AttachmentPreview(
+                    id: UUID(),
+                    name: attachment["name"]?.stringValue ?? "unnamed",
+                    size: attachment["size"]?.intValue ?? 0,
+                    mimeType: attachment["metadata"]?.dictionaryValue?["contentType"]?.stringValue ?? "application/octet-stream",
+                    digest: attachment["digest"]?.stringValue,
+                    attachmentKey: attachment["key"]?.stringValue,
+                    fileserverId: fileserverId
+                  )
+                )
+              }
+            }
+          }
+          
           let message = Message(
             id: UUID(),
             conversation: conversation!,
@@ -134,7 +153,7 @@ class EventHandler: ObservableObject {
             createdAt: Date(),
             from: conversation!.recipient,
             body: newMessage["text"]?.stringValue ?? "",
-            attachments: [],
+            attachments: attachmentPreviews,
             replyTo: nil,
             timestamp: Int64(timestamp),
             read: false,

@@ -21,17 +21,33 @@ export async function downloadFile(message: unknown): Promise<MessageResponse> {
     name: z.string()
   }).parse(message)
 
-  const file = await session?.getFile({
-    id,
-    metadata,
-    _digest: Buffer.from(digest, 'hex'),
-    _key: Buffer.from(key, 'hex'),
-    name
-  })
-  return {
-    ok: true,
-    content: await file?.arrayBuffer(),
-    name: file?.name,
-    contentType: file?.type
+  if (!session) {
+    return {
+      ok: false,
+      error: 'Backend instance not authorized'
+    }
+  }
+
+  try {
+    const file = await session.getFile({
+      id,
+      metadata,
+      _digest: Buffer.from(digest, 'hex'),
+      _key: Buffer.from(key, 'hex'),
+      name
+    })
+    const content = await file.arrayBuffer()
+    return {
+      ok: true,
+      content: new Uint8Array(content),
+      name: file.name,
+      contentType: file.type
+    }
+  } catch(e) {
+    console.error(e)
+    return {
+      ok: false,
+      error: e instanceof Error ? e.message : 'Unknown error'
+    }
   }
 }

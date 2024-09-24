@@ -18,25 +18,27 @@ class GlobalKeyMonitor: ObservableObject {
   private func handleKeyDown(event: NSEvent) {
     if event.modifierFlags.contains(.command) && event.charactersIgnoringModifiers == "v" {
       let pasteboard = NSPasteboard.general
-      if let pastedFileURLString = pasteboard.string(forType: .fileURL), let fileURL = URL(string: pastedFileURLString) {
-        DispatchQueue.main.async {
+      let pastedFileURLs = pasteboard.readObjects(forClasses: [NSURL.self], options: nil) as? [NSURL] ?? []
+      
+      DispatchQueue.main.async {
+        for fileURL in pastedFileURLs {
           do {
-            let data = try Data(contentsOf: fileURL)
-            let fileExtension = fileURL.pathExtension
-            let type = UTType(filenameExtension: fileExtension)
-            self.onFilePasted?(data, fileURL.lastPathComponent, type?.preferredMIMEType ?? "text/plain")
+            if(fileURL.hasDirectoryPath == false) {
+              let data = try Data(contentsOf: fileURL as URL)
+              if let fileExtension = fileURL.pathExtension {
+                let type = UTType(filenameExtension: fileExtension)
+                if let filename = fileURL.lastPathComponent {
+                  self.onFilePasted?(data, filename, type?.preferredMIMEType ?? "text/plain")
+                }
+              }
+            }
           } catch {
-            print("Error loading pasted image data: \(error)")
+            print("Error loading pasted data from \(fileURL): \(error)")
           }
         }
-      } else if let imageData = pasteboard.data(forType: .png) {
-        self.onFilePasted?(imageData, "image.png", "image/png")
-      } else if let imageData = pasteboard.data(forType: .tiff) {
-        self.onFilePasted?(imageData, "image.tiff", "image/tiff")
-      } else if let imageData = pasteboard.data(forType: .pdf) {
-        self.onFilePasted?(imageData, "document.pdf", "application/pdf")
       }
     }
+
   }
   
   deinit {

@@ -19,7 +19,13 @@ const onMessage = (message: Message) => {
         })
       },
       text: message.text,
-      attachments: message.attachments,
+      attachments: message.attachments
+        .filter(a => a._key !== undefined && a._digest !== undefined)
+        .map(a => ({
+          ...a,
+          key: Buffer.from(a._key!).toString('hex'),
+          digest: Buffer.from(a._digest!).toString('hex'),
+        })),
       replyToMessage: message.replyToMessage,
       timestamp: message.timestamp
     }

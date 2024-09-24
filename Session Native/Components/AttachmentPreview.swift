@@ -79,19 +79,26 @@ struct AttachmentPreviewView: View {
   
   var body: some View {
     if(imageAttachments.contains(attachment.mimeType)) {
-      if let url = attachment.contentURL {
-        if let nsImage = NSImage(contentsOf: url) {
-          Image(nsImage: nsImage)
-            .resizable()
-            .scaledToFill()
-            .frame(width: 200, height: 200)
-            .cornerRadius(6.0)
+      Button {
+        if let contentURL = attachment.contentURL {
+          NSWorkspace.shared.open(contentURL)
+        } else {
+          downloadAttachment(attachment)
         }
-      } else {
-        Button {
-          print(1)
-          attachment.downloading = !attachment.downloading
-        } label: {
+      } label: {
+        if let url = attachment.contentURL,
+          let nsImage = NSImage(contentsOf: url) {
+        Image(nsImage: nsImage)
+          .resizable()
+          .scaledToFill()
+          .frame(width: 200, height: 200)
+          .cornerRadius(6.0)
+          .onDrag {
+            let itemProvider = NSItemProvider(object: nsImage)
+            itemProvider.suggestedName = attachment.name
+            return itemProvider
+          }
+        } else {
           VStack {
             Spacer()
             HStack(alignment: .center, spacing: 6) {
@@ -116,12 +123,15 @@ struct AttachmentPreviewView: View {
               .padding(.bottom, 16)
           }
         }
-        .buttonStyle(.plain)
       }
+      .buttonStyle(.plain)
     } else if(videoAttachment.contains(attachment.mimeType)) {
       Button {
-        print(1)
-        attachment.downloading = !attachment.downloading
+        if let contentURL = attachment.contentURL {
+          NSWorkspace.shared.open(contentURL)
+        } else {
+          downloadAttachment(attachment)
+        }
       } label: {
         VStack {
           Spacer()
@@ -140,7 +150,7 @@ struct AttachmentPreviewView: View {
         .background(Color.black.gradient)
         .cornerRadius(6.0)
         .overlay {
-          Image(systemName: attachment.downloading ? "xmark.circle" : "arrow.down.circle")
+          Image(systemName: attachment.contentURL != nil ? "play.circle" : attachment.downloading ? "xmark.circle" : "arrow.down.circle")
             .resizable()
             .scaledToFit()
             .frame(width: 40, height: 40)
@@ -150,11 +160,14 @@ struct AttachmentPreviewView: View {
       .buttonStyle(.plain)
     } else {
       Button {
-        print(1)
-        attachment.downloading = !attachment.downloading
+        if let contentURL = attachment.contentURL {
+          NSWorkspace.shared.open(contentURL)
+        } else {
+          downloadAttachment(attachment)
+        }
       } label: {
         HStack(alignment: .center, spacing: 14) {
-          Image(systemName: attachment.downloading ? "xmark.circle" : "arrow.down.circle")
+          Image(systemName: attachment.contentURL != nil ? "doc" : attachment.downloading ? "xmark.circle" : "arrow.down.circle")
             .resizable()
             .scaledToFit()
             .frame(width: 30, height: 30)
@@ -177,6 +190,47 @@ struct AttachmentPreviewView: View {
       }
       .buttonStyle(.plain)
       .fixedSize(horizontal: false, vertical: true)
+    }
+  }
+  
+  private func downloadAttachment(_ attachment: AttachmentPreview) {
+    if let fileserverId = attachment.fileserverId,
+       let digest = attachment.digest,
+       let attachmentKey = attachment.attachmentKey {
+      if(!attachment.downloading) {
+        request([
+          "type": "download_file",
+          "id": .string(fileserverId),
+          "metadata": .map([
+            "contentType": .string(attachment.mimeType),
+          ]),
+          "digest": .string(digest),
+          "key": .string(attachmentKey),
+          "name": .string(attachment.name)
+        ], { response in
+          if(response["ok"]?.boolValue == true) {
+            if let content = response["content"]?.dataValue {
+              let contentURL = URL(fileURLWithPath: NSTemporaryDirectory() + attachment.name)
+              do {
+                try content.write(to: contentURL)
+                DispatchQueue.main.async {
+                  attachment.contentURL = contentURL
+                }
+              } catch {
+                print("Failed to write to file: \(error)")
+              }
+            }
+          } else {
+            DispatchQueue.main.async {
+              attachment.downloading = false
+              if let error = response["error"]?.stringValue {
+                print("Failed to download attachment: \(error)")
+              }
+            }
+          }
+        })
+      }
+      attachment.downloading = !attachment.downloading
     }
   }
 }
