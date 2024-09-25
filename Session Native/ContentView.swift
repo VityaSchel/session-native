@@ -114,19 +114,33 @@ struct ContentView: View {
       }
     }
     .onAppear() {
-      request([
-        "type": "ping"
-      ], { response in
-        NSLog("Ping received from sidecar" + (response["ok"]?.boolValue == true ? "true" : "false"))
-        if(response["ok"]?.boolValue == true) {
-          connected = true
-          if userManager.activeUser != nil {
-            DispatchQueue.main.async {
-              appViewManager.setActiveView(.conversations)
+      backendApiClient.startListening(callback: {
+        var timer: Timer?
+        
+        func pingBackend() {
+          NSLog("Pinging backend... " + backendSocketPath + " " + String(backendSocketPath.count))
+          request([
+            "type": "ping"
+          ], { response in
+            NSLog("Ping received from sidecar " + (response["ok"]?.boolValue == true ? "true" : "false"))
+            timer?.invalidate()
+            if(response["ok"]?.boolValue == true) {
+              DispatchQueue.main.async {
+                connected = true
+                if userManager.activeUser != nil {
+                  appViewManager.setActiveView(.conversations)
+                }
+              }
             }
-          }
+          })
+        }
+        
+        pingBackend()
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+          pingBackend()
         }
       })
+      
       requestNotificationAuthorization()
     }
     .preferredColorScheme(

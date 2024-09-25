@@ -70,5 +70,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   func terminateSidecar() {
     process?.terminate()
     print("Sidecar binary terminated")
+    
+    let socketPath = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "dev.hloth.Session-Native")?.appendingPathComponent("tmp/bun_socket").path
+    try? FileManager.default.removeItem(atPath: socketPath!)
   }
 }

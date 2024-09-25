@@ -20,7 +20,6 @@ class UnixDomainSocketClient {
   init(socketPath: String) {
     self.socketPath = socketPath
     self.dispatchQueue = DispatchQueue(label: "UnixDomainSocketClientQueue", attributes: .concurrent)
-    startListening()
   }
   
   func sendMessage(_ message: MessagePackValue, completion: @escaping (MessagePackValue) -> Void) {
@@ -45,16 +44,26 @@ class UnixDomainSocketClient {
   }
   
   private func sendData(data: Data) {
+    if self.listeningSocket == -1 {
+      print("Error: Socket is not connected")
+      NSLog("Error: Socket is not connected")
+      return
+    }
+    
     let payload: Data = data + Data(Array(repeating: 0x03, count: 64))
     payload.withUnsafeBytes { (ptr: UnsafeRawBufferPointer) in
       let bytesSent = send(self.listeningSocket, ptr.baseAddress!, payload.count, 0)
       if bytesSent < 0 {
-        print("Failed to send data")
+        let errorString = String(cString: strerror(errno))
+        print("Sending data of size: \(payload.count) bytes")
+        NSLog("Sending data of size: \(payload.count) bytes")
+        print("Failed to send data: \(errorString)")
+        NSLog("Failed to send data: \(errorString)")
       }
     }
   }
   
-  private func startListening() {
+  func startListening(callback: @escaping () -> Void) {
     dispatchQueue.async { [weak self] in
       guard let self = self else { return }
       self.listening = true
@@ -82,6 +91,8 @@ class UnixDomainSocketClient {
       }
       
       var receivedData = Data()
+      
+      callback()
       
       while self.listening == true {
         var buffer = [UInt8](repeating: 0, count: 1024)
@@ -153,7 +164,7 @@ let backendSocketPath = FileManager.default.containerURL(forSecurityApplicationG
   .appendingPathComponent("tmp/bun_socket")
   .path
 
-let backendApiClient = UnixDomainSocketClient(socketPath: backendSocketPath)
+var backendApiClient = UnixDomainSocketClient(socketPath: backendSocketPath)
 
 func request(_ message: MessagePackValue, _ completion: @escaping (MessagePackValue) -> Void = { _ in }) {
   backendApiClient.sendMessage(message) { response in

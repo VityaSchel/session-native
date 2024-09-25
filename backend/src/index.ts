@@ -11,12 +11,13 @@ import { addEventsHandlers, removeEventsHandlers } from '@/events'
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0
 process.env['NODE_ENV'] = 'development'
 
-const homeDir = process.env.HOME
-if (!homeDir) {
+const { HOME } = process.env
+
+if (!HOME) {
   throw new Error('HOME environment variable not set')
 }
-const socketPath = join(homeDir, 'Library/Containers/dev.hloth.Session-Native/Data/tmp/bun_socket')
-const logDir = join(homeDir, 'Library/Containers/dev.hloth.Session-Native/Data/tmp')
+const socketPath = join(HOME, 'Library/Containers/dev.hloth.Session-Native/Data/tmp/bun_socket')
+const logDir = join(HOME, 'Library/Containers/dev.hloth.Session-Native/Data/tmp')
 const logFile = join(logDir, 'app.log')
 
 if (!existsSync(logDir)) {
@@ -86,12 +87,15 @@ export const log = (...message: unknown[]) => {
       return m
     }
   }).join(' ')
-  appendFileSync(logFile, logMessage, { encoding: 'utf8' })
+  appendFileSync(logFile, logMessage + '\n', { encoding: 'utf8' })
 }
 
 try {
+  log('Started')
+
   if (existsSync(socketPath)) {
     try {
+      log('Removed old socket file')
       unlinkSync(socketPath)
     } catch (err) {
       log('Failed to remove existing socket file:', err)
@@ -104,6 +108,8 @@ try {
     let buffers: Buffer[] = []
 
     socket.on('data', async (data) => {
+      log('Received', data.length, 'bytes')
+
       let concatenatedData: Buffer
       if(data.length > 64 && data.subarray(-64).every(b => b === 0x03)) {
         concatenatedData = Buffer.concat([...buffers, data]).subarray(0, -64)
@@ -141,6 +147,7 @@ try {
   })
 
   server.on('error', (err) => {
+    log('Server error', err)
     console.error('Server error:', err)
   })
 } catch(e) {
