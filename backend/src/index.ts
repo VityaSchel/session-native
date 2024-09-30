@@ -13,11 +13,19 @@ process.env['NODE_ENV'] = 'development'
 
 const { HOME } = Bun.env
 
-if (!HOME) {
+const homeArg = Bun.argv.find(arg => arg === '--home')
+const homeDirArg = homeArg ? Bun.argv[Bun.argv.indexOf(homeArg) + 1] : null
+
+let home = HOME || homeDirArg
+
+if (!home) {
   throw new Error('HOME environment variable not set')
 }
-const socketPath = join(HOME, 'Library/Containers/dev.hloth.Session-Native/Data/tmp/bun_socket')
-const logDir = join(HOME, 'Library/Containers/dev.hloth.Session-Native/Data/tmp')
+if (!home?.includes('Library/Containers/dev.hloth.Session-Native/Data')) {
+  home = join(home, 'Library/Containers/dev.hloth.Session-Native/Data')
+}
+const socketPath = join(home, 'tmp/bun_socket')
+const logDir = join(home, 'tmp')
 const logFile = join(logDir, 'app.log')
 
 if (!existsSync(logDir)) {

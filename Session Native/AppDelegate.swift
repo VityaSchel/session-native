@@ -18,6 +18,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       process?.environment = [
         "NODE_TLS_REJECT_UNAUTHORIZED": "0"
       ]
+      process?.arguments = [
+        "--home", FileManager.default.homeDirectoryForCurrentUser.path
+      ]
+      print("Sidecar HOME set to " + FileManager.default.homeDirectoryForCurrentUser.path)
+      NSLog("Sidecar HOME set to " + FileManager.default.homeDirectoryForCurrentUser.path)
       process?.executableURL = URL(fileURLWithPath: binaryPath)
       
       outputPipe = Pipe()
@@ -54,8 +59,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       }
       
       if let outputString = String(data: data, encoding: .utf8) {
-        print("Sidecar Output: \(outputString)")
-        NSLog("Sidecar Output: \(outputString)")
+        let chunkSize = 500
+        var startIndex = outputString.startIndex
+        
+        while startIndex < outputString.endIndex {
+          let endIndex = outputString.index(startIndex, offsetBy: chunkSize, limitedBy: outputString.endIndex) ?? outputString.endIndex
+          let substring = outputString[startIndex..<endIndex]
+          
+          print("Sidecar Output: \(substring)")
+          NSLog("Sidecar Output: \(substring)")
+          
+          startIndex = endIndex
+        }
         
         if outputString.contains("Server listening") {
           DispatchQueue.main.async {
