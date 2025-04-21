@@ -4,6 +4,9 @@ Session Native is [Session messenger by OXEN](https://getsession.org) open-sourc
 
 ![session native screenshot](https://github.com/user-attachments/assets/5e302789-0645-4c19-80ad-e5d705497135)
 
+> [!IMPORTANT]
+> I'm looking for a job! Interested in hiring me? Visit [cv.hloth.dev](https://cv.hloth.dev) to review my resume & CV.
+
 ## Getting started
 
 - Download Session Native app from App Store (waiting for someone to [donate me](https://hloth.dev/donate) 100$)
