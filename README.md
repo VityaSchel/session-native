@@ -1,11 +1,11 @@
 # Session Native
 
+> [!NOTE]
+> This project is archived because I no longer contribute to Session. You might want to check out the official Session Desktop app: [session-foundation/session-desktop](https://github.com/session-foundation/session-desktop).
+
 Session Native is [Session messenger by OXEN](https://getsession.org) open-source client written with performance, design and user experience in mind. It uses native Swift and other native technologies of macOS and aims to run with latest technologies rather to be compatible with all devices, thus it requires at least macOS 14.0 or later.
 
 ![session native screenshot](https://github.com/user-attachments/assets/5e302789-0645-4c19-80ad-e5d705497135)
-
-> [!IMPORTANT]
-> I'm looking for a job! Interested in hiring me? Visit [cv.hloth.dev](https://cv.hloth.dev) to review my resume & CV.
 
 ## Getting started
 
